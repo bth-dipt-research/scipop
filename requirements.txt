@@ -1,0 +1,14 @@
+openpyxl
+xlrd
+openai
+pydantic
+seaborn
+pandas
+PyMuPDF
+pillow
+langchain
+langchain-community
+langchain-openai
+pdf2image
+pypdf
+tenacity
