@@ -17,7 +17,7 @@ from keys import OPENAI_KEY
 
 
 class ResearchQuestion(TypedDict):
-    """Informantion need extracted from a paper"""
+    """Research Question extracted from a paper"""
 
     explicit: Annotated[bool,..., "Explicitly stated research question"]
     research_question: Annotated[str, ..., "Research question"]
