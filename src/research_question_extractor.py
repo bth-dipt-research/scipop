@@ -41,15 +41,15 @@ def completion_with_backoff(messages):
     return llm.invoke(messages)
 
 
-data_dir = Path("../data/dipt_papers_2024/")
+data_dir = Path("../data/dipt_papers_2024")
 
-paper_dir = data_dir / Path("pdfs")
+paper_dir = data_dir / Path("pdfs/missed")
 
-output_dir = data_dir / Path("research_questions")
+output_dir = data_dir / Path("research_questions_0temp")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 model = "gpt-4o-mini"
-temperature = 0.3
+temperature = 0
 
 llm = ChatOpenAI(
     model=model,
@@ -104,10 +104,10 @@ extraction = {
     "results": results
 }
 
-with open(output_dir / Path("extraction.pkl"), "wb") as file:
+with open(output_dir / Path("extraction_missed.pkl"), "wb") as file:
     pickle.dump(extraction, file)
 
-with open(output_dir / Path("results.csv"), "w") as file:
+with open(output_dir / Path("results_missed.csv"), "w") as file:
     writer = csv.writer(file)
     writer.writerow(["paper_id", "research_question", "explicit"])
 

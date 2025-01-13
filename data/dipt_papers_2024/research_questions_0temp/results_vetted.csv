@@ -1,0 +1,244 @@
+paper_id,research_question,explicit,Correct,Comment,Can likely be extracted by with a regex
+1725960,What happens to psychological safety when going remote?,True,True,,False
+1725960,How do different work modes affect software teams’ psychological safety?,True,False,,False
+1725960,What are the impacts of remote work on team cohesion and communication?,False,False,All derived questions are by definition not correct (for now).,False
+1725960,How can teams maintain psychological safety in hybrid work environments?,False,False,,False
+1725960,What behaviors and attitudes indicate psychological safety in various work modes?,False,False,,False
+1797942,To which extent can Augmented Testing improve the efﬁciency of manual GUI-based regression testing?,True,True,,True
+1797942,What are the beneﬁts and drawbacks of Augmented Testing reported by practitioners?,True,True,,True
+1797942,What are the observed usability issues of Augmented Testing?,True,True,,True
+1799511,"Which qualitative methods, practices, and quality assurance frameworks from the social and behavioral sciences are currently underutilized in and could benefit software engineering research?",True,True,,False
+1809779,What is the current state-of-the-literature in terms of internal quality attributes and source code metrics that have been linked with external quality attributes and external metrics?,True,True,,False
+1809779,What are the characteristics of the secondary studies that link internal quality attributes and source code metrics with external quality attributes?,True,True,,True
+1809779,What is the efficacy of the relationship between internal quality attributes and source code metrics with external quality attributes and external metrics?,True,True,,True
+1809779,What is the efficacy of the models that use source code metrics to predict external quality attributes?,True,True,,True
+1814031,What is the effectiveness of VON Similo LLM compared to the VON Similo approach in terms of finding correct web elements?,True,True,,True
+1814031,"What is the efficiency, measured as execution time, of VON Similo LLM compared to the VON Similo approach?",True,True,,True
+1814031,What main aspects does an LLM use to improve web element localization?,True,True,,True
+1818167,How appropriate is the inference of user story similarity based on text similarity?,True,True,,True
+1818167,To what extent can the actual effort spent on past user stories help developers estimate new similar user stories?,True,True,,True
+1818167,What role an estimation tool can play to support the agile estimation process based on historical data?,True,True,,True
+1819839,How did the teams comprising researchers and practitioners conduct the RRs?,True,True,,False
+1819839,What are the benefits and challenges when conducting RRs?,True,True,,False
+1823117,How does the way of working in software teams change when WFH is adopted?,True,True,,True
+1823117,How is project management impacted when WFH is adopted?,True,True,,True
+1823117,How are software engineering activities impacted when WFH is adopted?,True,True,,True
+1823117,Is there any difference between startups and established companies regarding the above impact?,True,True,,True
+1832184,What is the desired office presence in a company?,True,True,,True
+1832184,What corporate actions support the desired office presence?,True,True,,True
+1832409,Does gamiﬁcation improve the effectiveness of test cases generated during manual exploratory testing of web applications compared to non-gamiﬁed manual exploratory testing?,True,True,,True
+1832409,Does gamiﬁcation improve the efﬁciency of manual exploratory GUI test case generation for web applications compared to non-gamiﬁed manual exploratory testing?,True,True,,True
+1832409,Does gamiﬁcation improve the quality of test cases generated during manual exploratory testing of web applications compared to non-gamiﬁed manual exploratory testing?,True,True,,True
+1832409,Does gamiﬁcation improve the User Experience (UX) of manual exploratory testing of web applications compared to non-gamiﬁed manual exploratory testing?,True,True,,True
+1836702,What is the association between sleep and dementia in older adults?,True,True,,True
+1836702,To what extent can machine learning predict dementia in older adults based on their sleep disturbances?,True,True,,True
+1836702,What are the sleep disturbance factors that lead to an increased risk of cognitive decline in older adults?,True,True,,True
+1836702,To what extent do the algorithms’ feature importances conclude the same result?,True,True,,True
+1836702,What are the primary sleep disturbance features that increase the risk of conceiving dementia?,True,True,,True
+1836702,Which machine learning algorithm has the best mean prediction accuracy when predicting dementia in older adults based on their sleep disturbances?,True,True,,True
+1838491,"What are the practices, challenges, inhibitors, and solutions in experimentation in software startups?",True,True,,False
+1838491,"How do software startups incorporate AI technologies, especially LLMs, in new product development?",True,True,,False
+1838491,How to measure whether an experiment produces a meaningful result or not?,True,True,,False
+1838491,How to effectively use prompts to guide the experimentation process?,True,True,,False
+1838491,How to improve the experimentation process by leveraging the power of LLMs?,True,True,,False
+1841232,How can we ensure complete and consistent requirements and test specifications in automotive development projects?,False,False,Paper formulates no research questions at all.,True
+1841232,What are the impacts of frequently changing stakeholder requirements on the specification of system requirements and tests?,False,False,,True
+1841232,How can the early definition of validation concerns based on stakeholder requirements improve the requirements modeling process?,False,False,,True
+1841232,What role does the Model-Based Systems Engineering (MBSE) methodology play in supporting system architects and test designers?,False,False,,True
+1841232,How does the test-driven scenario specification (TDSS) technique enhance the quality of requirements and test specifications?,False,False,,True
+1841232,In what ways can the proposed methodology be evaluated for its applicability in real-world automotive development projects?,False,False,,True
+1849043,What are the characteristics of the primary studies on software reuse costs and benefits?,True,True,,True
+1849043,"What are the software reuse costs and benefits reported in the primary studies, and how are they related to reuse practices?",True,True,,True
+1849043,How are software reuse costs and benefits measured in the primary studies?,True,True,,True
+1849043,What is the strength of reported evidence on software reuse costs and benefits in the primary studies?,True,True,,True
+1849080,How do repository-based metrics correlate with developer’s knowledge?,True,True,,True
+1849080,How do machine learning classifiers compare with traditional techniques for identifying source code experts?,True,True,,True
+1849080,Can the proposed models improve a state-of-the-art Truck Factor algorithm?,True,True,,True
+1849092,How do video game startups use experimentation in practice?,True,True,,True
+1851067,How to formulate a prompt for ChatGPT to identify case studies in software engineering accurately?,True,True,,True
+1851067,How do the indicators perform in comparison to the measures used by Rainer and Wohlin?,True,True,,True
+1853669,What is the relevance of each perspective of the candidate solution?,True,True,,True
+1853669,Are the perspectives of the candidate solution and their concerns complete?,True,True,,True
+1853669,To what extent do participants perceive the candidate solution as useful and beneficial?,True,True,,True
+1853669,What are the limitations and opportunities for improvement of the candidate solution?,True,True,,True
+1853669,What problems do participants face in practice when specifying ML-enabled systems?,True,True,,True
+1853669,What perception do the participants have of the retroactive specifications of projects A and B derived from PerSpecML v1?,True,True,,True
+1853669,What are the limitations and opportunities for improvement of PerSpecML v1?,True,True,,True
+1853669,"To what extent do the participants perceive PerSpecML v1 as easy to use, useful and usable in the future?",True,True,,True
+1853669,What perception do practitioners have while specifying ML-enabled systems by using PerSpecML v2?,True,True,,True
+1853669,What perception do experienced practitioners have of the resulting specifications derived from PerSpecML v2?,True,True,,True
+1853669,What are the limitations and opportunities for improvement of PerSpecML v2?,True,True,,True
+1853669,"To what extent do the practitioners perceive PerSpecML v2 as easy to use, useful and usable in the future?",True,True,,True
+1854020,Which of the theories and models of acceptance behavior identified in [14] have been used in the software engineering literature?,True,True,,True
+1854020,For which purposes have the theories been used?,True,True,,True
+1854020,In which knowledge areas have the theories been used?,True,True,,True
+1854020,How have the theories been operationalized?,True,True,,True
+1854020,Which data collection methods have been used?,True,True,,True
+1854020,Which constructs have been used?,True,True,,True
+1854384,Which context factors are perceived as important by the practitioners when selecting components?,True,True,,True
+1854384,Are there any differences in the perceived importance of context factors between the experience sources covered in the scenario?,True,True,,True
+1855173,"Following the design science paradigm, we studied the problem of requirements analysis and tracing in the context of contractual documents, with a specific focus on managing requirements variability.",True,False,"We stated no RQs in this experience report paper. The first inferred RQ does not make sense, the last two do make sense.",True
+1855173,"What are the challenges related to the variability and traceability of configurations extracted from CLAs, and their impact on requirements analysis and testing?",True,False,,True
+1855173,How can we develop an automated solution that can efficiently and accurately identify and manage the similarities among CLAs?,True,False,,True
+1855176,Which factors of requirements quality do engineers that process requirements perceive to be relevant?,True,True,,True
+1855176,Which factors of requirements quality are reported in issues?,True,True,,True
+1857025,This study sought to gather and analyze user reviews from the Google Play store for leading game apps.,True,False,Paper formulates no research questions,True
+1857025,"The primary aim was to construct a dataset for subsequent analysis utilizing requirements engineering, machine learning, and competitive assessment.",True,False,,True
+1857279,How do stakeholders in different roles evaluate the maturity of their organization using SAMM?,True,True,,True
+1857279,How do different approaches for SAMM assessment impact its results?,True,True,,True
+1857279,How do stakeholders in different roles perceive the SAMM assessment instrument?,True,True,,True
+1858022,To what extent can we predict users’ engagement using biofeedback measurements and supervised classifiers?,True,True,,True
+1858022,To what extent can we predict users’ engagement using voice analysis and supervised classifiers?,True,True,,True
+1858022,To what extent can we predict users’ engagement by combining voice and biofeedback features?,True,True,,True
+1858865,"How has Prof. Günther Ruhe's research influenced the fields of software engineering, particularly in software release planning and requirements engineering?",False,False,Paper formulates no research questions,True
+1858865,What are the key contributions of Prof. Günther Ruhe to empirical software engineering over his 40-year career?,False,False,,True
+1858865,In what ways did Günther Ruhe adapt his research focus in response to changes in software development practices?,False,False,,True
+1858865,What impact did Günther Ruhe's mathematical background have on his research in software engineering?,False,False,,True
+1858865,How did Günther Ruhe's role as editor-in-chief influence the Journal of Information and Software Technology during his tenure?,False,False,,True
+1859534,RQ1. What are contemporary practices for deploying ML models?,True,True,,True
+1859534,RQ1.1. What kind of approaches are used to deploy ML models?,True,True,,True
+1859534,RQ1.2. Which tools are used for automating model retraining?,True,True,,True
+1859534,RQ1.3. What are the MLOps practices and principles used?,True,True,,True
+1859534,RQ2. What are the main problems faced during the deployment in the ML life cycle stage?,True,True,,True
+1859534,RQ3. What are contemporary practices for monitoring ML models?,True,True,,True
+1859534,RQ3.1. What percentage of the ML-enabled system projects that get deployed into production have their ML models actually being monitored?,True,True,,True
+1859534,RQ3.2. What aspects of the models are monitored?,True,True,,True
+1859534,RQ4. What are the main problems faced during the monitoring in the ML life cycle stage?,True,True,,True
+1859534,RQ5. What is the percentage of projects that effectively go into production?,True,True,,True
+1871361,What is the current state-of-practice for using CI environments for quality attribute evaluation?,True,True,,False
+1871361,How can CI environments contribute to quality attribute evaluation?,True,True,,False
+1871361,How can practitioners evolve CI environments to meet the needs of quality attribute evaluation?,True,True,,False
+1873372,which security-specific challenges and needs are relevant in the context of CSD?,True,False,Paper formulates no research questions,True
+1873372,how to cope with the challenges of combining secure development practices with continuous software development workflows?,False,False,,True
+1873372,how do groups of practitioners perceive which challenges in their specific context?,False,False,,True
+1873415,What automated methods currently exist for quality assessment in MBSE?,True,True,,True
+1873415,Which strategies employ metric analysis?,True,True,,True
+1873415,Which methods ground on rule-based approaches?,True,True,,True
+1873415,What other distinctive approaches are there?,True,True,,True
+1873415,What are existing manual methods for assessing the quality of model artifacts in MBSE?,True,True,,True
+1873415,What are the limitations of the collected quality assessment strategies that impact practitioners?,True,True,,True
+1873415,Which quality attributes can we accurately estimate with model artifact metrics from model histories?,True,True,,True
+1873415,What data-driven estimation method performs best with which metrics for which quality attribute?,True,True,,True
+1873415,How can we predict the quality evolution of model artifacts with model changes and quality assessment data from model histories?,True,True,,True
+1873415,How can we estimate maintenance effort to improve model quality with model change and quality assessment data from model histories?,True,True,,True
+1876166,"For those SLSs that report the empirical research methods of primary studies, do those SLSs correct mislabelled case studies, propagate already mislabelled case studies, or exacerbate the problem by introducing new mislabels?",True,True,,True
+1876182,to what degree can research artifacts from the requirements quality research domain be recovered by approaching their owners,True,True,,True
+1876182,Which factors influence the availability of research artifacts?,True,True,,True
+1876182,Which factors influence the success of the recovery initiative?,True,True,,True
+1877635,What is a taxable transaction in software engineering?,False,False,Paper formulates no research questions,True
+1877635,How to track cross-border transactions in software engineering?,False,False,,True
+1877635,How to value taxable transactions in software engineering?,False,False,,True
+1879379,What is the state-of-the-art reported in the literature of ML Threat Modeling of ML-intensive Software Systems?,True,True,,True
+1879379,What challenges and needs do practitioners face when assessing the security of ML-intensive Software Systems?,True,True,,True
+1879379,How and to what extent can we adapt traditional Threat Modeling Techniques to the engineering of ML-intensive Software Systems?,True,True,,True
+1879379,What are the benefits and limitations of adapting Threat Modeling Techniques to ML-intensive Software Systems?,True,True,,True
+1887560,What are the challenges of annotating datasets for training and evaluating NLP4RE tools?,True,True,,True
+1887560,What are the challenges in reconstructing NLP4RE tools?,True,True,,True
+1887560,How to support NLP4RE researchers to overcome the identified challenges in RQ1 and RQ2?,True,True,,True
+1887575,What challenges do different stakeholders face in SE team project courses?,True,True,,False
+1887575,How and to what extent are the identified challenges addressed in research/practice?,True,True,,False
+1887575,How and to what extent do the selected solutions address the identified challenges?,True,True,,False
+1887575,How and to what extent are SE team project courses aligned with the industry’s needs?,True,True,,False
+1887575,How to align SE team project courses with the industry’s needs?,True,True,,False
+1887575,How and to what extent do the selected solutions contribute to aligning SE team project courses with industry needs?,True,True,,False
+1887710,How do computing educators incorporate the teaching and learning of professional dispositions into tertiary institutions?,True,True,,False
+1887710,How can educators utilise these teaching and learning practices to foster DEIA mindsets?,True,True,,False
+1887710,How do collaborative learning activities promote professional dispositions and cultivate DEIA mindsets?,True,True,,False
+1887710,What non-technical skills and knowledge are anticipated by the industry for individuals in entry-level roles?,True,True,,False
+1887710,How do the professional dispositions applied in academic learning environments align with the industry’s expectations and computing education policy?,True,True,,False
+1887734,What are manageable ways to address code quality in the CS1 classroom?,False,False,Paper formulates no research questions,True
+1887734,How do instructors perceive code quality issues and how do they deal with (or ignore) them?,False,False,,True
+1887734,What quality issues should be classified according to the appropriate strategies to fix them?,False,False,,True
+1887734,What teaching materials are needed to raise awareness and help students improve the quality of their code?,False,False,,True
+1887738,What is the quality of the specifications that were obtained using PCM?,True,True,,True
+1887738,What is the coverage of the privacy concerns in the specifications that were obtained using PCM?,True,True,,True
+1887738,How useful is PCM from the practitioners’ point of view?,True,True,,True
+1887738,How applicable is PCM from the practitioners’ point of view?,True,True,,True
+1887738,What are privacy concerns either missing or considered to be excessive in the PCM structure?,True,True,,True
+1887738,How scalable is PCM from the practitioners’ point of view?,True,True,,True
+1888898,What are the characteristics of invalid bug reports in a closed-source context?,True,True,,True
+1888898,How effective are existing techniques for predicting the validity of bug reports in a large-scale closed-source context?,True,True,,True
+1888898,What factors are important for practitioners when deciding to adopt an ML technique for predicting the validity of bug reports?,True,True,,True
+1888898,How can we support practitioners in interpreting the predictions of bug report validity?,True,True,,True
+1888898,How large an issue is concept drift in bug reports data used for predicting the validity of bug reports?,True,True,,True
+1889637,What challenges exist in the state-of-the-art and state-of-practice concerning threats associated with machine learning-based software-intensive products and services?,True,True,,True
+1889637,To what extent have solutions suggested in state-of-the-art been based on challenges in state-of-practice and been validated empirically?,True,True,,True
+1896290,To what extent does the word-based and sentence-based classiﬁer performance differ?,True,True,,True
+1896290,To what extent does the hierarchical classiﬁcation strategy differ from the ﬂat classiﬁcation strategy in terms of performance?,True,True,,True
+1896290,To what extent do structural characteristics of the taxonomy impact classiﬁer performance?,True,True,,True
+1896292,What is the current state of reported evidence in regulatory RE?,True,True,,True
+1896292,What are the reported challenges in regulatory compliance of software intensive systems?,True,True,,True
+1896292,"What is needed to address the challenges, and what principles and practices are used?",True,True,,True
+1896292,What are the practices and challenges when handling requirements with regulation as the source in the industry?,True,True,,True
+1896292,What are the engineering practices when working with requirements with regulations as a source?,True,True,,True
+1896292,What are the associated challenges encountered by software engineering teams when working with requirements stemming from regulations?,True,True,,True
+1896292,"Which engineering activities, highlighted by the identified challenges, can benefit most from tool support?",True,True,,True
+1896292,How and to what extent is tool support possible to assist engineers in addressing their most critical challenges?,True,True,,True
+1896308,What aspects of code understanding for reviews are implemented in support systems?,True,True,,False
+1896347,Which software development activities are affected by requirements artifacts?,True,True,,True
+1896347,By which attributes are requirements-affected activities evaluated?,True,True,,True
+1897875,How can we achieve industrial relevance in software engineering research?,False,False,Paper formulates no research questions,True
+1897875,How do we communicate and assess industrial relevance in software engineering research?,False,False,,True
+1897875,What are the definitions and attributes of relevance in software engineering?,False,False,,True
+1897875,What is the proposed reasoning framework for assessing industrial relevance in software engineering?,False,False,,True
+1897875,"How can the industrial relevance of research contributions be assessed from a design, reporting, or assessment perspective?",False,False,,True
+1897875,What are the six aspects (questions) considered in the reasoning framework for assessing relevance?,False,False,,True
+1897875,How do the perspectives of researchers and practitioners differ in assessing industrial relevance?,False,False,,True
+1897893,How can formalized metadata benefit the software engineering community?,True,False,Paper formulates no research questions,True
+1897893,What challenges do researchers face when sharing their artifacts?,True,False,,True
+1897893,How can Research Objects support the software engineering community in establishing a common ground to document research studies?,True,False,,True
+1897893,What is the impact of Research Objects on the quality of artifacts produced and shared in software engineering?,True,False,,True
+1897893,How can agreed-upon schemas for creating Research Objects improve the artifact evaluation process?,True,False,,True
+1897893,In what ways can licensing and access controls be incorporated within Research Objects?,True,False,,True
+1897908,What are the challenges in regulatory RE from the perspective of legal researchers?,True,True,,True
+1897908,How can the challenges in regulatory RE be effectively addressed in an integrative regulatory RE approach?,True,True,,True
+1897908,How do RE and legal researchers assess the applicability of such an integrative regulatory RE approach?,True,True,,True
+1897989,What are the engineering practices when working with requirements with regulations as a source?,True,True,,True
+1897989,What are the associated challenges encountered by software engineering teams when working with requirements stemming from regulations?,True,True,,True
+1897989,"How can tool support ease engineering activities, highlighted by the identified challenges?",True,True,,True
+1903073,Is the use of passive sentences in requirements harmful for finding actors?,True,True,,True
+1903073,Is the use of passive sentences in requirements harmful for identifying domain objects?,True,True,,True
+1903073,Is the use of passive sentences in requirements harmful for identifying associations?,True,True,,True
+1903420,What are the requirements engineering attributes published in the literature?,True,True,,True
+1903420,What attributes are used/documented in two large software-intensive companies operating in a global market?,True,True,,True
+1906690,What is the effectiveness of the novel end-to-end mobile testing technique designed to enhance exploratory testing by incorporating gamification strategies?,True,False,Paper formulates no research questions,True
+1906690,How does the integration of a live feedback system in the testing process influence tester engagement and defect discovery?,True,False,,True
+1906690,What are the potential benefits of merging exploratory testing with gamification in mobile application testing?,True,False,,True
+1906690,"How can gamification mechanics, such as leaderboards and rewards, be effectively integrated into mobile testing methodologies?",False,False,,True
+1906690,"What impact do human factors like stress, fatigue, and boredom have on the quality of test cases produced during exploratory testing?",False,False,,True
+1906690,How can mutation testing be introduced into mobile application testing to assess the bug-detection effectiveness of test cases?,False,False,,True
+1914024,What are the operational faults in district heating (DH) substations that impact efficiency?,True,False,Paper formulates no research questions,True
+1914024,How does the SHEDAD approach improve anomaly detection in district heating networks?,True,False,,True
+1914024,What are the distinct categories of anomalies identified by the SHEDAD method?,True,False,,True
+1914024,How does the SHEDAD method compare to traditional clustering methods in terms of intra-cluster variance and distance?,True,False,,True
+1914024,What is the sensitivity and specificity of the SHEDAD method in identifying anomalous substations?,True,False,,True
+1914024,How can the SHEDAD approach enable more targeted and effective maintenance interventions in district heating networks?,True,False,,True
+1919946,How can a data-driven approach improve early identification and prediction of cancer using the F-RUS-RF model?,True,False,Paper formulates no research questions,True
+1919946,What are the risk factors linked to the onset of cancer that can be identified by the F-RUS-RF model?,True,False,,True
+1919946,How does the F-RUS-RF model compare to traditional machine learning models in terms of accuracy for cancer prediction?,True,False,,True
+1919946,What impact does the random undersampling technique have on the performance of the F-RUS-RF model in addressing class imbalance?,True,False,,True
+1919946,What are the significant variables identified by the F-score method that contribute to cancer prediction in older adults?,True,False,,True
+1919986,How can we automatically extract model metrics from system model histories?,True,True,,True
+1919986,How can we collect quality ratings for training an estimator on project and domain-specific quality aspects?,True,True,,True
+1919986,What constitutes an effective training pipeline utilizing model metrics and quality ratings to prototype a quality attribute estimator?,True,True,,True
+1920262,What are the contemporary practices of RE for ML-enabled systems?,True,True,,True
+1920262,Who is addressing the requirements of ML-enabled system projects?,True,True,,True
+1920262,How are requirements typically elicited in ML-enabled system projects?,True,True,,True
+1920262,How are requirements typically documented in ML-enabled system projects?,True,True,,True
+1920262,Which NFRs do typically play a major role in ML-enabled system projects?,True,True,,True
+1920262,Which activities are considered to be most difficult when defining requirements for ML-enabled system projects?,True,True,,True
+1920262,What are the main RE-related problems faced by practitioners in ML-enabled system projects?,True,True,,True
+1921867,How do SE experiments that utilize a crossover design based on guidelines by Vegas et al. analyze their data?,True,True,,False
+1922042,What are the challenges of adhering to security compliance regulations in continuous software engineering projects?,True,False,,True
+1922042,What are the requirements and constraints for automation in Continuous Security Compliance as suggested in literature and practice?,True,False,,True
+1922042,What is the potential and limitations of automation as treatment towards the identified challenges and its implications for manual involvement?,True,False,,True
+1922042,How can we develop and evaluate sensible solutions containing automation in industrial settings to treat respective challenges?,True,False,,True
+1922278,What factors explain the difference in effort between a Systematic Review and a Rapid Review?,True,True,"This is tricky. There are investigative research questions on comparing rapid reviews with SLRs, as well as the research questions of the review itself. Both are answered in the paper, hence I marked them all as correctly extracted.",True
+1922278,What factors explain the difference in relevance between the findings of a Systematic Review and a Rapid Review?,True,True,,True
+1922278,Are the findings from a Systematic Review and a Rapid Review significantly different in some ways?,True,True,,True
+1922278,What are the benefits of customer collaboration in software development practice?,True,True,,True
+1922278,What are the problems caused by low customer collaboration in the software development practice?,True,True,,True
+1922278,What are the challenges in establishing customer collaboration in software development practice?,True,True,,True
+1922278,What are the strategies to improve customer collaboration in software development practice?,True,True,,True
+,,,,,
+59,Unique papers,,,,

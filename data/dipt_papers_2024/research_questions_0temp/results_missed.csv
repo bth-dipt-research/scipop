@@ -1,0 +1,10 @@
+paper_id,research_question,explicit
+1825239,"Therefore, this study aims to present a noninvasive method for the early prediction of dementia so that preventive steps should be taken to avoid dementia.",True
+1825239,"The aim and purpose of this study is given as follows: 1. Constructing a dataset for dementia by integrating data from four distinct SNAC sites (Blekinge, Kungsholmen, and Skåne) employing data integration and harmonization criteria.",True
+1825239,2. Significant features are selected from the dataset using a statistical method (F-score).,True
+1825239,"3. For the classification of dementia, an ensemble voting classifier based on DT, NB, SVM, LR, and RF was constructed.",True
+1825239,"4. The effectiveness of the proposed hybrid system, which combines an ensemble voting classifier and a statistical method (F-score), is also evaluated in comparison to three other feature selection techniques.",True
+1825239,"5. Experimental results show that the proposed model outperforms the baseline machine learning models, such as AdaBoost, Random Forest, Support Vector Machines, Linear Regression, Logistic Regression, Naive Bayes, and Decision Tree, according to the three commonly used evaluation metrics of accuracy, ROC curves, and AUC.",True
+1924133,How do developers perceive and interpret the concept of privacy in their daily work?,True
+1924133,"What practices, formal or informal for privacy, do developers use in their development of software-intensive products and services?",True
+1924133,"To what extent does the work environment help developers deal with privacy in the development of software-intensive products and services (including methods, artifacts, standards and tools)?",True
