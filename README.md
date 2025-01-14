@@ -2,6 +2,28 @@
 
 This is SciPop, the friendly AI that analyses and synthesizes scientific articles for the general public.
 
+
+```mermaid
+flowchart TD
+    Papers@{ shape: docs}
+    DiVA@{ shape: database}
+    RQE@{ shape: rect, label: "Research question
+    extractor (GPT)"}
+    RQL@{ shape: doc, label: "List of 
+    research questions"}
+    RQC@{ shape: rect, label: "Research question
+    clusterer (BERTopic)"}
+    RT@{ shape: doc, label: "Research topics"}
+    CHS@{ shape: rect, label: "Challenge synthesizer (GPT)" }
+    PS@{ shape: doc, label: "Problem - Solution
+    statements"}
+    RS@{ shape: rect, label: "Research synthesizer (GPT)"}
+    Papers --> DiVA --> RQE --> RQL --> RQC --> RT --> CHS --> PS
+    RT --> RS
+    RS --> PS
+    PS --Author review--> PS
+```
+
 # Environment setup
 
 1. Install miniconda
