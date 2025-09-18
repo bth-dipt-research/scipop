@@ -12,3 +12,5 @@ langchain-openai
 pdf2image
 pypdf
 tenacity
+bertopic
+nltk
