@@ -4,24 +4,16 @@ This is SciPop, the friendly AI that analyses and synthesizes scientific article
 
 
 ```mermaid
-flowchart TD
-    Papers@{ shape: docs}
-    DiVA@{ shape: database}
-    RQE@{ shape: rect, label: "Research question
-    extractor (GPT)"}
-    RQL@{ shape: doc, label: "List of 
-    research questions"}
-    RQC@{ shape: rect, label: "Research question
+flowchart LR
+    Papers@{ shape: docs, label: "DIPT publications"}
+    DiVA@{ shape: database, label: "DiVA: Titles, abstracts and meta-data"}
+    RAC@{ shape: rect, label: "Research abstract
     clusterer (BERTopic)"}
-    RT@{ shape: doc, label: "Research topics"}
-    CHS@{ shape: rect, label: "Challenge synthesizer (GPT)" }
-    PS@{ shape: doc, label: "Problem - Solution
-    statements"}
-    RS@{ shape: rect, label: "Research synthesizer (GPT)"}
-    Papers --> DiVA --> RQE --> RQL --> RQC --> RT --> CHS --> PS
-    RT --> RS
-    RS --> PS
-    PS --Author review--> PS
+    RT@{ shape: docs, label: "Research topics"}
+    RTP@{ shape: rect, label: "Research-to-practice synthesizer (GPT)" }
+    RTS@{ shape: docs, label: "Research themes syntheses" }
+    Papers --> DiVA --> RAC --> RT --> RTP --> RTS
+    RTS --Research theme editor review--> RTS
 ```
 
 # Environment setup
