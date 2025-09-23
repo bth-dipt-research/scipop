@@ -8,7 +8,7 @@ flowchart LR
     Papers@{ shape: docs, label: "DIPT\npublications"}
     DiVA@{ shape: database, label: "DiVA: Titles,\nabstracts and meta-data"}
     RAC@{ shape: rect, label: "Research abstract\nclusterer (BERTopic)"}
-    RT@{ shape: docs, label: "Research themes"}
+    RT@{ shape: docs, label: "Research\nthemes"}
     RTP@{ shape: rect, label: "Research-to-practice\nsynthesizer (GPT)" }
     RTS@{ shape: docs, label: "Research themes\nsyntheses" }
     Papers --> DiVA --> RAC --> RT --> RTP --> RTS
