@@ -56,6 +56,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Publication Surface | 1/3 | In Progress|  |
+| 1. Core Publication Surface | 2/3 | In Progress|  |
 | 2. Readability & Accessibility Baseline | 0/TBD | Not started | - |
 | 3. Analytics Baseline | 0/TBD | Not started | - |
