@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  summary: string;
+  href: string;
+  clusterId: string;
+}
+
+const { title, summary, href, clusterId } = Astro.props;
+---
+
+<article>
+  <h2>
+    <a href={href}>{title}</a>
+  </h2>
+  <p>{summary}</p>
+  <p>
+    <small>Cluster: {clusterId}</small>
+  </p>
+</article>

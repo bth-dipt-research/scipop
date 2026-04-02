@@ -1,8 +1,26 @@
 ---
+import { getCollection } from 'astro:content';
+
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ClusterCard from '../components/ClusterCard.astro';
+
+const approvedSyntheses = (await getCollection('syntheses'))
+  .filter((entry) => entry.data.status === 'approved')
+  .sort((left, right) => left.data.order - right.data.order);
 ---
 
 <BaseLayout title="SciPop">
   <h1>Research Cluster Syntheses</h1>
   <p>Browse approved synthesis destinations.</p>
+
+  {
+    approvedSyntheses.map((entry) => (
+      <ClusterCard
+        title={entry.data.title}
+        summary={entry.data.summary}
+        href={`/syntheses/${entry.data.slug}`}
+        clusterId={entry.data.cluster_id}
+      />
+    ))
+  }
 </BaseLayout>
