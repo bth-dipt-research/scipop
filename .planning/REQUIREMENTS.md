@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 ### Publication
 
-- [ ] **PUBL-01**: User can browse a homepage listing all research area clusters
-- [ ] **PUBL-02**: User can open a dedicated detail page for each research area synthesis via stable URL
-- [ ] **PUBL-03**: User can open a featured top-level synthesis page representing the research group as a whole
-- [ ] **PUBL-04**: User can open a methodology page that explains how syntheses were created and expert-reviewed
+- [x] **PUBL-01**: User can browse a homepage listing all research area clusters
+- [x] **PUBL-02**: User can open a dedicated detail page for each research area synthesis via stable URL
+- [x] **PUBL-03**: User can open a featured top-level synthesis page representing the research group as a whole
+- [x] **PUBL-04**: User can open a methodology page that explains how syntheses were created and expert-reviewed
 - [ ] **PUBL-05**: User can read a disclaimer section at the end of each synthesis page
 - [ ] **PUBL-06**: User can read and navigate all public pages on both desktop and mobile devices
 
@@ -54,10 +54,10 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PUBL-01 | Phase 1 | Pending |
-| PUBL-02 | Phase 1 | Pending |
-| PUBL-03 | Phase 1 | Pending |
-| PUBL-04 | Phase 1 | Pending |
+| PUBL-01 | Phase 1 | Complete |
+| PUBL-02 | Phase 1 | Complete |
+| PUBL-03 | Phase 1 | Complete |
+| PUBL-04 | Phase 1 | Complete |
 | PUBL-05 | Phase 2 | Pending |
 | PUBL-06 | Phase 2 | Pending |
 | ANLT-01 | Phase 3 | Pending |
