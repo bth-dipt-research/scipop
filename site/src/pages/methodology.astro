@@ -1,8 +1,21 @@
 ---
+import { getCollection, render } from 'astro:content';
+
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pages = await getCollection('pages');
+const methodology = pages.find((entry) => entry.data.slug === 'methodology');
+
+if (!methodology) {
+  throw new Error('Methodology page entry with slug "methodology" was not found.');
+}
+
+const { Content } = await render(methodology);
 ---
 
-<BaseLayout title="Methodology">
-  <h1>Methodology</h1>
-  <p>How syntheses are created and reviewed.</p>
+<BaseLayout title={methodology.data.title}>
+  <article>
+    <h1>{methodology.data.title}</h1>
+    <Content />
+  </article>
 </BaseLayout>
