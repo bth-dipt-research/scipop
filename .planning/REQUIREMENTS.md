@@ -54,19 +54,19 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PUBL-01 | Unmapped | Pending |
-| PUBL-02 | Unmapped | Pending |
-| PUBL-03 | Unmapped | Pending |
-| PUBL-04 | Unmapped | Pending |
-| PUBL-05 | Unmapped | Pending |
-| PUBL-06 | Unmapped | Pending |
-| ANLT-01 | Unmapped | Pending |
+| PUBL-01 | Phase 1 | Pending |
+| PUBL-02 | Phase 1 | Pending |
+| PUBL-03 | Phase 1 | Pending |
+| PUBL-04 | Phase 1 | Pending |
+| PUBL-05 | Phase 2 | Pending |
+| PUBL-06 | Phase 2 | Pending |
+| ANLT-01 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 7 total
-- Mapped to phases: 0
-- Unmapped: 7
+- Mapped to phases: 7
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 after roadmap creation*
