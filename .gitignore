@@ -2,3 +2,6 @@ __pycache__
 src/keys.py
 .projectile
 *.ipynb*
+site/node_modules/
+site/dist/
+site/.astro/
