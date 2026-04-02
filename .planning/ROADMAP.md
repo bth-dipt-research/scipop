@@ -25,7 +25,11 @@ This roadmap delivers the MVP as a public, static publication experience: first 
   2. User can open each research area synthesis at a stable, shareable URL.
   3. User can open a featured top-level synthesis representing the whole research group.
   4. User can open a methodology page that explains synthesis creation and expert review.
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Astro publication app and content contracts with route smoke verification
+- [ ] 01-02-PLAN.md — Implement homepage cluster listing and synthesis detail routes
+- [ ] 01-03-PLAN.md — Implement featured and methodology routes with destination verification
 **UI hint**: yes
 
 ### Phase 2: Readability & Accessibility Baseline
@@ -52,6 +56,6 @@ This roadmap delivers the MVP as a public, static publication experience: first 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Publication Surface | 0/TBD | Not started | - |
+| 1. Core Publication Surface | 0/3 | Planned | - |
 | 2. Readability & Accessibility Baseline | 0/TBD | Not started | - |
 | 3. Analytics Baseline | 0/TBD | Not started | - |
