@@ -10,7 +10,11 @@ const routeFilters = [];
 const routePrefixes = [];
 
 for (let i = 0; i < args.length; i += 1) {
-  if (args[i] === '--route' && args[i + 1]) {
+  if (args[i].startsWith('--route=')) {
+    routeFilters.push(args[i].slice('--route='.length));
+  } else if (args[i].startsWith('--route-prefix=')) {
+    routePrefixes.push(args[i].slice('--route-prefix='.length));
+  } else if (args[i] === '--route' && args[i + 1]) {
     routeFilters.push(args[i + 1]);
     i += 1;
   } else if (args[i] === '--route-prefix' && args[i + 1]) {
@@ -57,17 +61,15 @@ for (const slug of readApprovedSynthesisSlugs()) {
   requiredRoutes.push(`/syntheses/${slug}`);
 }
 
-const selectedRoutes = routeFilters.length > 0
-  ? requiredRoutes.filter((route) => routeFilters.includes(route))
-  : requiredRoutes;
+let finalRoutes = requiredRoutes;
 
-const routesWithPrefixes = routePrefixes.length > 0
-  ? selectedRoutes.filter((route) => routePrefixes.some((prefix) => route.startsWith(prefix)))
-  : selectedRoutes;
+if (routeFilters.length > 0) {
+  finalRoutes = finalRoutes.filter((route) => routeFilters.includes(route));
+}
 
-const finalRoutes = routeFilters.length > 0 || routePrefixes.length > 0
-  ? [...new Set([...selectedRoutes, ...routesWithPrefixes])]
-  : selectedRoutes;
+if (routePrefixes.length > 0) {
+  finalRoutes = finalRoutes.filter((route) => routePrefixes.some((prefix) => route.startsWith(prefix)));
+}
 
 const missing = finalRoutes.filter((route) => !existsRoute(route));
 

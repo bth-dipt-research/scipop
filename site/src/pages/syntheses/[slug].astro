@@ -1,17 +1,34 @@
 ---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  return [
-    { params: { slug: 'engineering-practices' } },
-    { params: { slug: 'ai-and-software-engineering' } },
-  ];
+  const approvedSyntheses = (await getCollection('syntheses'))
+    .filter((entry) => entry.data.status === 'approved');
+
+  return approvedSyntheses.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { synthesis: entry },
+  }));
 }
 
-const { slug } = Astro.params;
+interface Props {
+  synthesis: CollectionEntry<'syntheses'>;
+}
+
+const { synthesis } = Astro.props as Props;
+const { Content } = await render(synthesis);
 ---
 
-<BaseLayout title={`Synthesis: ${slug}`}>
-  <h1>{slug}</h1>
-  <p>Research area synthesis destination.</p>
+<BaseLayout title={synthesis.data.title}>
+  <article>
+    <header>
+      <h1>{synthesis.data.title}</h1>
+      <p>Cluster ID: {synthesis.data.cluster_id}</p>
+      <p>Reviewed: {synthesis.data.reviewed_at.toISOString().slice(0, 10)}</p>
+    </header>
+
+    <Content />
+  </article>
 </BaseLayout>
