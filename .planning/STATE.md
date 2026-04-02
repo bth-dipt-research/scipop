@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-04-02T22:27:31.254Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-04-02T22:29:49.309Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 33
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 ## Current Position
 
 Phase: 1 of 3 (Core Publication Surface)
-Plan: 2 of 3 in current phase
+Plan: 3 of 3 in current phase
 Status: Ready to execute
 Last activity: 2026-04-02
 
@@ -55,6 +55,7 @@ Progress: [███░░░░░░░] 33%
 
 | Phase 01 P01 | 8min | 3 tasks | 16 files |
 | Phase 01 P02 | 3min | 2 tasks | 4 files |
+| Phase 01 P03 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Enforce required destination coverage via build-artifact route smoke checks (verify:phase1).
 - [Phase 01]: Render homepage cluster cards only from approved synthesis entries sorted by order.
 - [Phase 01]: Generate /syntheses/{slug} pages via getStaticPaths from content collections rather than hardcoded route lists.
+- [Phase 01]: Render featured and methodology routes from markdown collection entries with build-time missing-entry guards.
+- [Phase 01]: Keep /, /featured, and /methodology as explicit core routes in route verification defaults.
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T22:27:31.251Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-04-02T22:29:49.274Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None

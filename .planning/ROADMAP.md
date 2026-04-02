@@ -10,7 +10,7 @@ This roadmap delivers the MVP as a public, static publication experience: first 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Core Publication Surface** - Users can discover and open all core synthesis content destinations.
+- [x] **Phase 1: Core Publication Surface** - Users can discover and open all core synthesis content destinations. (completed 2026-04-02)
 - [ ] **Phase 2: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile.
 - [ ] **Phase 3: Analytics Baseline** - Basic page-level usage is captured for MVP learning.
 
@@ -56,6 +56,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Publication Surface | 2/3 | In Progress|  |
+| 1. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
 | 2. Readability & Accessibility Baseline | 0/TBD | Not started | - |
 | 3. Analytics Baseline | 0/TBD | Not started | - |
