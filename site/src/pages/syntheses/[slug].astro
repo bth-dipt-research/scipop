@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  return [
+    { params: { slug: 'engineering-practices' } },
+    { params: { slug: 'ai-and-software-engineering' } },
+  ];
+}
+
+const { slug } = Astro.params;
+---
+
+<BaseLayout title={`Synthesis: ${slug}`}>
+  <h1>{slug}</h1>
+  <p>Research area synthesis destination.</p>
+</BaseLayout>

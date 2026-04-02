@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "verify:phase1": "node ./scripts/verify-phase1.mjs"
   },
   "dependencies": {
     "astro": "^6.0.0"
