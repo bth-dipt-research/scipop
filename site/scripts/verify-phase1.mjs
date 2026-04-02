@@ -56,7 +56,8 @@ const routeToCandidates = (route) => {
 
 const existsRoute = (route) => routeToCandidates(route).some((candidate) => fs.existsSync(candidate));
 
-const requiredRoutes = ['/', '/featured', '/methodology'];
+const coreRoutes = ['/', '/featured', '/methodology'];
+const requiredRoutes = [...coreRoutes];
 for (const slug of readApprovedSynthesisSlugs()) {
   requiredRoutes.push(`/syntheses/${slug}`);
 }
@@ -69,6 +70,11 @@ if (routeFilters.length > 0) {
 
 if (routePrefixes.length > 0) {
   finalRoutes = finalRoutes.filter((route) => routePrefixes.some((prefix) => route.startsWith(prefix)));
+}
+
+if (finalRoutes.length === 0) {
+  console.error('No routes selected for verification.');
+  process.exit(1);
 }
 
 const missing = finalRoutes.filter((route) => !existsRoute(route));
