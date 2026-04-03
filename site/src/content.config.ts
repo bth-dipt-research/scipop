@@ -11,6 +11,7 @@ const syntheses = defineCollection({
     reviewed_at: z.coerce.date(),
     status: z.enum(['approved', 'draft']),
     order: z.number().int(),
+    disclaimer_override: z.string().optional(),
   }),
 });
 
@@ -21,6 +22,7 @@ const featured = defineCollection({
     slug: z.string(),
     summary: z.string(),
     reviewed_at: z.coerce.date(),
+    disclaimer_override: z.string().optional(),
   }),
 });
 
