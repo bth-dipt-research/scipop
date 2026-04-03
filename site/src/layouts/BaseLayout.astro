@@ -14,16 +14,49 @@ const { title } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <header>
-      <nav aria-label="Primary">
-        <a href="/">Home</a>
-        <a href="/featured">Featured synthesis</a>
-        <a href="/methodology">Methodology</a>
-      </nav>
+    <header class="site-header">
+      <div class="header-inner">
+        <button
+          type="button"
+          class="menu-toggle"
+          data-menu-button
+          aria-expanded="false"
+          aria-controls="primary-menu"
+        >
+          Menu
+        </button>
+        <nav id="primary-menu" class="primary-nav" aria-label="Primary" data-expanded="false">
+          <a href="/">Home</a>
+          <a href="/featured">Featured synthesis</a>
+          <a href="/methodology">Methodology</a>
+        </nav>
+      </div>
     </header>
     <main>
       <slot />
     </main>
+    <script is:inline>
+      const menuButton = document.querySelector('[data-menu-button]');
+      const primaryMenu = document.getElementById('primary-menu');
+
+      if (menuButton instanceof HTMLButtonElement && primaryMenu) {
+        const closeMenu = () => {
+          menuButton.setAttribute('aria-expanded', 'false');
+          primaryMenu.dataset.expanded = 'false';
+        };
+
+        menuButton.addEventListener('click', () => {
+          const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+          const next = String(!isOpen);
+          menuButton.setAttribute('aria-expanded', next);
+          primaryMenu.dataset.expanded = next;
+        });
+
+        primaryMenu.querySelectorAll('a').forEach((link) => {
+          link.addEventListener('click', closeMenu);
+        });
+      }
+    </script>
   </body>
 </html>
 
@@ -46,6 +79,58 @@ const { title } = Astro.props;
     line-height: 1.65;
     color: #1f2937;
     background-color: #ffffff;
+  }
+
+  .site-header {
+    border-bottom: 1px solid #d1d5db;
+    padding: var(--space-2);
+  }
+
+  .header-inner {
+    max-width: 70ch;
+    margin-inline: auto;
+  }
+
+  .menu-toggle,
+  .primary-nav a {
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #6b7280;
+    background-color: #ffffff;
+    color: #1f2937;
+    cursor: pointer;
+  }
+
+  .primary-nav {
+    margin-top: var(--space-2);
+  }
+
+  .primary-nav a {
+    display: none;
+    color: #1f2937;
+    text-decoration: none;
+    align-items: center;
+  }
+
+  .primary-nav[data-expanded='true'] a {
+    display: flex;
+  }
+
+  .primary-nav a + a {
+    margin-top: var(--space-1);
+  }
+
+  .menu-toggle:focus-visible,
+  .primary-nav a:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
   }
 
   main {
@@ -79,6 +164,30 @@ const { title } = Astro.props;
   @media (min-width: 1024px) {
     body {
       font-size: 18px;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+
+    .primary-nav {
+      margin-top: 0;
+      display: flex;
+      gap: var(--space-1);
+      align-items: center;
+    }
+
+    .primary-nav a,
+    .primary-nav[data-expanded='false'] a {
+      display: inline-flex;
+      margin-top: 0;
     }
 
     main {
