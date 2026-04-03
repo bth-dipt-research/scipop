@@ -11,7 +11,7 @@ This roadmap delivers the MVP as a public, static publication experience: first 
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Core Publication Surface** - Users can discover and open all core synthesis content destinations. (completed 2026-04-02)
-- [ ] **Phase 2: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile.
+- [x] **Phase 2: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile. (completed 2026-04-03)
 - [ ] **Phase 3: Analytics Baseline** - Basic page-level usage is captured for MVP learning.
 
 ## Phase Details
@@ -42,8 +42,8 @@ Plans:
   3. User can navigate between public destinations on both device classes without interaction blockers.
 **Plans**: 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Add required synthesis disclaimers with build-time coverage checks
-- [ ] 02-02-PLAN.md — Implement responsive typography and accessible mobile/desktop navigation baseline
+- [x] 02-01-PLAN.md — Add required synthesis disclaimers with build-time coverage checks
+- [x] 02-02-PLAN.md — Implement responsive typography and accessible mobile/desktop navigation baseline
 **UI hint**: yes
 
 ### Phase 3: Analytics Baseline
@@ -53,12 +53,15 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. When a visitor accesses any public route, a corresponding GA pageview event is recorded.
   2. Project owner can confirm real-time and standard-report visibility of visit data for the published routes.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — Implement production-gated GA bootstrap and privacy-safe pageview config in shared layout
+- [ ] 03-02-PLAN.md — Add Phase 3 analytics verification automation and manual GA evidence checklist
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
-| 2. Readability & Accessibility Baseline | 0/TBD | Not started | - |
-| 3. Analytics Baseline | 0/TBD | Not started | - |
+| 2. Readability & Accessibility Baseline | 2/2 | Complete | 2026-04-03 |
+| 3. Analytics Baseline | 1/2 | In Progress|  |

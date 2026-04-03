@@ -18,7 +18,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 ### Analytics
 
-- [ ] **ANLT-01**: User visits are tracked with basic Google Analytics pageview events across public pages
+- [x] **ANLT-01**: User visits are tracked with basic Google Analytics pageview events across public pages
 
 ## v2 Requirements
 
@@ -60,7 +60,7 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 | PUBL-04 | Phase 1 | Complete |
 | PUBL-05 | Phase 2 | Complete |
 | PUBL-06 | Phase 2 | Complete |
-| ANLT-01 | Phase 3 | Pending |
+| ANLT-01 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 7 total
