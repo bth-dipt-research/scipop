@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-03T14:36:15.721Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-03T14:39:27.764Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 33
 ---
 
@@ -57,6 +57,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01 P02 | 3min | 2 tasks | 4 files |
 | Phase 01 P03 | 3min | 2 tasks | 3 files |
 | Phase 02 P01 | 3min | 2 tasks | 6 files |
+| Phase 02 P02 | 2min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Keep /, /featured, and /methodology as explicit core routes in route verification defaults.
 - [Phase 02]: Centralized disclaimer heading/default copy in site/src/lib/disclaimer.ts with optional trimmed override resolution.
 - [Phase 02]: Added verify:phase2 to enforce disclaimer heading coverage on /featured and approved /syntheses/{slug} build artifacts.
+- [Phase 02]: Established shared readability tokens and 70ch article measure in BaseLayout for all public routes.
+- [Phase 02]: Implemented mobile menu toggle with aria-expanded/aria-controls, focus-visible states, and auto-close on link activation.
 
 ### Pending Todos
 
@@ -85,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T14:36:15.718Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-03T14:39:27.761Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

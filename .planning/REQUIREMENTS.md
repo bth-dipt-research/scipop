@@ -14,7 +14,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **PUBL-03**: User can open a featured top-level synthesis page representing the research group as a whole
 - [x] **PUBL-04**: User can open a methodology page that explains how syntheses were created and expert-reviewed
 - [x] **PUBL-05**: User can read a disclaimer section at the end of each synthesis page
-- [ ] **PUBL-06**: User can read and navigate all public pages on both desktop and mobile devices
+- [x] **PUBL-06**: User can read and navigate all public pages on both desktop and mobile devices
 
 ### Analytics
 
@@ -59,7 +59,7 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 | PUBL-03 | Phase 1 | Complete |
 | PUBL-04 | Phase 1 | Complete |
 | PUBL-05 | Phase 2 | Complete |
-| PUBL-06 | Phase 2 | Pending |
+| PUBL-06 | Phase 2 | Complete |
 | ANLT-01 | Phase 3 | Pending |
 
 **Coverage:**
