@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { DISCLAIMER_HEADING, resolveDisclaimer } from '../../lib/disclaimer';
 
 export async function getStaticPaths() {
   const approvedSyntheses = (await getCollection('syntheses'))
@@ -19,6 +20,11 @@ interface Props {
 
 const { synthesis } = Astro.props as Props;
 const { Content } = await render(synthesis);
+const disclaimerText = resolveDisclaimer(synthesis.data.disclaimer_override);
+
+if (!disclaimerText.trim()) {
+  throw new Error(`Missing disclaimer content for synthesis slug "${synthesis.data.slug}".`);
+}
 ---
 
 <BaseLayout title={synthesis.data.title}>
@@ -30,5 +36,10 @@ const { Content } = await render(synthesis);
     </header>
 
     <Content />
+
+    <section aria-label={DISCLAIMER_HEADING}>
+      <h2>{DISCLAIMER_HEADING}</h2>
+      <p>{disclaimerText}</p>
+    </section>
   </article>
 </BaseLayout>

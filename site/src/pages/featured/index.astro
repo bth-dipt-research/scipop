@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { DISCLAIMER_HEADING, resolveDisclaimer } from '../../lib/disclaimer';
 
 const featuredEntries = await getCollection('featured');
 const featured = featuredEntries.find((entry) => entry.data.slug === 'research-group');
@@ -11,6 +12,11 @@ if (!featured) {
 }
 
 const { Content } = await render(featured);
+const disclaimerText = resolveDisclaimer(featured.data.disclaimer_override);
+
+if (!disclaimerText.trim()) {
+  throw new Error('Missing disclaimer content for featured slug "research-group".');
+}
 ---
 
 <BaseLayout title={featured.data.title}>
@@ -22,5 +28,10 @@ const { Content } = await render(featured);
     </header>
 
     <Content />
+
+    <section aria-label={DISCLAIMER_HEADING}>
+      <h2>{DISCLAIMER_HEADING}</h2>
+      <p>{disclaimerText}</p>
+    </section>
   </article>
 </BaseLayout>
