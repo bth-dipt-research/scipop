@@ -11,7 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "verify:phase1": "node ./scripts/verify-phase1.mjs",
-    "verify:phase2": "node ./scripts/verify-phase2.mjs"
+    "verify:phase2": "node ./scripts/verify-phase2.mjs",
+    "verify:phase3": "node ./scripts/verify-phase3.mjs"
   },
   "dependencies": {
     "astro": "^6.0.0"
