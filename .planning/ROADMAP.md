@@ -40,7 +40,10 @@ Plans:
   1. User can find and read a disclaimer section at the end of every synthesis page.
   2. User can read content without layout breakage on both mobile and desktop viewports.
   3. User can navigate between public destinations on both device classes without interaction blockers.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Add required synthesis disclaimers with build-time coverage checks
+- [ ] 02-02-PLAN.md — Implement responsive typography and accessible mobile/desktop navigation baseline
 **UI hint**: yes
 
 ### Phase 3: Analytics Baseline
