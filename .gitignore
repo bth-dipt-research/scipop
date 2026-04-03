@@ -5,3 +5,4 @@ src/keys.py
 site/node_modules/
 site/dist/
 site/.astro/
+.opencode
