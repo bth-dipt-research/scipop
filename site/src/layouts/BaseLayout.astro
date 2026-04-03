@@ -3,7 +3,18 @@ interface Props {
   title: string;
 }
 
+import { withBase } from '../lib/paths';
+import {
+  assertProductionTelemetryConfig,
+  getPublicMeasurementId,
+  isProductionTelemetryEnabled,
+} from '../lib/analytics';
+
 const { title } = Astro.props;
+const telemetryEnabled = isProductionTelemetryEnabled();
+const measurementId = getPublicMeasurementId();
+
+assertProductionTelemetryConfig();
 ---
 
 <!doctype html>
@@ -12,6 +23,26 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
+    {
+      telemetryEnabled && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
+          <script is:inline define:vars={{ measurementId }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', measurementId, {
+              anonymize_ip: true,
+              allow_google_signals: false,
+              allow_ad_personalization_signals: false,
+              page_path: window.location.pathname,
+            });
+          </script>
+        </>
+      )
+    }
   </head>
   <body>
     <header class="site-header">
@@ -26,9 +57,9 @@ const { title } = Astro.props;
           Menu
         </button>
         <nav id="primary-menu" class="primary-nav" aria-label="Primary" data-expanded="false">
-          <a href="/">Home</a>
-          <a href="/featured">Featured synthesis</a>
-          <a href="/methodology">Methodology</a>
+          <a href={withBase('/')}>Home</a>
+          <a href={withBase('/featured')}>Featured synthesis</a>
+          <a href={withBase('/methodology')}>Methodology</a>
         </nav>
       </div>
     </header>
