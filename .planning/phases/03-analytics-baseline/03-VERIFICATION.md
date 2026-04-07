@@ -1,23 +1,27 @@
 ---
 phase: 03-analytics-baseline
-verified: 2026-04-07T19:26:10Z
-status: human_needed
+verified: 2026-04-07T21:32:49Z
+status: passed
 score: 9/9 must-haves verified
 human_verification:
   - test: "GA realtime route visibility in production"
     expected: "After visiting /, /featured, /methodology, and an approved /syntheses/{slug}, those paths appear in GA Realtime for the production property."
     why_human: "Requires live GA console observation in production property; cannot be programmatically asserted from repo code alone."
+    result: approved
+    completed: 2026-04-07T21:32:49Z
   - test: "GA standard report visibility within 24 hours"
     expected: "Within 24 hours, standard GA reports include the tested production routes with visit data."
     why_human: "Requires delayed external-report validation in GA UI and timestamped evidence capture."
+    result: approved
+    completed: 2026-04-07T21:32:49Z
 ---
 
 # Phase 3: Analytics Baseline Verification Report
 
 **Phase Goal:** Project owner can verify that public usage is being measured with basic GA pageview telemetry.
-**Verified:** 2026-04-07T19:26:10Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-04-07T21:32:49Z
+**Status:** passed
+**Re-verification:** Yes — closure pass after approved human verification evidence
 
 ## Goal Achievement
 
@@ -79,7 +83,7 @@ human_verification:
 
 | Requirement | Source Plan | Description | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| ANLT-01 | `03-01-PLAN.md`, `03-02-PLAN.md`, `03-03-PLAN.md` | User visits are tracked with basic Google Analytics pageview events across public pages | ? NEEDS HUMAN | Code-level instrumentation + static/runtime verification tooling is present and passing under production env; final proof of live tracking in GA Realtime/standard reports requires manual console checks. |
+| ANLT-01 | `03-01-PLAN.md`, `03-02-PLAN.md`, `03-03-PLAN.md` | User visits are tracked with basic Google Analytics pageview events across public pages | ✓ VERIFIED | Code-level instrumentation + static/runtime verification tooling passed, and human evidence for GA Realtime plus standard-report visibility has been approved. |
 
 Orphaned requirements for Phase 3 in `REQUIREMENTS.md`: **None**. (`ANLT-01` is mapped to Phase 3 and declared in all Phase 3 plan frontmatter.)
 
@@ -89,25 +93,25 @@ Orphaned requirements for Phase 3 in `REQUIREMENTS.md`: **None**. (`ANLT-01` is 
 | --- | --- | --- | --- | --- |
 | _None_ | - | No blocker/warning stub patterns found in phase key files | ℹ️ Info | Verification scripts and GA wiring are substantive and connected; empty-array initializations observed are normal collection setup, not user-visible stubs. |
 
-### Human Verification Required
+### Human Verification Evidence (Completed)
 
 ### 1. GA Realtime route telemetry
 
 **Test:** Follow `.planning/phases/03-analytics-baseline/03-GA-VERIFICATION-CHECKLIST.md` realtime steps on production and visit `/`, `/featured`, `/methodology`, plus one approved `/syntheses/{slug}`.
 **Expected:** Matching route paths appear in GA Realtime and request-domain observations (`googletagmanager.com`, `google-analytics.com`) are recorded.
-**Why human:** Requires live external GA property + browser/network observations.
+**Result:** Approved and completed.
 
 ### 2. GA 24-hour standard report confirmation
 
 **Test:** Within 24 hours, check GA standard report and fill checklist evidence table.
 **Expected:** Tested production routes appear in standard report data.
-**Why human:** Delayed analytics reporting cannot be verified from static repository checks.
+**Result:** Approved and completed.
 
 ### Gaps Summary
 
-No code gaps found for Phase 3 must-haves. Automated verification indicates the implementation is complete and wired. Remaining closure is human-run GA console evidence collection (realtime + 24-hour reports).
+No code gaps found for Phase 3 must-haves. Automated verification is complete and human GA console evidence collection (realtime + 24-hour reports) is approved.
 
 ---
 
-_Verified: 2026-04-07T19:26:10Z_
+_Verified: 2026-04-07T21:32:49Z_
 _Verifier: the agent (gsd-verifier)_
