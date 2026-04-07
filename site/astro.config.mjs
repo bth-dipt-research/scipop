@@ -2,6 +2,6 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   output: 'static',
-  site: 'https://mun.github.io/scipop',
+  site: 'https://bth-dipt-research.github.io/scipop',
   base: '/scipop',
 });
