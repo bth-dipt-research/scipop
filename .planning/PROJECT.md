@@ -15,15 +15,16 @@ Anyone can reliably access and understand the approved research syntheses throug
 - ✓ Topic-modeling and clustering workflows exist in the repository via experiments and scripts (`experiments/`, `src/DIPT research topics-hierarchical TM.py`) — existing
 - ✓ Prompt-based synthesis assets exist and are already used in practice (`prompts/research-to-practice.txt`, `prompts/vision-builder.txt`) — existing
 - ✓ Research text extraction and data-preparation pipelines exist for source material (`src/research_question_extractor.py`, `data/`) — existing
+- ✓ Publish a static homepage that lists research area clusters and links to synthesis detail pages — Phase 1
+- ✓ Publish one dedicated synthesis page per research area from finalized markdown sources — Phase 1
+- ✓ Publish one featured top-level synthesis page representing the research group as a whole — Phase 1
+- ✓ Publish a methodology page explaining how syntheses were created and expert-reviewed — Phase 1
+- ✓ Include synthesis disclaimers and cross-device readability/navigation baseline — Phase 2
+- ✓ Add basic Google Analytics tracking (page-level usage), without building a custom analytics UI — Validated in Phase 03: analytics-baseline
 
 ### Active
 
-- [ ] Publish a static homepage that lists research area clusters and links to synthesis detail pages
-- [ ] Publish one dedicated synthesis page per research area from finalized markdown sources
-- [ ] Publish a featured top-level synthesis page representing the research group as a whole
-- [ ] Publish a methodology page explaining how syntheses were created and expert-reviewed
 - [ ] Deploy the site on GitHub Pages with a stable public URL for sharing
-- [ ] Add basic Google Analytics tracking (page-level usage), without building a custom analytics UI
 
 ### Out of Scope
 
@@ -53,11 +54,14 @@ Existing codebase map documents:
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Start with static publication before automation | Fastest path to visible value from already reviewed syntheses | — Pending |
-| Use index + detail information architecture | Matches browse-first discovery and supports multiple research areas cleanly | — Pending |
-| Include a featured top-level research-group synthesis page | User wants both area-level syntheses and a whole-group synthesis narrative | — Pending |
+| Start with static publication before automation | Fastest path to visible value from already reviewed syntheses | Adopted in Phase 1 |
+| Use index + detail information architecture | Matches browse-first discovery and supports multiple research areas cleanly | Implemented in Phase 1 |
+| Include a featured top-level research-group synthesis page | User wants both area-level syntheses and a whole-group synthesis narrative | Implemented in Phase 1 |
 | Host MVP on GitHub Pages | Low-friction static deployment and easy sharing | — Pending |
-| Include basic Google Analytics only | Need lightweight usage visibility without building product analytics features | — Pending |
+| Include basic Google Analytics only | Need lightweight usage visibility without building product analytics features | Implemented in Phase 3 |
+| Standardize disclaimer heading/default copy with optional page override | Keep trust messaging consistent while allowing narrative-specific nuance | Implemented in Phase 2 |
+| Enforce disclaimer coverage through build-artifact verification | Prevent accidental omission on required narrative routes | Implemented in Phase 2 |
+| Set shared readability tokens with 70ch article measure and accessible mobile menu behavior | Ensure cross-device readability and navigation usability for public audience | Implemented in Phase 2 |
 
 ## Evolution
 
@@ -77,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after initialization*
+*Last updated: 2026-04-07 after Phase 3*
