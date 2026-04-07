@@ -53,10 +53,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. When a visitor accesses any public route, a corresponding GA pageview event is recorded.
   2. Project owner can confirm real-time and standard-report visibility of visit data for the published routes.
-**Plans**: 2 plans
+**Plans**: 3 plans
 Plans:
 - [ ] 03-01-PLAN.md — Implement production-gated GA bootstrap and privacy-safe pageview config in shared layout
 - [ ] 03-02-PLAN.md — Add Phase 3 analytics verification automation and manual GA evidence checklist
+- [ ] 03-03-PLAN.md — Close UAT runtime GA request-visibility gap with smoke validation and checklist hardening
 
 ## Progress
 
