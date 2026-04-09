@@ -43,6 +43,10 @@ assertProductionTelemetryConfig();
           <a href={withBase('/')}>Home</a>
           <a href={withBase('/featured')}>Featured synthesis</a>
           <a href={withBase('/methodology')}>Methodology</a>
+          <a href={withBase('/privacy')}>Privacy</a>
+          <button type="button" class="privacy-settings-button" data-consent-manage>
+            Privacy settings
+          </button>
         </nav>
       </div>
     </header>
@@ -104,6 +108,7 @@ assertProductionTelemetryConfig();
       const consentBanner = document.querySelector('[data-consent-banner]');
       const consentAcceptButton = document.querySelector('[data-consent-accept]');
       const consentDeclineButton = document.querySelector('[data-consent-decline]');
+      const consentManageButton = document.querySelector('[data-consent-manage]');
       let gaInitialized = false;
 
       const setBannerVisible = (visible) => {
@@ -149,7 +154,29 @@ assertProductionTelemetryConfig();
         localStorage.setItem(consentStorageKey, nextConsent);
         setBannerVisible(false);
 
+        if (nextConsent === 'denied') {
+          const expiredDate = 'Thu, 01 Jan 1970 00:00:00 GMT';
+          const cookieNames = document.cookie
+            .split(';')
+            .map((cookie) => cookie.trim().split('=')[0])
+            .filter(Boolean);
+
+          cookieNames
+            .filter((cookieName) => cookieName === '_ga' || cookieName === '_gid' || cookieName.startsWith('_ga_'))
+            .forEach((cookieName) => {
+              document.cookie = `${cookieName}=; expires=${expiredDate}; path=/`;
+            });
+
+          if (measurementId) {
+            window[`ga-disable-${measurementId}`] = true;
+          }
+        }
+
         if (nextConsent === 'granted') {
+          if (measurementId) {
+            window[`ga-disable-${measurementId}`] = false;
+          }
+
           initializeGa();
         }
       };
@@ -166,6 +193,10 @@ assertProductionTelemetryConfig();
 
       consentAcceptButton?.addEventListener('click', () => setConsent('granted'));
       consentDeclineButton?.addEventListener('click', () => setConsent('denied'));
+
+      consentManageButton?.addEventListener('click', () => {
+        setBannerVisible(true);
+      });
     </script>
   </body>
 </html>
@@ -202,7 +233,8 @@ assertProductionTelemetryConfig();
   }
 
   .menu-toggle,
-  .primary-nav a {
+  .primary-nav a,
+  .privacy-settings-button {
     min-height: 44px;
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
@@ -229,7 +261,17 @@ assertProductionTelemetryConfig();
     align-items: center;
   }
 
-  .primary-nav[data-expanded='true'] a {
+  .privacy-settings-button {
+    display: none;
+    border: 1px solid #6b7280;
+    background-color: #ffffff;
+    color: #1f2937;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .primary-nav[data-expanded='true'] a,
+  .primary-nav[data-expanded='true'] .privacy-settings-button {
     display: flex;
   }
 
@@ -237,8 +279,13 @@ assertProductionTelemetryConfig();
     margin-top: var(--space-1);
   }
 
+  .primary-nav :is(a, .privacy-settings-button) + :is(a, .privacy-settings-button) {
+    margin-top: var(--space-1);
+  }
+
   .menu-toggle:focus-visible,
-  .primary-nav a:focus-visible {
+  .primary-nav a:focus-visible,
+  .privacy-settings-button:focus-visible {
     outline: 3px solid #2563eb;
     outline-offset: 2px;
   }
@@ -335,7 +382,9 @@ assertProductionTelemetryConfig();
     }
 
     .primary-nav a,
-    .primary-nav[data-expanded='false'] a {
+    .primary-nav[data-expanded='false'] a,
+    .privacy-settings-button,
+    .primary-nav[data-expanded='false'] .privacy-settings-button {
       display: inline-flex;
       margin-top: 0;
     }
