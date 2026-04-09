@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-04-09T18:58:28.717Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-04-07T21:33:33.311Z"
 last_activity: 2026-04-07
 progress:
-  total_phases: 5
-  completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 8
   percent: 67
 ---
 
@@ -61,7 +61,6 @@ Progress: [███████░░░] 67%
 | Phase 03 P01 | 89s | 2 tasks | 2 files |
 | Phase 03 P02 | 126s | 3 tasks | 3 files |
 | Phase 03 P03 | 1 min | 2 tasks | 3 files |
-| Phase 04 P03 | 395s | 6 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -87,14 +86,6 @@ Recent decisions affecting current work:
 - [Phase 03]: Made verify-phase3 executable from repo root and site directory for consistent CI/local invocation.
 - [Phase 03]: Kept runtime smoke as additive companion command to verify:phase3 to preserve static-vs-runtime separation.
 - [Phase 03]: Required both googletagmanager.com and google-analytics.com request-domain evidence to make missing-request diagnostics actionable.
-- [Phase 04]: Gate GA initialization behind explicit consent and default to non-tracking for unset consent state.
-- [Phase 04]: Publish a dedicated /privacy route plus persistent Privacy settings control for consent withdrawal and changes.
-- [Phase 04]: Add verify:phase4 static artifact checks and GDPR runtime evidence checklist to prevent consent/privacy regressions.
-
-### Roadmap Evolution
-
-- Phase 4 added: gdpr-compliance
-- Phase 5 added: ui-polish
 
 ### Pending Todos
 
@@ -106,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T18:58:28.714Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-04-07T19:22:07.430Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None

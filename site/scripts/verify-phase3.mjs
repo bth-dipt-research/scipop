@@ -13,7 +13,7 @@ const distDir = path.join(siteDir, 'dist');
 const basePrefix = 'scipop';
 
 const TELEMETRY_MARKERS = [
-  'googletagmanager.com/gtag/js',
+  'googletagmanager.com/gtag/js?id=',
   "gtag('config'",
   'anonymize_ip: true',
   'allow_google_signals: false',

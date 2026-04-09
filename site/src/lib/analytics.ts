@@ -17,21 +17,3 @@ export function assertProductionTelemetryConfig(): void {
     throw new Error('PUBLIC_GA_MEASUREMENT_ID is required when PUBLIC_SITE_ENV=production');
   }
 }
-
-export function buildGaScriptUrl(measurementId: string): string {
-  return `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-}
-
-export function buildGaConfigPayload(): {
-  anonymize_ip: true;
-  allow_google_signals: false;
-  allow_ad_personalization_signals: false;
-  page_path: string;
-} {
-  return {
-    anonymize_ip: true,
-    allow_google_signals: false,
-    allow_ad_personalization_signals: false,
-    page_path: window.location.pathname,
-  };
-}

@@ -66,25 +66,3 @@ Plans:
 | 01. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
 | 02. Readability & Accessibility Baseline | 2/2 | Complete | 2026-04-03 |
 | 03. Analytics Baseline | 3/3 | Complete   | 2026-04-07 |
-
-### Phase 4: gdpr-compliance
-
-**Goal:** Visitors can review privacy terms and control analytics consent so non-essential tracking only occurs after explicit opt-in.
-**Requirements**: TBD
-**Depends on:** Phase 3
-**Plans:** 3 plans
-
-Plans:
-- [ ] 04-01-PLAN.md — Implement consent-state contract and consent-gated GA bootstrap in BaseLayout
-- [ ] 04-02-PLAN.md — Publish /privacy route and persistent consent-management controls
-- [ ] 04-03-PLAN.md — Add Phase 4 verifier and GDPR evidence checklist
-
-### Phase 5: ui-polish
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 4
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 5 to break down)
