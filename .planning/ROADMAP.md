@@ -13,6 +13,7 @@ This roadmap delivers the MVP as a public, static publication experience: first 
 - [x] **Phase 01: Core Publication Surface** - Users can discover and open all core synthesis content destinations. (completed 2026-04-02)
 - [x] **Phase 02: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile. (completed 2026-04-03)
 - [x] **Phase 03: Analytics Baseline** - Basic page-level usage is captured for MVP learning. (completed 2026-04-07)
+- [ ] **Phase 04: GDPR Compliance** - Public visitors can control analytics tracking consent and review what data is collected.
 
 ## Phase Details
 
@@ -59,6 +60,19 @@ Plans:
 - [ ] 03-02-PLAN.md — Add Phase 3 analytics verification automation and manual GA evidence checklist
 - [ ] 03-03-PLAN.md — Close UAT runtime GA request-visibility gap with smoke validation and checklist hardening
 
+### Phase 04: GDPR Compliance
+**Goal**: Respect user privacy by applying consent-based analytics behavior and transparent tracking disclosure.
+**Depends on**: Phase 03
+**Requirements**: PRIV-01, PRIV-02, PRIV-03
+**Success Criteria** (what must be TRUE):
+  1. Visitor privacy choice is respected before any analytics tracking runs.
+  2. Visitor can change privacy settings after initial selection.
+  3. Visitor can access clear information about what data is tracked when consent is granted.
+**Plans**: 1 plan
+Plans:
+- [ ] 04-01-PLAN.md — Implement consent management with library integration and consent-aware analytics behavior
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -66,3 +80,4 @@ Plans:
 | 01. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
 | 02. Readability & Accessibility Baseline | 2/2 | Complete | 2026-04-03 |
 | 03. Analytics Baseline | 3/3 | Complete   | 2026-04-07 |
+| 04. GDPR Compliance | 0/1 | Planned | - |
