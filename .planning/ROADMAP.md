@@ -7,16 +7,16 @@ This roadmap delivers the MVP as a public, static publication experience: first 
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
+- Zero-padded integer phases (01, 02, 03): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [x] **Phase 1: Core Publication Surface** - Users can discover and open all core synthesis content destinations. (completed 2026-04-02)
-- [x] **Phase 2: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile. (completed 2026-04-03)
-- [x] **Phase 3: Analytics Baseline** - Basic page-level usage is captured for MVP learning. (completed 2026-04-03)
+- [x] **Phase 01: Core Publication Surface** - Users can discover and open all core synthesis content destinations. (completed 2026-04-02)
+- [x] **Phase 02: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile. (completed 2026-04-03)
+- [x] **Phase 03: Analytics Baseline** - Basic page-level usage is captured for MVP learning. (completed 2026-04-07)
 
 ## Phase Details
 
-### Phase 1: Core Publication Surface
+### Phase 01: Core Publication Surface
 **Goal**: Users can discover the research landscape and open each primary synthesis destination through stable public links.
 **Depends on**: Nothing (first phase)
 **Requirements**: PUBL-01, PUBL-02, PUBL-03, PUBL-04
@@ -32,9 +32,9 @@ Plans:
 - [ ] 01-03-PLAN.md — Implement featured and methodology routes with destination verification
 **UI hint**: yes
 
-### Phase 2: Readability & Accessibility Baseline
+### Phase 02: Readability & Accessibility Baseline
 **Goal**: Users can comfortably consume and navigate all published synthesis content across desktop and mobile contexts.
-**Depends on**: Phase 1
+**Depends on**: Phase 01
 **Requirements**: PUBL-05, PUBL-06
 **Success Criteria** (what must be TRUE):
   1. User can find and read a disclaimer section at the end of every synthesis page.
@@ -46,9 +46,9 @@ Plans:
 - [x] 02-02-PLAN.md — Implement responsive typography and accessible mobile/desktop navigation baseline
 **UI hint**: yes
 
-### Phase 3: Analytics Baseline
+### Phase 03: Analytics Baseline
 **Goal**: Project owner can verify that public usage is being measured with basic GA pageview telemetry.
-**Depends on**: Phase 2
+**Depends on**: Phase 02
 **Requirements**: ANLT-01
 **Success Criteria** (what must be TRUE):
   1. When a visitor accesses any public route, a corresponding GA pageview event is recorded.
@@ -63,6 +63,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
-| 2. Readability & Accessibility Baseline | 2/2 | Complete | 2026-04-03 |
-| 3. Analytics Baseline | 2/2 | Complete   | 2026-04-03 |
+| 01. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
+| 02. Readability & Accessibility Baseline | 2/2 | Complete | 2026-04-03 |
+| 03. Analytics Baseline | 3/3 | Complete   | 2026-04-07 |
