@@ -16,6 +16,7 @@
     "verify:phase3:runtime-smoke": "node ./scripts/verify-phase3-runtime-smoke.mjs"
   },
   "dependencies": {
-    "astro": "^6.0.0"
+    "astro": "^6.0.0",
+    "vanilla-cookieconsent": "^3.1.0"
   }
 }
