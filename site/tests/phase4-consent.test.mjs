@@ -5,6 +5,9 @@ import path from 'node:path';
 
 const consentPath = path.join(process.cwd(), 'src', 'lib', 'consent.ts');
 const baseLayoutPath = path.join(process.cwd(), 'src', 'layouts', 'BaseLayout.astro');
+const privacyPagePath = path.join(process.cwd(), 'src', 'pages', 'privacy.astro');
+const phase4VerifierPath = path.join(process.cwd(), 'scripts', 'verify-phase4.mjs');
+const packageJsonPath = path.join(process.cwd(), 'package.json');
 
 test('readConsentState defaults to unset when no storage values exist', () => {
   assert.equal(fs.existsSync(consentPath), true, 'consent.ts should exist');
@@ -53,4 +56,31 @@ test('footer privacy settings re-open flow includes inline confirmation text', (
 
   assert.match(content, /Privacy settings/);
   assert.match(content, /Privacy settings updated\./);
+});
+
+test('privacy disclosure page includes required sections', () => {
+  assert.equal(fs.existsSync(privacyPagePath), true, 'privacy.astro should exist');
+  const content = fs.readFileSync(privacyPagePath, 'utf8');
+
+  assert.match(content, /Google Analytics/);
+  assert.match(content, /What we track/);
+  assert.match(content, /How to change consent/);
+  assert.match(content, /Contact/);
+});
+
+test('phase 4 verifier script exists and checks disclosure markers', () => {
+  assert.equal(fs.existsSync(phase4VerifierPath), true, 'verify-phase4.mjs should exist');
+  const content = fs.readFileSync(phase4VerifierPath, 'utf8');
+
+  assert.match(content, /privacy/);
+  assert.match(content, /Accept all/);
+  assert.match(content, /Reject all/);
+  assert.match(content, /Privacy settings/);
+  assert.match(content, /process\.exit\(1\)/);
+});
+
+test('package scripts include verify:phase4 command', () => {
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  assert.equal(typeof packageJson.scripts?.['verify:phase4'], 'string');
+  assert.match(packageJson.scripts['verify:phase4'], /node\s+\.\/scripts\/verify-phase4\.mjs/);
 });
