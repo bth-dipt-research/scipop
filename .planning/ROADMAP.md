@@ -13,7 +13,7 @@ This roadmap delivers the MVP as a public, static publication experience: first 
 - [x] **Phase 01: Core Publication Surface** - Users can discover and open all core synthesis content destinations. (completed 2026-04-02)
 - [x] **Phase 02: Readability & Accessibility Baseline** - Public content is readable and navigable on desktop and mobile. (completed 2026-04-03)
 - [x] **Phase 03: Analytics Baseline** - Basic page-level usage is captured for MVP learning. (completed 2026-04-07)
-- [ ] **Phase 04: GDPR Compliance** - Public visitors can control analytics tracking consent and review what data is collected.
+- [x] **Phase 04: GDPR Compliance** - Public visitors can control analytics tracking consent and review what data is collected. (completed 2026-04-09)
 
 ## Phase Details
 
@@ -80,4 +80,4 @@ Plans:
 | 01. Core Publication Surface | 3/3 | Complete   | 2026-04-02 |
 | 02. Readability & Accessibility Baseline | 2/2 | Complete | 2026-04-03 |
 | 03. Analytics Baseline | 3/3 | Complete   | 2026-04-07 |
-| 04. GDPR Compliance | 0/1 | Planned | - |
+| 04. GDPR Compliance | 1/1 | Complete    | 2026-04-09 |

@@ -20,6 +20,12 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 - [x] **ANLT-01**: User visits are tracked with basic Google Analytics pageview events across public pages
 
+### Privacy
+
+- [x] **PRIV-01**: User analytics tracking is gated by explicit consent (no tracking before consent)
+- [x] **PRIV-02**: User can revisit and change privacy consent settings at any time
+- [x] **PRIV-03**: User can read clear disclosure of what analytics data is tracked when consent is granted
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -61,12 +67,15 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 | PUBL-05 | Phase 2 | Complete |
 | PUBL-06 | Phase 2 | Complete |
 | ANLT-01 | Phase 3 | Complete |
+| PRIV-01 | Phase 4 | Planned |
+| PRIV-02 | Phase 4 | Planned |
+| PRIV-03 | Phase 4 | Planned |
 
 **Coverage:**
-- v1 requirements: 7 total
-- Mapped to phases: 7
+- v1 requirements: 10 total
+- Mapped to phases: 10
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after roadmap creation*
+*Last updated: 2026-04-09 after Phase 4 scope alignment*
