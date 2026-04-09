@@ -11,6 +11,7 @@ const siteDir = fs.existsSync(path.join(process.cwd(), 'package.json'))
     : path.resolve(scriptDir, '..');
 const distDir = path.join(siteDir, 'dist');
 const basePrefix = 'scipop';
+const isProductionMode = String(process.env.PUBLIC_SITE_ENV ?? '').trim().toLowerCase() === 'production';
 
 const TELEMETRY_MARKERS = [
   'googletagmanager.com/gtag/js?id=',
@@ -73,11 +74,13 @@ for (const route of requiredRoutes) {
     continue;
   }
 
-  const html = fs.readFileSync(htmlPath, 'utf8');
-  const missingMarkers = TELEMETRY_MARKERS.filter((marker) => !html.includes(marker));
+  if (isProductionMode) {
+    const html = fs.readFileSync(htmlPath, 'utf8');
+    const missingMarkers = TELEMETRY_MARKERS.filter((marker) => !html.includes(marker));
 
-  if (missingMarkers.length > 0) {
-    missingMarkersByRoute.push({ route, missingMarkers });
+    if (missingMarkers.length > 0) {
+      missingMarkersByRoute.push({ route, missingMarkers });
+    }
   }
 }
 
@@ -88,7 +91,7 @@ if (missingRoutes.length > 0) {
   }
 }
 
-if (missingMarkersByRoute.length > 0) {
+if (isProductionMode && missingMarkersByRoute.length > 0) {
   console.error('Routes missing required GA telemetry markers:');
   for (const result of missingMarkersByRoute) {
     console.error(`- ${result.route}`);
@@ -98,8 +101,14 @@ if (missingMarkersByRoute.length > 0) {
   }
 }
 
-if (missingRoutes.length > 0 || missingMarkersByRoute.length > 0) {
+if (missingRoutes.length > 0 || (isProductionMode && missingMarkersByRoute.length > 0)) {
   process.exit(1);
 }
 
-console.log(`Verified Phase 3 analytics coverage for ${requiredRoutes.length} route(s).`);
+if (!isProductionMode) {
+  console.log(
+    `Verified Phase 3 route coverage for ${requiredRoutes.length} route(s); telemetry markers are checked only when PUBLIC_SITE_ENV=production.`,
+  );
+} else {
+  console.log(`Verified Phase 3 analytics coverage for ${requiredRoutes.length} route(s).`);
+}
