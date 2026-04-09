@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const consentPath = path.join(process.cwd(), 'src', 'lib', 'consent.ts');
+const baseLayoutPath = path.join(process.cwd(), 'src', 'layouts', 'BaseLayout.astro');
 
 test('readConsentState defaults to unset when no storage values exist', () => {
   assert.equal(fs.existsSync(consentPath), true, 'consent.ts should exist');
@@ -28,4 +29,28 @@ test('writeConsentState persists rejected state for subsequent reads', () => {
 
   assert.match(content, /next\s*===\s*'accepted'\s*\|\|\s*next\s*===\s*'rejected'/);
   assert.match(content, /if\s*\(stored\s*===\s*'accepted'\s*\|\|\s*stored\s*===\s*'rejected'\)/);
+});
+
+test('ga snippet is gated by production and accepted consent state', () => {
+  assert.equal(fs.existsSync(baseLayoutPath), true, 'BaseLayout.astro should exist');
+  const content = fs.readFileSync(baseLayoutPath, 'utf8');
+
+  assert.match(content, /isProductionTelemetryEnabled\(\)\s*&&\s*consentState\s*===\s*'accepted'/);
+});
+
+test('banner exposes only accept and reject controls', () => {
+  assert.equal(fs.existsSync(baseLayoutPath), true, 'BaseLayout.astro should exist');
+  const content = fs.readFileSync(baseLayoutPath, 'utf8');
+
+  assert.match(content, /Accept all/);
+  assert.match(content, /Reject all/);
+  assert.doesNotMatch(content, /Customize/);
+});
+
+test('footer privacy settings re-open flow includes inline confirmation text', () => {
+  assert.equal(fs.existsSync(baseLayoutPath), true, 'BaseLayout.astro should exist');
+  const content = fs.readFileSync(baseLayoutPath, 'utf8');
+
+  assert.match(content, /Privacy settings/);
+  assert.match(content, /Privacy settings updated\./);
 });
