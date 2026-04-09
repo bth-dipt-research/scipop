@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ClusterCard from '../components/ClusterCard.astro';
+import { withBase } from '../lib/paths';
 
 const approvedSyntheses = (await getCollection('syntheses'))
   .filter((entry) => entry.data.status === 'approved')
@@ -18,7 +19,7 @@ const approvedSyntheses = (await getCollection('syntheses'))
       <ClusterCard
         title={entry.data.title}
         summary={entry.data.summary}
-        href={`/syntheses/${entry.data.slug}`}
+        href={withBase(`/syntheses/${entry.data.slug}`)}
         clusterId={entry.data.cluster_id}
       />
     ))
