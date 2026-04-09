@@ -6,13 +6,16 @@ interface Props {
 import { withBase } from '../lib/paths';
 import {
   assertProductionTelemetryConfig,
-  getPublicMeasurementId,
+  buildGaScriptUrl,
   isProductionTelemetryEnabled,
 } from '../lib/analytics';
+import { SCIPOP_ANALYTICS_CONSENT_KEY } from '../lib/consent';
 
 const { title } = Astro.props;
 const telemetryEnabled = isProductionTelemetryEnabled();
-const measurementId = getPublicMeasurementId();
+const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID ?? '';
+const consentStorageKey = SCIPOP_ANALYTICS_CONSENT_KEY;
+const gaScriptBaseUrl = telemetryEnabled ? buildGaScriptUrl('').replace(/\?id=$/, '') : '';
 
 assertProductionTelemetryConfig();
 ---
@@ -23,26 +26,6 @@ assertProductionTelemetryConfig();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
-    {
-      telemetryEnabled && (
-        <>
-          <script async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
-          <script is:inline define:vars={{ measurementId }}>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() {
-              dataLayer.push(arguments);
-            }
-            gtag('js', new Date());
-            gtag('config', measurementId, {
-              anonymize_ip: true,
-              allow_google_signals: false,
-              allow_ad_personalization_signals: false,
-              page_path: window.location.pathname,
-            });
-          </script>
-        </>
-      )
-    }
   </head>
   <body>
     <header class="site-header">
@@ -66,7 +49,33 @@ assertProductionTelemetryConfig();
     <main>
       <slot />
     </main>
-    <script is:inline>
+    {
+      telemetryEnabled && (
+        <div class="consent-banner" data-consent-banner hidden>
+          <p>
+            We use optional analytics cookies to understand site usage. You can accept or decline analytics
+            tracking.
+          </p>
+          <div class="consent-actions">
+            <button type="button" data-consent-accept>Accept analytics</button>
+            <button type="button" data-consent-decline>Decline analytics</button>
+          </div>
+        </div>
+      )
+    }
+    <script is:inline define:vars={{ telemetryEnabled, measurementId, consentStorageKey, gaScriptBaseUrl }}>
+      const parseConsentState = (value) => {
+        if (value === 'granted') {
+          return 'granted';
+        }
+
+        if (value === 'denied') {
+          return 'denied';
+        }
+
+        return 'unset';
+      };
+
       const menuButton = document.querySelector('[data-menu-button]');
       const primaryMenu = document.getElementById('primary-menu');
 
@@ -87,6 +96,76 @@ assertProductionTelemetryConfig();
           link.addEventListener('click', closeMenu);
         });
       }
+
+      if (!telemetryEnabled) {
+        return;
+      }
+
+      const consentBanner = document.querySelector('[data-consent-banner]');
+      const consentAcceptButton = document.querySelector('[data-consent-accept]');
+      const consentDeclineButton = document.querySelector('[data-consent-decline]');
+      let gaInitialized = false;
+
+      const setBannerVisible = (visible) => {
+        if (!consentBanner) {
+          return;
+        }
+
+        if (visible) {
+          consentBanner.removeAttribute('hidden');
+          return;
+        }
+
+        consentBanner.setAttribute('hidden', '');
+      };
+
+      const initializeGa = () => {
+        if (gaInitialized || !measurementId) {
+          return;
+        }
+
+        gaInitialized = true;
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `${gaScriptBaseUrl}?id=${measurementId}`;
+        document.head.appendChild(script);
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function gtag() {
+          window.dataLayer.push(arguments);
+        };
+
+        window.gtag('js', new Date());
+        window.gtag('config', measurementId, {
+          anonymize_ip: true,
+          allow_google_signals: false,
+          allow_ad_personalization_signals: false,
+          page_path: window.location.pathname,
+        });
+      };
+
+      const setConsent = (nextConsent) => {
+        localStorage.setItem(consentStorageKey, nextConsent);
+        setBannerVisible(false);
+
+        if (nextConsent === 'granted') {
+          initializeGa();
+        }
+      };
+
+      const consentState = parseConsentState(localStorage.getItem(consentStorageKey));
+
+      if (consentState === 'unset') {
+        setBannerVisible(true);
+      }
+
+      if (consentState === 'granted') {
+        initializeGa();
+      }
+
+      consentAcceptButton?.addEventListener('click', () => setConsent('granted'));
+      consentDeclineButton?.addEventListener('click', () => setConsent('denied'));
     </script>
   </body>
 </html>
@@ -166,6 +245,46 @@ assertProductionTelemetryConfig();
 
   main {
     padding: var(--space-3) var(--space-2) var(--space-4);
+  }
+
+  .consent-banner {
+    position: fixed;
+    left: var(--space-2);
+    right: var(--space-2);
+    bottom: var(--space-2);
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: var(--space-2);
+    background-color: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    max-width: 60ch;
+    margin: 0 auto;
+    z-index: 10;
+  }
+
+  .consent-banner p {
+    margin-bottom: var(--space-2);
+  }
+
+  .consent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .consent-actions button {
+    min-height: 44px;
+    border: 1px solid #6b7280;
+    border-radius: 0.375rem;
+    background: #ffffff;
+    color: #1f2937;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+  }
+
+  .consent-actions button:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
   }
 
   article {
