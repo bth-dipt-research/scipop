@@ -9,10 +9,14 @@ import {
   getPublicMeasurementId,
   isProductionTelemetryEnabled,
 } from '../lib/analytics';
+import { readConsentState, writeConsentState } from '../lib/consent';
 
 const { title } = Astro.props;
-const telemetryEnabled = isProductionTelemetryEnabled();
+const consentState = readConsentState();
+const telemetryEnabled = isProductionTelemetryEnabled() && consentState === 'accepted';
 const measurementId = getPublicMeasurementId();
+const productionTelemetryEnabled = isProductionTelemetryEnabled();
+const privacyPath = withBase('/privacy');
 
 assertProductionTelemetryConfig();
 ---
@@ -24,21 +28,86 @@ assertProductionTelemetryConfig();
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
     {
-      telemetryEnabled && (
+      productionTelemetryEnabled && (
         <>
-          <script async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
           <script is:inline define:vars={{ measurementId }}>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() {
-              dataLayer.push(arguments);
+            const CONSENT_STORAGE_KEY = 'scipop_analytics_consent';
+
+            const getCookieValue = (key) => {
+              const prefix = `${key}=`;
+              return document.cookie
+                .split(';')
+                .map((part) => part.trim())
+                .find((part) => part.startsWith(prefix))
+                ?.slice(prefix.length);
+            };
+
+            const readConsentState = () => {
+              const fromLocal = String(localStorage.getItem(CONSENT_STORAGE_KEY) ?? '').trim().toLowerCase();
+              if (fromLocal === 'accepted' || fromLocal === 'rejected') {
+                return fromLocal;
+              }
+
+              const fromCookie = String(getCookieValue(CONSENT_STORAGE_KEY) ?? '').trim().toLowerCase();
+              if (fromCookie === 'accepted' || fromCookie === 'rejected') {
+                return fromCookie;
+              }
+
+              return 'unset';
+            };
+
+            const writeConsentState = (next) => {
+              localStorage.setItem(CONSENT_STORAGE_KEY, next);
+              document.cookie = `${CONSENT_STORAGE_KEY}=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
+            };
+
+            const disableAnalytics = () => {
+              window[`ga-disable-${measurementId}`] = true;
+              if (typeof window.gtag === 'function') {
+                window.gtag('consent', 'update', {
+                  analytics_storage: 'denied',
+                });
+              }
+            };
+
+            const enableAnalytics = () => {
+              window[`ga-disable-${measurementId}`] = false;
+              if (!document.querySelector(`script[data-ga-loader="${measurementId}"]`)) {
+                const gaScript = document.createElement('script');
+                gaScript.async = true;
+                gaScript.dataset.gaLoader = measurementId;
+                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+                document.head.appendChild(gaScript);
+              }
+
+              window.dataLayer = window.dataLayer || [];
+              window.gtag = window.gtag || function gtag() {
+                dataLayer.push(arguments);
+              };
+              window.gtag('js', new Date());
+              window.gtag('consent', 'update', {
+                analytics_storage: 'granted',
+              });
+              window.gtag('config', measurementId, {
+                anonymize_ip: true,
+                allow_google_signals: false,
+                allow_ad_personalization_signals: false,
+                page_path: window.location.pathname,
+              });
+            };
+
+            if (readConsentState() === 'accepted') {
+              enableAnalytics();
+            } else {
+              disableAnalytics();
             }
-            gtag('js', new Date());
-            gtag('config', measurementId, {
-              anonymize_ip: true,
-              allow_google_signals: false,
-              allow_ad_personalization_signals: false,
-              page_path: window.location.pathname,
-            });
+
+            window.__scipopConsent = {
+              readConsentState,
+              writeConsentState,
+              enableAnalytics,
+              disableAnalytics,
+            };
           </script>
         </>
       )
@@ -66,9 +135,76 @@ assertProductionTelemetryConfig();
     <main>
       <slot />
     </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <button type="button" class="privacy-settings-link" data-open-privacy-settings>Privacy settings</button>
+      </div>
+    </footer>
+
+    <section class="consent-banner" data-consent-banner hidden>
+      <div class="consent-banner__content">
+        <h2>Privacy choices</h2>
+        <p>
+          We use Google Analytics to measure page visits only after you choose to allow tracking.
+          <a href={privacyPath}>Read full privacy details</a>.
+        </p>
+        <div class="consent-banner__actions">
+          <button type="button" class="consent-btn consent-btn--primary" data-consent-accept>Accept all</button>
+          <button type="button" class="consent-btn" data-consent-reject>Reject all</button>
+          <button type="button" class="consent-btn consent-btn--ghost" data-consent-dismiss>Close</button>
+        </div>
+        <p class="consent-status" data-consent-status aria-live="polite"></p>
+      </div>
+    </section>
+
     <script is:inline>
       const menuButton = document.querySelector('[data-menu-button]');
       const primaryMenu = document.getElementById('primary-menu');
+      const consentBanner = document.querySelector('[data-consent-banner]');
+      const acceptButton = document.querySelector('[data-consent-accept]');
+      const rejectButton = document.querySelector('[data-consent-reject]');
+      const dismissButton = document.querySelector('[data-consent-dismiss]');
+      const openPrivacyButton = document.querySelector('[data-open-privacy-settings]');
+      const consentStatus = document.querySelector('[data-consent-status]');
+
+      const setConsentStatus = (message) => {
+        if (consentStatus) {
+          consentStatus.textContent = message;
+        }
+      };
+
+      const openConsentBanner = () => {
+        if (consentBanner instanceof HTMLElement) {
+          consentBanner.hidden = false;
+        }
+      };
+
+      const closeConsentBanner = () => {
+        if (consentBanner instanceof HTMLElement) {
+          consentBanner.hidden = true;
+        }
+      };
+
+      const consentApi = window.__scipopConsent;
+
+      if (consentApi?.readConsentState() === 'unset') {
+        openConsentBanner();
+      }
+
+      const applyConsent = (nextConsent) => {
+        if (!consentApi) {
+          return;
+        }
+
+        consentApi.writeConsentState(nextConsent);
+        if (nextConsent === 'accepted') {
+          consentApi.enableAnalytics();
+        } else {
+          consentApi.disableAnalytics();
+        }
+        setConsentStatus('Privacy settings updated.');
+        closeConsentBanner();
+      };
 
       if (menuButton instanceof HTMLButtonElement && primaryMenu) {
         const closeMenu = () => {
@@ -85,6 +221,27 @@ assertProductionTelemetryConfig();
 
         primaryMenu.querySelectorAll('a').forEach((link) => {
           link.addEventListener('click', closeMenu);
+        });
+      }
+
+      if (acceptButton instanceof HTMLButtonElement) {
+        acceptButton.addEventListener('click', () => applyConsent('accepted'));
+      }
+
+      if (rejectButton instanceof HTMLButtonElement) {
+        rejectButton.addEventListener('click', () => applyConsent('rejected'));
+      }
+
+      if (dismissButton instanceof HTMLButtonElement) {
+        dismissButton.addEventListener('click', () => {
+          consentApi?.writeConsentState('rejected');
+          applyConsent('rejected');
+        });
+      }
+
+      if (openPrivacyButton instanceof HTMLButtonElement) {
+        openPrivacyButton.addEventListener('click', () => {
+          openConsentBanner();
         });
       }
     </script>
@@ -166,6 +323,77 @@ assertProductionTelemetryConfig();
 
   main {
     padding: var(--space-3) var(--space-2) var(--space-4);
+  }
+
+  .site-footer {
+    border-top: 1px solid #d1d5db;
+    padding: var(--space-2);
+  }
+
+  .footer-inner {
+    max-width: 70ch;
+    margin-inline: auto;
+  }
+
+  .privacy-settings-link {
+    border: none;
+    background: none;
+    color: #1d4ed8;
+    text-decoration: underline;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .consent-banner {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #111827;
+    color: #f9fafb;
+    padding: var(--space-2);
+    z-index: 1000;
+  }
+
+  .consent-banner__content {
+    max-width: 70ch;
+    margin-inline: auto;
+  }
+
+  .consent-banner a {
+    color: #93c5fd;
+  }
+
+  .consent-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: var(--space-2);
+  }
+
+  .consent-btn {
+    border: 1px solid #d1d5db;
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .consent-btn--primary {
+    background: #2563eb;
+    border-color: #2563eb;
+  }
+
+  .consent-btn--ghost {
+    background: transparent;
+  }
+
+  .consent-status {
+    min-height: 1.25rem;
+    margin-top: 0.5rem;
   }
 
   article {
