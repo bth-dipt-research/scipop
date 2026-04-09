@@ -21,6 +21,7 @@ Anyone can reliably access and understand the approved research syntheses throug
 - ✓ Publish a methodology page explaining how syntheses were created and expert-reviewed — Phase 1
 - ✓ Include synthesis disclaimers and cross-device readability/navigation baseline — Phase 2
 - ✓ Add basic Google Analytics tracking (page-level usage), without building a custom analytics UI — Validated in Phase 03: analytics-baseline
+- ✓ Gate analytics behind explicit visitor consent with reopenable privacy controls and disclosure content — Validated in Phase 04: gdpr-compliance
 
 ### Active
 
@@ -59,6 +60,7 @@ Existing codebase map documents:
 | Include a featured top-level research-group synthesis page | User wants both area-level syntheses and a whole-group synthesis narrative | Implemented in Phase 1 |
 | Host MVP on GitHub Pages | Low-friction static deployment and easy sharing | — Pending |
 | Include basic Google Analytics only | Need lightweight usage visibility without building product analytics features | Implemented in Phase 3 |
+| Gate analytics behind explicit consent with persistent settings access | Respect privacy requirements while keeping static-site delivery and simple UX | Implemented in Phase 4 |
 | Standardize disclaimer heading/default copy with optional page override | Keep trust messaging consistent while allowing narrative-specific nuance | Implemented in Phase 2 |
 | Enforce disclaimer coverage through build-artifact verification | Prevent accidental omission on required narrative routes | Implemented in Phase 2 |
 | Set shared readability tokens with 70ch article measure and accessible mobile menu behavior | Ensure cross-device readability and navigation usability for public audience | Implemented in Phase 2 |
@@ -81,4 +83,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 3*
+*Last updated: 2026-04-09 after Phase 4*
