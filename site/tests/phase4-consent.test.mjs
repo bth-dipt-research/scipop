@@ -56,6 +56,19 @@ test('footer privacy settings re-open flow includes inline confirmation text', (
 
   assert.match(content, /Privacy settings/);
   assert.match(content, /Privacy settings updated\./);
+  assert.match(content, /Current status: accepted\./);
+  assert.match(content, /Current status: rejected\./);
+  assert.match(content, /Current status: unset\./);
+  assert.match(content, /openPrivacyButton\.addEventListener\('click',\s*\(\)\s*=>\s*{\s*renderCurrentConsentStatus\(\);\s*openConsentBanner\(\);/s);
+});
+
+test('dismiss action closes banner without persisting or applying rejected consent', () => {
+  assert.equal(fs.existsSync(baseLayoutPath), true, 'BaseLayout.astro should exist');
+  const content = fs.readFileSync(baseLayoutPath, 'utf8');
+
+  assert.match(content, /dismissButton\.addEventListener\('click',\s*\(\)\s*=>\s*{\s*closeConsentBanner\(\);\s*setConsentStatus\(''\);/s);
+  assert.doesNotMatch(content, /dismissButton\.addEventListener\('click',\s*\(\)\s*=>\s*{[\s\S]*applyConsent\('rejected'\);/);
+  assert.doesNotMatch(content, /dismissButton\.addEventListener\('click',\s*\(\)\s*=>\s*{[\s\S]*writeConsentState\('rejected'\);/);
 });
 
 test('privacy disclosure page includes required sections', () => {
