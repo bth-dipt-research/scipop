@@ -12,6 +12,10 @@ const syntheses = defineCollection({
     status: z.enum(['approved', 'draft']),
     order: z.number().int(),
     disclaimer_override: z.string().optional(),
+    editor_name: z.string(),
+    editor_email: z.string().email(),
+    editor_photo: z.string(),
+    editor_contact_sentence: z.string(),
   }),
 });
 

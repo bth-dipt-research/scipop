@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="avatarTitle avatarDesc">
+  <title id="avatarTitle">Professor Kai Petersen</title>
+  <desc id="avatarDesc">Stylized editor portrait placeholder</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#143447" />
+      <stop offset="1" stop-color="#245470" />
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="120" fill="url(#bg)" />
+  <circle cx="120" cy="95" r="48" fill="#f2c59f" />
+  <path d="M48 215c9-41 34-63 72-63s63 22 72 63" fill="#f2c59f" />
+  <text x="120" y="134" text-anchor="middle" font-family="Source Sans 3, Segoe UI, sans-serif" font-size="19" font-weight="700" fill="#143447">KP</text>
+</svg>

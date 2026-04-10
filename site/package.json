@@ -14,7 +14,8 @@
     "verify:phase2": "node ./scripts/verify-phase2.mjs",
     "verify:phase3": "node ./scripts/verify-phase3.mjs",
     "verify:phase3:runtime-smoke": "node ./scripts/verify-phase3-runtime-smoke.mjs",
-    "verify:phase4": "node ./scripts/verify-phase4.mjs"
+    "verify:phase4": "node ./scripts/verify-phase4.mjs",
+    "verify:phase5": "node ./scripts/verify-phase5.mjs"
   },
   "dependencies": {
     "astro": "^6.0.0",

@@ -58,7 +58,7 @@ const getExistingHtmlPath = (route) => {
   return candidates.find((candidate) => fs.existsSync(candidate));
 };
 
-const coreRoutes = ['/', '/featured', '/methodology'];
+const coreRoutes = ['/', '/overview', '/methodology'];
 const requiredRoutes = [...coreRoutes];
 for (const slug of readApprovedSynthesisSlugs()) {
   requiredRoutes.push(`/syntheses/${slug}`);
