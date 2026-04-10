@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: v1.0 archived — ready for next milestone definition
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-09T21:11:54.666Z"
-last_activity: 2026-04-09
+status: v1.0 archived — phase 05 complete, ready for next milestone definition
+stopped_at: Phase 05 completed
+last_updated: "2026-04-10T15:10:00.000Z"
+last_activity: 2026-04-10
 progress:
   total_phases: 5
-  completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 12
   percent: 100
 ---
 
@@ -18,7 +18,7 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-03)
+See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Anyone can reliably access and understand the approved research syntheses through a simple, shareable public website.
 **Current focus:** Milestone planning for v1.1
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 
 Phase: Archived milestone
 Plan: N/A
-Status: v1.0 archived — ready for next milestone definition
-Last activity: 2026-04-09
+Status: v1.0 archived — phase 05 complete, ready for next milestone definition
+Last activity: 2026-04-10
 
 Progress: [██████████] 100%
 
@@ -89,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Required both googletagmanager.com and google-analytics.com request-domain evidence to make missing-request diagnostics actionable.
 - [Phase 04]: Keep analytics bootstrap runtime-controlled behind explicit accepted consent and production mode checks.
 - [Phase 04]: Use a persistent footer privacy-settings entry that reopens the same bottom consent banner controls.
+- [Phase 05]: Replace featured IA with dedicated `/overview` long-form route and align shared nav links accordingly.
+- [Phase 05]: Require editor profile metadata/contact sentence on every approved synthesis page and verify in build output.
+- [Phase 05]: Keep desktop research-theme image map with explicit mobile fallback links while preserving accessibility and consent behavior.
 
 ### Pending Todos
 
@@ -100,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T21:11:54.657Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-ui-polish/05-CONTEXT.md
+Last session: 2026-04-10T15:10:00.000Z
+Stopped at: Phase 05 completed
+Resume file: .planning/ROADMAP.md

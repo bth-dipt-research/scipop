@@ -11,10 +11,13 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 - [x] **PUBL-01**: User can browse a homepage listing all research area clusters
 - [x] **PUBL-02**: User can open a dedicated detail page for each research area synthesis via stable URL
-- [x] **PUBL-03**: User can open a featured top-level synthesis page representing the research group as a whole
+- [x] **PUBL-03**: User can open a top-level synthesis page representing the research group as a whole
 - [x] **PUBL-04**: User can open a methodology page that explains how syntheses were created and expert-reviewed
 - [x] **PUBL-05**: User can read a disclaimer section at the end of each synthesis page
 - [x] **PUBL-06**: User can read and navigate all public pages on both desktop and mobile devices
+- [x] **UIP-01**: User can read long-form content with polished typography and justified body copy while preserving readability/accessibility baselines
+- [x] **UIP-02**: User can see a complete editor profile block (photo, name, email, contact sentence) near the top of each synthesis page
+- [x] **UIP-03**: User can navigate with updated IA (`/overview` instead of `/featured`) and use desktop image-map plus mobile fallback homepage navigation
 
 ### Analytics
 
@@ -67,15 +70,18 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 | PUBL-05 | Phase 2 | Complete |
 | PUBL-06 | Phase 2 | Complete |
 | ANLT-01 | Phase 3 | Complete |
-| PRIV-01 | Phase 4 | Planned |
-| PRIV-02 | Phase 4 | Planned |
-| PRIV-03 | Phase 4 | Planned |
+| PRIV-01 | Phase 4 | Complete |
+| PRIV-02 | Phase 4 | Complete |
+| PRIV-03 | Phase 4 | Complete |
+| UIP-01 | Phase 5 | Complete |
+| UIP-02 | Phase 5 | Complete |
+| UIP-03 | Phase 5 | Complete |
 
 **Coverage:**
-- v1 requirements: 10 total
-- Mapped to phases: 10
+- v1 requirements: 13 total
+- Mapped to phases: 13
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-09 after Phase 4 scope alignment*
+*Last updated: 2026-04-10 after Phase 5 completion sync*

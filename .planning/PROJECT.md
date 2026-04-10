@@ -17,11 +17,12 @@ Anyone can reliably access and understand the approved research syntheses throug
 - ✓ Research text extraction and data-preparation pipelines exist for source material (`src/research_question_extractor.py`, `data/`) — existing
 - ✓ Publish a static homepage that lists research area clusters and links to synthesis detail pages — Phase 1
 - ✓ Publish one dedicated synthesis page per research area from finalized markdown sources — Phase 1
-- ✓ Publish one featured top-level synthesis page representing the research group as a whole — Phase 1
+- ✓ Publish one top-level research-group synthesis page representing the group as a whole (`/featured` in Phase 1, migrated to `/overview` in Phase 5)
 - ✓ Publish a methodology page explaining how syntheses were created and expert-reviewed — Phase 1
 - ✓ Include synthesis disclaimers and cross-device readability/navigation baseline — Phase 2
 - ✓ Add basic Google Analytics tracking (page-level usage), without building a custom analytics UI — Validated in Phase 03: analytics-baseline
 - ✓ Gate analytics behind explicit visitor consent with reopenable privacy controls and disclosure content — Validated in Phase 04: gdpr-compliance
+- ✓ Polish long-form presentation and site navigation IA while preserving accessibility/privacy/analytics behavior — Validated in Phase 05: ui-polish
 
 ### Active
 
@@ -57,13 +58,16 @@ Existing codebase map documents:
 |----------|-----------|---------|
 | Start with static publication before automation | Fastest path to visible value from already reviewed syntheses | Adopted in Phase 1 |
 | Use index + detail information architecture | Matches browse-first discovery and supports multiple research areas cleanly | Implemented in Phase 1 |
-| Include a featured top-level research-group synthesis page | User wants both area-level syntheses and a whole-group synthesis narrative | Implemented in Phase 1 |
+| Include a top-level research-group synthesis page | User wants both area-level syntheses and a whole-group synthesis narrative | Implemented in Phase 1, IA migrated to `/overview` in Phase 5 |
 | Host MVP on GitHub Pages | Low-friction static deployment and easy sharing | — Pending |
 | Include basic Google Analytics only | Need lightweight usage visibility without building product analytics features | Implemented in Phase 3 |
 | Gate analytics behind explicit consent with persistent settings access | Respect privacy requirements while keeping static-site delivery and simple UX | Implemented in Phase 4 |
 | Standardize disclaimer heading/default copy with optional page override | Keep trust messaging consistent while allowing narrative-specific nuance | Implemented in Phase 2 |
 | Enforce disclaimer coverage through build-artifact verification | Prevent accidental omission on required narrative routes | Implemented in Phase 2 |
 | Set shared readability tokens with 70ch article measure and accessible mobile menu behavior | Ensure cross-device readability and navigation usability for public audience | Implemented in Phase 2 |
+| Replace `/featured` with `/overview` and update global navigation links | Keep research-group narrative destination while aligning polished IA | Implemented in Phase 5 |
+| Require per-synthesis editor profile block (photo, name, email, contact sentence) | Improve trust and accountability on each approved synthesis article | Implemented in Phase 5 |
+| Use desktop research-theme image map with explicit mobile fallback links | Deliver stronger homepage wayfinding without regressing accessibility | Implemented in Phase 5 |
 
 ## Evolution
 
@@ -83,4 +87,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after Phase 4*
+*Last updated: 2026-04-10 after Phase 5*
