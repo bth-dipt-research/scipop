@@ -14,7 +14,7 @@ const { Content } = await render(methodology);
 ---
 
 <BaseLayout title={methodology.data.title}>
-  <article>
+  <article class="long-form-article" data-long-form="true">
     <h1>{methodology.data.title}</h1>
     <Content />
   </article>

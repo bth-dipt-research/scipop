@@ -113,9 +113,12 @@ assertProductionTelemetryConfig();
       )
     }
   </head>
-  <body>
+<body>
     <header class="site-header">
       <div class="header-inner">
+        <a href={withBase('/')} class="brand-link" aria-label="SciPop home">
+          <img src={withBase('/images/serl-logo.svg')} alt="SERL Sweden" class="brand-logo" />
+        </a>
         <button
           type="button"
           class="menu-toggle"
@@ -125,9 +128,15 @@ assertProductionTelemetryConfig();
         >
           Menu
         </button>
-        <nav id="primary-menu" class="primary-nav" aria-label="Primary" data-expanded="false">
+        <nav
+          id="primary-menu"
+          class="primary-nav"
+          aria-label="Primary"
+          data-expanded="false"
+          data-phase5-nav
+        >
           <a href={withBase('/')}>Home</a>
-          <a href={withBase('/featured')}>Featured synthesis</a>
+          <a href={withBase('/overview')}>Overview</a>
           <a href={withBase('/methodology')}>Methodology</a>
         </nav>
       </div>
@@ -185,7 +194,63 @@ assertProductionTelemetryConfig();
         }
       };
 
-      const consentApi = window.__scipopConsent;
+      const CONSENT_STORAGE_KEY = 'scipop_analytics_consent';
+
+      const parseStoredConsent = (value) => {
+        const normalized = String(value ?? '').trim().toLowerCase();
+        return normalized === 'accepted' || normalized === 'rejected' ? normalized : 'unset';
+      };
+
+      const readConsentStateFallback = () => {
+        const fromLocal = parseStoredConsent(localStorage.getItem(CONSENT_STORAGE_KEY));
+        if (fromLocal !== 'unset') {
+          return fromLocal;
+        }
+
+        const fromCookie = parseStoredConsent(
+          document.cookie
+            .split(';')
+            .map((part) => part.trim())
+            .find((part) => part.startsWith(`${CONSENT_STORAGE_KEY}=`))
+            ?.slice(`${CONSENT_STORAGE_KEY}=`.length),
+        );
+
+        return fromCookie;
+      };
+
+      const writeConsentStateFallback = (next) => {
+        if (!(next === 'accepted' || next === 'rejected')) {
+          return;
+        }
+
+        localStorage.setItem(CONSENT_STORAGE_KEY, next);
+        document.cookie = `${CONSENT_STORAGE_KEY}=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
+      };
+
+      const consentApi = window.__scipopConsent ?? {
+        readConsentState: readConsentStateFallback,
+        writeConsentState: writeConsentStateFallback,
+        enableAnalytics: () => {},
+        disableAnalytics: () => {},
+      };
+
+      const getConsentStatusMessage = (consentState) => {
+        if (consentState === 'accepted') {
+          return 'Current status: accepted.';
+        }
+
+        if (consentState === 'rejected') {
+          return 'Current status: rejected.';
+        }
+
+        return 'Current status: unset.';
+      };
+
+      const renderCurrentConsentStatus = () => {
+        setConsentStatus(getConsentStatusMessage(consentApi.readConsentState()));
+      };
+
+      renderCurrentConsentStatus();
 
       if (consentApi?.readConsentState() === 'unset') {
         openConsentBanner();
@@ -234,13 +299,14 @@ assertProductionTelemetryConfig();
 
       if (dismissButton instanceof HTMLButtonElement) {
         dismissButton.addEventListener('click', () => {
-          consentApi?.writeConsentState('rejected');
-          applyConsent('rejected');
+          closeConsentBanner();
+          setConsentStatus('');
         });
       }
 
       if (openPrivacyButton instanceof HTMLButtonElement) {
         openPrivacyButton.addEventListener('click', () => {
+          renderCurrentConsentStatus();
           openConsentBanner();
         });
       }
@@ -250,10 +316,27 @@ assertProductionTelemetryConfig();
 
 <style is:global>
   :root {
+    --color-bg: #f4f5f1;
+    --color-surface: #ffffff;
+    --color-text: #1e2b34;
+    --color-muted: #4b5a62;
+    --color-border: #ced5d9;
+    --color-accent: #d16d2e;
+    --color-accent-strong: #ac531f;
+    --color-link: #174b68;
+    --color-focus: #d16d2e;
+
+    --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --font-ui: 'Source Sans 3', 'Segoe UI', Tahoma, sans-serif;
+
     --space-1: 0.75rem;
     --space-2: 1rem;
     --space-3: 1.5rem;
-    --space-4: 2rem;
+    --space-4: 2.25rem;
+
+    --radius-sm: 0.4rem;
+    --radius-md: 0.75rem;
+    --shadow-soft: 0 10px 30px -24px rgba(17, 36, 46, 0.8);
   }
 
   * {
@@ -262,47 +345,70 @@ assertProductionTelemetryConfig();
 
   body {
     margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.65;
-    color: #1f2937;
-    background-color: #ffffff;
+    color: var(--color-text);
+    background: radial-gradient(circle at top right, #e8eef2 0%, var(--color-bg) 55%);
   }
 
   .site-header {
-    border-bottom: 1px solid #d1d5db;
-    padding: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-2) var(--space-2) 0.9rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
   }
 
   .header-inner {
     max-width: 70ch;
     margin-inline: auto;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .brand-logo {
+    width: min(16rem, 58vw);
+    max-height: 2.75rem;
+    display: block;
   }
 
   .menu-toggle,
   .primary-nav a {
     min-height: 44px;
     padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-ui);
+    font-size: 0.98rem;
+    letter-spacing: 0.01em;
   }
 
   .menu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #6b7280;
-    background-color: #ffffff;
-    color: #1f2937;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
     cursor: pointer;
+    justify-self: end;
   }
 
   .primary-nav {
+    grid-column: 1 / -1;
     margin-top: var(--space-2);
   }
 
   .primary-nav a {
     display: none;
-    color: #1f2937;
+    color: var(--color-link);
     text-decoration: none;
     align-items: center;
   }
@@ -316,8 +422,11 @@ assertProductionTelemetryConfig();
   }
 
   .menu-toggle:focus-visible,
-  .primary-nav a:focus-visible {
-    outline: 3px solid #2563eb;
+  .primary-nav a:focus-visible,
+  .privacy-settings-link:focus-visible,
+  .consent-btn:focus-visible,
+  a:focus-visible {
+    outline: 3px solid var(--color-focus);
     outline-offset: 2px;
   }
 
@@ -326,8 +435,9 @@ assertProductionTelemetryConfig();
   }
 
   .site-footer {
-    border-top: 1px solid #d1d5db;
+    border-top: 1px solid var(--color-border);
     padding: var(--space-2);
+    background-color: rgba(255, 255, 255, 0.92);
   }
 
   .footer-inner {
@@ -338,9 +448,9 @@ assertProductionTelemetryConfig();
   .privacy-settings-link {
     border: none;
     background: none;
-    color: #1d4ed8;
+    color: var(--color-link);
     text-decoration: underline;
-    font: inherit;
+    font: 600 0.95rem/1.4 var(--font-ui);
     cursor: pointer;
     padding: 0;
   }
@@ -350,7 +460,7 @@ assertProductionTelemetryConfig();
     left: 0;
     right: 0;
     bottom: 0;
-    background: #111827;
+    background: #102430;
     color: #f9fafb;
     padding: var(--space-2);
     z-index: 1000;
@@ -362,7 +472,7 @@ assertProductionTelemetryConfig();
   }
 
   .consent-banner a {
-    color: #93c5fd;
+    color: #f8b788;
   }
 
   .consent-banner__actions {
@@ -373,18 +483,20 @@ assertProductionTelemetryConfig();
   }
 
   .consent-btn {
-    border: 1px solid #d1d5db;
-    background: #1f2937;
+    border: 1px solid #cae0ea;
+    background: #254558;
     color: #f9fafb;
     padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
+    border-radius: var(--radius-sm);
     min-height: 44px;
     cursor: pointer;
+    font-family: var(--font-ui);
   }
 
   .consent-btn--primary {
-    background: #2563eb;
-    border-color: #2563eb;
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
   }
 
   .consent-btn--ghost {
@@ -399,6 +511,11 @@ assertProductionTelemetryConfig();
   article {
     max-width: 70ch;
     margin-inline: auto;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    box-shadow: var(--shadow-soft);
   }
 
   article > * + * {
@@ -410,10 +527,25 @@ assertProductionTelemetryConfig();
   h3 {
     line-height: 1.25;
     margin: 0;
+    font-family: var(--font-ui);
+    color: #122d3d;
   }
 
   p {
     margin: 0;
+  }
+
+  a {
+    color: var(--color-link);
+  }
+
+  .long-form-article p {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .long-form-article {
+    hyphens: auto;
   }
 
   section {
@@ -430,6 +562,10 @@ assertProductionTelemetryConfig();
       justify-content: space-between;
       align-items: center;
       gap: var(--space-2);
+    }
+
+    .brand-logo {
+      width: 17rem;
     }
 
     .menu-toggle {
@@ -451,6 +587,17 @@ assertProductionTelemetryConfig();
 
     main {
       padding-top: var(--space-4);
+    }
+  }
+
+  @media (max-width: 699px) {
+    .long-form-article p {
+      text-align: left;
+      hyphens: manual;
+    }
+
+    article {
+      padding: var(--space-2);
     }
   }
 </style>

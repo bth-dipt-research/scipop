@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ClusterCard from '../components/ClusterCard.astro';
+import ResearchThemeMap from '../components/ResearchThemeMap.astro';
 import { withBase } from '../lib/paths';
 
 const approvedSyntheses = (await getCollection('syntheses'))
@@ -11,17 +12,58 @@ const approvedSyntheses = (await getCollection('syntheses'))
 ---
 
 <BaseLayout title="SciPop">
-  <h1>Research Cluster Syntheses</h1>
-  <p>Browse approved synthesis destinations.</p>
+  <article class="home-intro">
+    <h1>Software Engineering Research Themes</h1>
+    <p>
+      Explore expert-reviewed synthesis pages from the Software Engineering Research Lab. On
+      desktop and tablet, use the map to jump directly to a theme. On mobile, use the cards below.
+    </p>
+  </article>
 
-  {
-    approvedSyntheses.map((entry) => (
-      <ClusterCard
-        title={entry.data.title}
-        summary={entry.data.summary}
-        href={withBase(`/syntheses/${entry.data.slug}`)}
-        clusterId={entry.data.cluster_id}
-      />
-    ))
-  }
+  <ResearchThemeMap
+    items={approvedSyntheses.map((entry) => ({
+      title: entry.data.title,
+      slug: entry.data.slug,
+      clusterId: entry.data.cluster_id,
+    }))}
+  />
+
+  <section class="mobile-fallback" data-phase5-mobile-fallback aria-label="Research theme links">
+    {
+      approvedSyntheses.map((entry) => (
+        <ClusterCard
+          title={entry.data.title}
+          summary={entry.data.summary}
+          href={withBase(`/syntheses/${entry.data.slug}`)}
+          clusterId={entry.data.cluster_id}
+        />
+      ))
+    }
+  </section>
 </BaseLayout>
+
+<style>
+  .home-intro {
+    margin-bottom: 0;
+  }
+
+  .mobile-fallback {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .mobile-fallback :global(article) {
+    margin: 0;
+  }
+
+  .mobile-fallback :global(h2) {
+    font-size: 1.2rem;
+  }
+
+  @media (min-width: 901px) {
+    .mobile-fallback {
+      display: none;
+    }
+  }
+</style>

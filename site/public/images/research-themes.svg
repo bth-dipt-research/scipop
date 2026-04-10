@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="themesTitle themesDesc">
+  <title id="themesTitle">Research Themes</title>
+  <desc id="themesDesc">Five connected research themes arranged around a center.</desc>
+  <defs>
+    <style>
+      .tile { fill: #ffffff; stroke: #214a62; stroke-width: 6; }
+      .tile-label { font: 600 32px 'Source Sans 3', 'Segoe UI', sans-serif; fill: #173f56; text-anchor: middle; }
+      .link-line { stroke: #90a7b5; stroke-width: 8; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f6f8fa" />
+
+  <line class="link-line" x1="320" y1="140" x2="600" y2="80" />
+  <line class="link-line" x1="320" y1="140" x2="210" y2="360" />
+  <line class="link-line" x1="320" y1="140" x2="430" y2="360" />
+  <line class="link-line" x1="600" y1="80" x2="790" y2="360" />
+  <line class="link-line" x1="430" y1="360" x2="790" y2="360" />
+  <line class="link-line" x1="210" y1="360" x2="600" y2="640" />
+  <line class="link-line" x1="430" y1="360" x2="600" y2="640" />
+  <line class="link-line" x1="790" y1="360" x2="600" y2="640" />
+
+  <polygon class="tile" points="260,140 290,88 350,88 380,140 350,192 290,192" />
+  <text class="tile-label" x="320" y="150">Engineering</text>
+
+  <polygon class="tile" points="540,80 570,28 630,28 660,80 630,132 570,132" />
+  <text class="tile-label" x="600" y="90">AI + SE</text>
+
+  <polygon class="tile" points="150,360 180,308 240,308 270,360 240,412 180,412" />
+  <text class="tile-label" x="210" y="370">Quality</text>
+
+  <polygon class="tile" points="370,360 400,308 460,308 490,360 460,412 400,412" />
+  <text class="tile-label" x="430" y="352">Requirements</text>
+  <text class="tile-label" x="430" y="388">Engineering</text>
+
+  <polygon class="tile" points="730,360 760,308 820,308 850,360 820,412 760,412" />
+  <text class="tile-label" x="790" y="352">Research</text>
+  <text class="tile-label" x="790" y="388">Methods</text>
+
+  <polygon class="tile" points="540,640 570,588 630,588 660,640 630,692 570,692" />
+  <text class="tile-label" x="600" y="650">Overview</text>
+</svg>

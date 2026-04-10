@@ -1,0 +1,109 @@
+---
+import { withBase } from '../lib/paths';
+
+interface Props {
+  items: Array<{ title: string; slug: string; clusterId: string }>;
+}
+
+const { items } = Astro.props;
+
+const coordinatesByClusterId: Record<string, { top: string; left: string }> = {
+  'engineering-practices': { top: '16%', left: '26%' },
+  'ai-software-engineering': { top: '8%', left: '50%' },
+  quality: { top: '44%', left: '17%' },
+  'requirements-engineering': { top: '44%', left: '36%' },
+  'research-methodologies': { top: '44%', left: '66%' },
+};
+
+const getLinkPosition = (clusterId: string, index: number) => {
+  const mapped = coordinatesByClusterId[clusterId];
+  if (mapped) {
+    return mapped;
+  }
+
+  const fallbackRows = [20, 42, 64];
+  const fallbackCols = [22, 50, 78];
+  return {
+    top: `${fallbackRows[index % fallbackRows.length]}%`,
+    left: `${fallbackCols[index % fallbackCols.length]}%`,
+  };
+};
+---
+
+<section class="theme-map" aria-label="Research theme map" data-phase5-map>
+  <img src={withBase('/images/research-themes.svg')} alt="Research themes map" loading="lazy" />
+  <div class="theme-map__hotspots">
+    {
+      items.map((item, index) => {
+        const hotspot = getLinkPosition(item.clusterId, index);
+        return (
+          <a
+            href={withBase(`/syntheses/${item.slug}`)}
+            class="theme-map__hotspot"
+            style={`top: ${hotspot.top}; left: ${hotspot.left};`}
+            aria-label={`Open synthesis: ${item.title}`}
+          >
+            <span>{item.title}</span>
+          </a>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .theme-map {
+    position: relative;
+    margin: 2rem auto;
+    max-width: 70rem;
+    border: 1px solid #cad3da;
+    border-radius: 1rem;
+    background: #fff;
+    padding: 1rem;
+  }
+
+  .theme-map img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .theme-map__hotspots {
+    position: absolute;
+    inset: 1rem;
+  }
+
+  .theme-map__hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    text-decoration: none;
+    background: rgba(17, 52, 71, 0.9);
+    color: #fff;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.55rem 0.9rem;
+    font: 600 0.92rem/1.2 'Source Sans 3', 'Segoe UI', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(12, 31, 43, 0.35);
+  }
+
+  .theme-map__hotspot:hover {
+    background: #d16d2e;
+  }
+
+  .theme-map__hotspot:focus-visible {
+    outline: none;
+    border-color: #f6c49c;
+  }
+
+  @media (max-width: 900px) {
+    .theme-map {
+      display: none;
+    }
+  }
+</style>
