@@ -3,18 +3,12 @@ title: Engineering Practices
 slug: engineering-practices
 cluster_id: engineering-practices
 summary: Consolidated insights on practical engineering workflows and delivery quality improvements.
-reviewed_at: 2026-04-01
+reviewed_at: 2025-10-09
 status: approved
-order: 1
-editor_name: Professor Kai Petersen
-editor_email: kai.petersen@bth.se
-editor_photo: /images/editor-kai-petersen.svg
-editor_contact_sentence: Questions regarding the research presented on this page? Please contact Professor Kai Petersen. kai.petersen@bth.se
+editor_name: Dr. Eriks Klotins
+editor_email: eriks.klotins@bth.se
+editor_photo: /images/eriks-klotins.jpg
 ---
-
-This overview is based on research conducted at the Software Engineering
-Research Lab (SERL), Blekinge Institute of Technology.
-
 SERL focuses on making modern software delivery sustainable, evidence-informed,
 and reusable. A central thread explains how continuous software engineering
 (CSE) changes planning, feedback, and governance, emphasizing “readiness” and

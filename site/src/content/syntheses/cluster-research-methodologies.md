@@ -2,19 +2,13 @@
 title: Research methodologies
 slug: research-methodologies
 cluster_id: research-methodologies
-summary: Synthesis of research methodology advances that strengthen quality, reproducibility, and ethical empirical practice.
-reviewed_at: 2026-04-01
+summary: Research methodology advances that strengthen quality, reproducibility, and ethical empirical practice.
+reviewed_at: 2026-01-07
 status: approved
-order: 5
-editor_name: Professor Kai Petersen
-editor_email: kai.petersen@bth.se
-editor_photo: /images/editor-kai-petersen.svg
-editor_contact_sentence: Questions regarding the research presented on this page? Please contact Professor Kai Petersen. kai.petersen@bth.se
+editor_name: Dr. Davide Fucci
+editor_email: davide.fucci@bth.se
+editor_photo: /images/davide-fucci.jpg
 ---
-
-This overview is based on research conducted at the Software Engineering
-Research Lab (SERL), Blekinge Institute of Technology.
-
 SERL focuses on making software engineering evidence more trustworthy, findable,
 and useful in practice. The group strengthens how we plan, search, appraise, and
 report empirical work so stakeholders of software-intensive products of and

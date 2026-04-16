@@ -4,11 +4,11 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { DISCLAIMER_HEADING, resolveDisclaimer } from '../lib/disclaimer';
 
-const featuredEntries = await getCollection('featured');
-const overview = featuredEntries.find((entry) => entry.data.slug === 'research-group');
+const syntheses = await getCollection('syntheses');
+const overview = syntheses.find((entry) => entry.data.slug === 'research-group');
 
 if (!overview) {
-  throw new Error('Featured entry with slug "research-group" was not found.');
+  throw new Error('Syntheses entry with slug "research-group" was not found.');
 }
 
 const { Content } = await render(overview);
@@ -23,8 +23,6 @@ if (!disclaimerText.trim()) {
   <article class="long-form-article" data-long-form="true">
     <header>
       <h1>Research Group Overview</h1>
-      <p>{overview.data.summary}</p>
-      <p>Reviewed: {overview.data.reviewed_at.toISOString().slice(0, 10)}</p>
     </header>
 
     <Content />

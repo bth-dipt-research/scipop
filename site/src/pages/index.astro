@@ -8,62 +8,96 @@ import { withBase } from '../lib/paths';
 
 const approvedSyntheses = (await getCollection('syntheses'))
   .filter((entry) => entry.data.status === 'approved')
-  .sort((left, right) => left.data.order - right.data.order);
+  .filter((entry) => entry.data.cluster_id !== 'research-group')
+  .sort((left, right) => left.data.title.localeCompare(right.data.title, 'en', { sensitivity: 'base'}));
 ---
 
 <BaseLayout title="SciPop">
-  <article class="home-intro">
-    <h1>Software Engineering Research Themes</h1>
-    <p>
-      Explore expert-reviewed synthesis pages from the Software Engineering Research Lab. On
-      desktop and tablet, use the map to jump directly to a theme. On mobile, use the cards below.
-    </p>
-  </article>
+    <article class="home-intro">
+        <h1>Engineering Confidence: AI-Ready, Evidence-Driven, Human-Centered Software</h1>
+        <p>
+            The Software Engineering Research Lab (SERL) at Blekinge Institute of Technology studies how modern software is actually built - and how to make that work safer, faster, and more learnable. Two complementary directions anchor SERL's research portfolio: using AI to improve software engineering activities, and engineering AI-intensive systems so they are dependable in production. The portfolio blends methods, tools, and organizational practices into an operable whole that scales from startups to large, hybrid organizations.
+        </p>
+        <p style="font-weight:bold;">Edited by: Prof. Tony Gorschek</p>
+        <p class="home-intro__link-wrap">
+            <a class="ui-pill-button text-to-button-gap" href={withBase('/syntheses/research-group')}>Read more</a>
+        </p>
+    </article>
 
-  <ResearchThemeMap
-    items={approvedSyntheses.map((entry) => ({
-      title: entry.data.title,
-      slug: entry.data.slug,
-      clusterId: entry.data.cluster_id,
-    }))}
-  />
-
-  <section class="mobile-fallback" data-phase5-mobile-fallback aria-label="Research theme links">
-    {
-      approvedSyntheses.map((entry) => (
-        <ClusterCard
-          title={entry.data.title}
-          summary={entry.data.summary}
-          href={withBase(`/syntheses/${entry.data.slug}`)}
-          clusterId={entry.data.cluster_id}
-        />
-      ))
-    }
-  </section>
+    <section class="syntheses-grid" aria-label="Research theme links">
+        {
+            approvedSyntheses.map((entry) => (
+                <ClusterCard
+                    title={entry.data.title}
+                    summary={entry.data.summary}
+                    href={withBase(`/syntheses/${entry.data.slug}`)}
+                    editorName={entry.data.editor_name}
+                />
+            ))
+        }
+    </section>
 </BaseLayout>
 
 <style>
-  .home-intro {
-    margin-bottom: 0;
-  }
+            .home-intro {
+                margin: 0 auto var(--space-4);
+            padding: clamp(1.25rem, 1rem + 1.5vw, 2.1rem);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background:
+                linear-gradient(170deg, rgba(232, 238, 242, 0.75), rgba(255, 255, 255, 0.96) 60%),
+                var(--color-surface);
+            box-shadow: var(--shadow-soft);
+        }
 
-  .mobile-fallback {
-    display: grid;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
+        .home-intro h1 {
+            margin: 0 0 var(--space-2);
+            font-family: var(--font-ui);
+            font-size: clamp(1.7rem, 1.25rem + 1.8vw, 2.35rem);
+            line-height: 1.18;
+            letter-spacing: 0.01em;
+            color: var(--color-text);
+            text-wrap: balance;
+        }
 
-  .mobile-fallback :global(article) {
-    margin: 0;
-  }
+            .home-intro p {
+                text-align: justify;
+                text-justify: inter-word;
+                hyphens: auto;
+                margin: 0;
+                max-width: 72ch;
+                font-size: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+                color: var(--color-muted);
+            }
 
-  .mobile-fallback :global(h2) {
-    font-size: 1.2rem;
-  }
+        .home-intro__link-wrap {
+            margin-top: 0;
+        }
 
-  @media (min-width: 901px) {
-    .mobile-fallback {
-      display: none;
+    .syntheses-grid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-2);
+        align-items: stretch;
     }
-  }
+
+    @media (min-width: 760px) {
+        .syntheses-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .syntheses-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    .syntheses-grid :global(article) {
+        margin: 0;
+        max-width: none;
+        width: 100%;
+        height: 100%;
+    }
 </style>

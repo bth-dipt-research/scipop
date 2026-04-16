@@ -1,13 +1,14 @@
 ---
 interface Props {
-  title: string;
+    title: string;
 }
 
 import { withBase } from '../lib/paths';
+import { getCollection } from 'astro:content';
 import {
-  assertProductionTelemetryConfig,
-  getPublicMeasurementId,
-  isProductionTelemetryEnabled,
+    assertProductionTelemetryConfig,
+    getPublicMeasurementId,
+    isProductionTelemetryEnabled,
 } from '../lib/analytics';
 import { readConsentState, writeConsentState } from '../lib/consent';
 
@@ -17,292 +18,372 @@ const telemetryEnabled = isProductionTelemetryEnabled() && consentState === 'acc
 const measurementId = getPublicMeasurementId();
 const productionTelemetryEnabled = isProductionTelemetryEnabled();
 const privacyPath = withBase('/privacy');
+const generatedAt = new Date();
+const generatedAtLabel = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short',
+}).format(generatedAt);
+const generatedAtTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+const approvedSyntheses = (await getCollection('syntheses'))
+    .filter((entry) => entry.data.status === 'approved')
+    .filter((entry) => entry.data.cluster_id !== 'research-group')
+    .sort((left, right) => left.data.title.localeCompare(right.data.title, 'en', { sensitivity: 'base' }));
 
 assertProductionTelemetryConfig();
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{title}</title>
-    {
-      productionTelemetryEnabled && (
-        <>
-          <script is:inline define:vars={{ measurementId }}>
-            const CONSENT_STORAGE_KEY = 'scipop_analytics_consent';
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>{title}</title>
+        {
+            productionTelemetryEnabled && (
+                <>
+                    <script is:inline define:vars={{ measurementId }}>
+                        const CONSENT_STORAGE_KEY = 'scipop_analytics_consent';
 
-            const getCookieValue = (key) => {
-              const prefix = `${key}=`;
-              return document.cookie
-                .split(';')
-                .map((part) => part.trim())
-                .find((part) => part.startsWith(prefix))
-                ?.slice(prefix.length);
+                        const getCookieValue = (key) => {
+                            const prefix = `${key}=`;
+                            return document.cookie
+                                           .split(';')
+                                           .map((part) => part.trim())
+                                           .find((part) => part.startsWith(prefix))
+                                  ?.slice(prefix.length);
+                        };
+
+                        const readConsentState = () => {
+                            const fromLocal = String(localStorage.getItem(CONSENT_STORAGE_KEY) ?? '').trim().toLowerCase();
+                            if (fromLocal === 'accepted' || fromLocal === 'rejected') {
+                                return fromLocal;
+                            }
+
+                            const fromCookie = String(getCookieValue(CONSENT_STORAGE_KEY) ?? '').trim().toLowerCase();
+                            if (fromCookie === 'accepted' || fromCookie === 'rejected') {
+                                return fromCookie;
+                            }
+
+                            return 'unset';
+                        };
+
+                        const writeConsentState = (next) => {
+                            localStorage.setItem(CONSENT_STORAGE_KEY, next);
+                            document.cookie = `${CONSENT_STORAGE_KEY}=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
+                        };
+
+                        const disableAnalytics = () => {
+                            window[`ga-disable-${measurementId}`] = true;
+                            if (typeof window.gtag === 'function') {
+                                window.gtag('consent', 'update', {
+                                    analytics_storage: 'denied',
+                                });
+                            }
+                        };
+
+                        const enableAnalytics = () => {
+                            window[`ga-disable-${measurementId}`] = false;
+                            if (!document.querySelector(`script[data-ga-loader="${measurementId}"]`)) {
+                                const gaScript = document.createElement('script');
+                                gaScript.async = true;
+                                gaScript.dataset.gaLoader = measurementId;
+                                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+                                document.head.appendChild(gaScript);
+                            }
+
+                            window.dataLayer = window.dataLayer || [];
+                            window.gtag = window.gtag || function gtag() {
+                                dataLayer.push(arguments);
+                            };
+                            window.gtag('js', new Date());
+                            window.gtag('consent', 'update', {
+                                analytics_storage: 'granted',
+                            });
+                            window.gtag('config', measurementId, {
+                                anonymize_ip: true,
+                                allow_google_signals: false,
+                                allow_ad_personalization_signals: false,
+                                page_path: window.location.pathname,
+                            });
+                        };
+
+                        if (readConsentState() === 'accepted') {
+                            enableAnalytics();
+                        } else {
+                            disableAnalytics();
+                        }
+
+                        window.__scipopConsent = {
+                        readConsentState,
+                            writeConsentState,
+                            enableAnalytics,
+                            disableAnalytics,
+                        };
+                    </script>
+                </>
+            )
+        }
+    </head>
+    <body>
+        <header class="site-header">
+            <div class="header-inner">
+                <a href={withBase('/')} class="brand-link" aria-label="SciPop home">
+                    <img src={withBase('/images/serl-logo.svg')} alt="SERL Sweden" class="brand-logo" />
+                </a>
+                <nav class="primary-nav" aria-label="Primary">
+                    <div class="research-themes-menu" data-research-themes-menu>
+                        <button
+                            type="button"
+                            class="ui-pill-button research-themes-trigger"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-controls="research-themes-list"
+                        >
+                            Research themes
+                        </button>
+                        <ul id="research-themes-list" class="research-themes-list" role="list" hidden>
+                          <li>
+                            <a href={withBase(`/syntheses/research-group`)}>Overview</a>
+                          </li>
+                          {
+                                approvedSyntheses.map((entry, index) => (
+                                    <li class={index === 0 ? 'after-manual-separator' : undefined}>
+                                        <a href={withBase(`/syntheses/${entry.data.slug}`)}>{entry.data.title}</a>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <slot />
+        </main>
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <button type="button" class="ui-pill-button" data-open-privacy-settings>Privacy settings</button>
+                <p class="build-timestamp">
+                    Page generated:
+                    <time datetime={generatedAt.toISOString()}>{generatedAtLabel}</time>
+                    <span class="build-timestamp-zone">({generatedAtTimeZone})</span>
+                </p>
+            </div>
+        </footer>
+
+        <section class="consent-banner" data-consent-banner hidden>
+            <div class="consent-banner__content">
+                <h2>Privacy choices</h2>
+                <p>
+                    We use Google Analytics to measure page visits only after you choose to allow tracking.
+                    <a href={privacyPath}>Read full privacy details</a>.
+                </p>
+                <div class="consent-banner__actions">
+                    <button type="button" class="consent-btn consent-btn--primary" data-consent-accept>Accept all</button>
+                    <button type="button" class="consent-btn" data-consent-reject>Reject all</button>
+                    <button type="button" class="consent-btn consent-btn--ghost" data-consent-dismiss>Close</button>
+                </div>
+                <p class="consent-status" data-consent-status aria-live="polite"></p>
+            </div>
+        </section>
+
+        <script is:inline>
+            const researchThemesMenu = document.querySelector('[data-research-themes-menu]');
+            const researchThemesTrigger = researchThemesMenu?.querySelector('.research-themes-trigger');
+            const researchThemesList = researchThemesMenu?.querySelector('.research-themes-list');
+            const consentBanner = document.querySelector('[data-consent-banner]');
+            const acceptButton = document.querySelector('[data-consent-accept]');
+            const rejectButton = document.querySelector('[data-consent-reject]');
+            const dismissButton = document.querySelector('[data-consent-dismiss]');
+            const openPrivacyButton = document.querySelector('[data-open-privacy-settings]');
+            const consentStatus = document.querySelector('[data-consent-status]');
+
+            const setResearchThemesMenuState = (isOpen) => {
+                if (!(researchThemesMenu instanceof HTMLElement)) {
+                    return;
+                }
+
+                if (!(researchThemesTrigger instanceof HTMLButtonElement)) {
+                    return;
+                }
+
+                if (!(researchThemesList instanceof HTMLElement)) {
+                    return;
+                }
+
+                researchThemesMenu.dataset.open = isOpen ? 'true' : 'false';
+                researchThemesTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                researchThemesList.hidden = !isOpen;
             };
 
-            const readConsentState = () => {
-              const fromLocal = String(localStorage.getItem(CONSENT_STORAGE_KEY) ?? '').trim().toLowerCase();
-              if (fromLocal === 'accepted' || fromLocal === 'rejected') {
-                return fromLocal;
-              }
-
-              const fromCookie = String(getCookieValue(CONSENT_STORAGE_KEY) ?? '').trim().toLowerCase();
-              if (fromCookie === 'accepted' || fromCookie === 'rejected') {
-                return fromCookie;
-              }
-
-              return 'unset';
+            const closeResearchThemesMenu = ({ returnFocus = false } = {}) => {
+                setResearchThemesMenuState(false);
+                if (returnFocus && researchThemesTrigger instanceof HTMLButtonElement) {
+                    researchThemesTrigger.focus();
+                }
             };
 
-            const writeConsentState = (next) => {
-              localStorage.setItem(CONSENT_STORAGE_KEY, next);
-              document.cookie = `${CONSENT_STORAGE_KEY}=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
-            };
+            if (
+                researchThemesMenu instanceof HTMLElement
+                && researchThemesTrigger instanceof HTMLButtonElement
+                && researchThemesList instanceof HTMLElement
+            ) {
+                setResearchThemesMenuState(false);
 
-            const disableAnalytics = () => {
-              window[`ga-disable-${measurementId}`] = true;
-              if (typeof window.gtag === 'function') {
-                window.gtag('consent', 'update', {
-                  analytics_storage: 'denied',
+                researchThemesTrigger.addEventListener('click', () => {
+                    const isOpen = researchThemesTrigger.getAttribute('aria-expanded') === 'true';
+                    setResearchThemesMenuState(!isOpen);
                 });
-              }
-            };
 
-            const enableAnalytics = () => {
-              window[`ga-disable-${measurementId}`] = false;
-              if (!document.querySelector(`script[data-ga-loader="${measurementId}"]`)) {
-                const gaScript = document.createElement('script');
-                gaScript.async = true;
-                gaScript.dataset.gaLoader = measurementId;
-                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-                document.head.appendChild(gaScript);
-              }
+                document.addEventListener('click', (event) => {
+                    if (!(event.target instanceof Node)) {
+                        return;
+                    }
 
-              window.dataLayer = window.dataLayer || [];
-              window.gtag = window.gtag || function gtag() {
-                dataLayer.push(arguments);
-              };
-              window.gtag('js', new Date());
-              window.gtag('consent', 'update', {
-                analytics_storage: 'granted',
-              });
-              window.gtag('config', measurementId, {
-                anonymize_ip: true,
-                allow_google_signals: false,
-                allow_ad_personalization_signals: false,
-                page_path: window.location.pathname,
-              });
-            };
+                    const isOpen = researchThemesTrigger.getAttribute('aria-expanded') === 'true';
+                    if (!isOpen) {
+                        return;
+                    }
 
-            if (readConsentState() === 'accepted') {
-              enableAnalytics();
-            } else {
-              disableAnalytics();
+                    if (!researchThemesMenu.contains(event.target)) {
+                        closeResearchThemesMenu();
+                    }
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Escape') {
+                        return;
+                    }
+
+                    const isOpen = researchThemesTrigger.getAttribute('aria-expanded') === 'true';
+                    if (!isOpen) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    closeResearchThemesMenu({ returnFocus: true });
+                });
+
+                researchThemesList.querySelectorAll('a').forEach((link) => {
+                    link.addEventListener('click', () => closeResearchThemesMenu());
+                });
             }
 
-            window.__scipopConsent = {
-              readConsentState,
-              writeConsentState,
-              enableAnalytics,
-              disableAnalytics,
+            const setConsentStatus = (message) => {
+                if (consentStatus) {
+                    consentStatus.textContent = message;
+                }
             };
-          </script>
-        </>
-      )
-    }
-  </head>
-<body>
-    <header class="site-header">
-      <div class="header-inner">
-        <a href={withBase('/')} class="brand-link" aria-label="SciPop home">
-          <img src={withBase('/images/serl-logo.svg')} alt="SERL Sweden" class="brand-logo" />
-        </a>
-        <button
-          type="button"
-          class="menu-toggle"
-          data-menu-button
-          aria-expanded="false"
-          aria-controls="primary-menu"
-        >
-          Menu
-        </button>
-        <nav
-          id="primary-menu"
-          class="primary-nav"
-          aria-label="Primary"
-          data-expanded="false"
-          data-phase5-nav
-        >
-          <a href={withBase('/')}>Home</a>
-          <a href={withBase('/overview')}>Overview</a>
-          <a href={withBase('/methodology')}>Methodology</a>
-        </nav>
-      </div>
-    </header>
-    <main>
-      <slot />
-    </main>
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <button type="button" class="privacy-settings-link" data-open-privacy-settings>Privacy settings</button>
-      </div>
-    </footer>
 
-    <section class="consent-banner" data-consent-banner hidden>
-      <div class="consent-banner__content">
-        <h2>Privacy choices</h2>
-        <p>
-          We use Google Analytics to measure page visits only after you choose to allow tracking.
-          <a href={privacyPath}>Read full privacy details</a>.
-        </p>
-        <div class="consent-banner__actions">
-          <button type="button" class="consent-btn consent-btn--primary" data-consent-accept>Accept all</button>
-          <button type="button" class="consent-btn" data-consent-reject>Reject all</button>
-          <button type="button" class="consent-btn consent-btn--ghost" data-consent-dismiss>Close</button>
-        </div>
-        <p class="consent-status" data-consent-status aria-live="polite"></p>
-      </div>
-    </section>
+            const openConsentBanner = () => {
+                if (consentBanner instanceof HTMLElement) {
+                    consentBanner.hidden = false;
+                }
+            };
 
-    <script is:inline>
-      const menuButton = document.querySelector('[data-menu-button]');
-      const primaryMenu = document.getElementById('primary-menu');
-      const consentBanner = document.querySelector('[data-consent-banner]');
-      const acceptButton = document.querySelector('[data-consent-accept]');
-      const rejectButton = document.querySelector('[data-consent-reject]');
-      const dismissButton = document.querySelector('[data-consent-dismiss]');
-      const openPrivacyButton = document.querySelector('[data-open-privacy-settings]');
-      const consentStatus = document.querySelector('[data-consent-status]');
+            const closeConsentBanner = () => {
+                if (consentBanner instanceof HTMLElement) {
+                    consentBanner.hidden = true;
+                }
+            };
 
-      const setConsentStatus = (message) => {
-        if (consentStatus) {
-          consentStatus.textContent = message;
-        }
-      };
+            const CONSENT_STORAGE_KEY = 'scipop_analytics_consent';
 
-      const openConsentBanner = () => {
-        if (consentBanner instanceof HTMLElement) {
-          consentBanner.hidden = false;
-        }
-      };
+            const parseStoredConsent = (value) => {
+                const normalized = String(value ?? '').trim().toLowerCase();
+                return normalized === 'accepted' || normalized === 'rejected' ? normalized : 'unset';
+            };
 
-      const closeConsentBanner = () => {
-        if (consentBanner instanceof HTMLElement) {
-          consentBanner.hidden = true;
-        }
-      };
+            const readConsentStateFallback = () => {
+                const fromLocal = parseStoredConsent(localStorage.getItem(CONSENT_STORAGE_KEY));
+                if (fromLocal !== 'unset') {
+                    return fromLocal;
+                }
 
-      const CONSENT_STORAGE_KEY = 'scipop_analytics_consent';
+                const fromCookie = parseStoredConsent(
+                    document.cookie
+                            .split(';')
+                            .map((part) => part.trim())
+                            .find((part) => part.startsWith(`${CONSENT_STORAGE_KEY}=`))
+                    ?.slice(`${CONSENT_STORAGE_KEY}=`.length),
+                );
 
-      const parseStoredConsent = (value) => {
-        const normalized = String(value ?? '').trim().toLowerCase();
-        return normalized === 'accepted' || normalized === 'rejected' ? normalized : 'unset';
-      };
+                return fromCookie;
+            };
 
-      const readConsentStateFallback = () => {
-        const fromLocal = parseStoredConsent(localStorage.getItem(CONSENT_STORAGE_KEY));
-        if (fromLocal !== 'unset') {
-          return fromLocal;
-        }
+            const writeConsentStateFallback = (next) => {
+                if (!(next === 'accepted' || next === 'rejected')) {
+                    return;
+                }
 
-        const fromCookie = parseStoredConsent(
-          document.cookie
-            .split(';')
-            .map((part) => part.trim())
-            .find((part) => part.startsWith(`${CONSENT_STORAGE_KEY}=`))
-            ?.slice(`${CONSENT_STORAGE_KEY}=`.length),
-        );
+                localStorage.setItem(CONSENT_STORAGE_KEY, next);
+                document.cookie = `${CONSENT_STORAGE_KEY}=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
+            };
 
-        return fromCookie;
-      };
+            const consentApi = window.__scipopConsent ?? {
+                readConsentState: readConsentStateFallback,
+                    writeConsentState: writeConsentStateFallback,
+                    enableAnalytics: () => {},
+                    disableAnalytics: () => {},
+            };
 
-      const writeConsentStateFallback = (next) => {
-        if (!(next === 'accepted' || next === 'rejected')) {
-          return;
-        }
+            const getConsentStatusMessage = (consentState) => {
+                if (consentState === 'accepted') {
+                    return 'Current status: accepted.';
+                }
 
-        localStorage.setItem(CONSENT_STORAGE_KEY, next);
-        document.cookie = `${CONSENT_STORAGE_KEY}=${next}; Path=/; Max-Age=31536000; SameSite=Lax`;
-      };
+                if (consentState === 'rejected') {
+                    return 'Current status: rejected.';
+                }
 
-      const consentApi = window.__scipopConsent ?? {
-        readConsentState: readConsentStateFallback,
-        writeConsentState: writeConsentStateFallback,
-        enableAnalytics: () => {},
-        disableAnalytics: () => {},
-      };
+                return 'Current status: unset.';
+            };
 
-      const getConsentStatusMessage = (consentState) => {
-        if (consentState === 'accepted') {
-          return 'Current status: accepted.';
-        }
+            const renderCurrentConsentStatus = () => {
+                setConsentStatus(getConsentStatusMessage(consentApi.readConsentState()));
+            };
 
-        if (consentState === 'rejected') {
-          return 'Current status: rejected.';
-        }
+            renderCurrentConsentStatus();
 
-        return 'Current status: unset.';
-      };
+            if (consentApi?.readConsentState() === 'unset') {
+                openConsentBanner();
+            }
 
-      const renderCurrentConsentStatus = () => {
-        setConsentStatus(getConsentStatusMessage(consentApi.readConsentState()));
-      };
+            const applyConsent = (nextConsent) => {
+                if (!consentApi) {
+                    return;
+                }
 
-      renderCurrentConsentStatus();
+                consentApi.writeConsentState(nextConsent);
+                if (nextConsent === 'accepted') {
+                    consentApi.enableAnalytics();
+                } else {
+                    consentApi.disableAnalytics();
+                }
+                setConsentStatus('Privacy settings updated.');
+                closeConsentBanner();
+            };
 
-      if (consentApi?.readConsentState() === 'unset') {
-        openConsentBanner();
-      }
+            if (acceptButton instanceof HTMLButtonElement) {
+                acceptButton.addEventListener('click', () => applyConsent('accepted'));
+            }
 
-      const applyConsent = (nextConsent) => {
-        if (!consentApi) {
-          return;
-        }
+            if (rejectButton instanceof HTMLButtonElement) {
+                rejectButton.addEventListener('click', () => applyConsent('rejected'));
+            }
 
-        consentApi.writeConsentState(nextConsent);
-        if (nextConsent === 'accepted') {
-          consentApi.enableAnalytics();
-        } else {
-          consentApi.disableAnalytics();
-        }
-        setConsentStatus('Privacy settings updated.');
-        closeConsentBanner();
-      };
-
-      if (menuButton instanceof HTMLButtonElement && primaryMenu) {
-        const closeMenu = () => {
-          menuButton.setAttribute('aria-expanded', 'false');
-          primaryMenu.dataset.expanded = 'false';
-        };
-
-        menuButton.addEventListener('click', () => {
-          const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-          const next = String(!isOpen);
-          menuButton.setAttribute('aria-expanded', next);
-          primaryMenu.dataset.expanded = next;
-        });
-
-        primaryMenu.querySelectorAll('a').forEach((link) => {
-          link.addEventListener('click', closeMenu);
-        });
-      }
-
-      if (acceptButton instanceof HTMLButtonElement) {
-        acceptButton.addEventListener('click', () => applyConsent('accepted'));
-      }
-
-      if (rejectButton instanceof HTMLButtonElement) {
-        rejectButton.addEventListener('click', () => applyConsent('rejected'));
-      }
-
-      if (dismissButton instanceof HTMLButtonElement) {
-        dismissButton.addEventListener('click', () => {
-          closeConsentBanner();
-          setConsentStatus('');
-        });
-      }
+            if (dismissButton instanceof HTMLButtonElement) {
+                dismissButton.addEventListener('click', () => {
+                    closeConsentBanner();
+                    setConsentStatus('');
+                });
+}
 
       if (openPrivacyButton instanceof HTMLButtonElement) {
         openPrivacyButton.addEventListener('click', () => {
@@ -333,6 +414,7 @@ assertProductionTelemetryConfig();
     --space-2: 1rem;
     --space-3: 1.5rem;
     --space-4: 2.25rem;
+    --space-text-to-button: var(--space-2);
 
     --radius-sm: 0.4rem;
     --radius-md: 0.75rem;
@@ -380,50 +462,112 @@ assertProductionTelemetryConfig();
     display: block;
   }
 
-  .menu-toggle,
-  .primary-nav a {
+  .ui-pill-button {
+    appearance: none;
     min-height: 44px;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
     font-family: var(--font-ui);
     font-size: 0.98rem;
     letter-spacing: 0.01em;
-  }
-
-  .menu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.45rem;
     border: 1px solid var(--color-border);
-    background-color: var(--color-surface);
-    color: var(--color-text);
+    background: linear-gradient(180deg, #ffffff, #f7fafc);
+    color: var(--color-link);
     cursor: pointer;
-    justify-self: end;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    box-shadow: 0 8px 18px -14px rgba(18, 45, 61, 0.7);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease,
+      color 180ms ease;
+  }
+
+  .ui-pill-button:hover {
+    border-color: #a6b6bf;
+    background: #eef3f6;
+    color: #12384d;
+  }
+
+  .text-to-button-gap {
+    margin-top: var(--space-text-to-button);
+  }
+
+
+  .research-themes-list li.after-manual-separator {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--color-border);
   }
 
   .primary-nav {
-    grid-column: 1 / -1;
-    margin-top: var(--space-2);
+    justify-self: begin;
+    position: relative;
   }
 
-  .primary-nav a {
-    display: none;
-    color: var(--color-link);
+  .research-themes-menu {
+    position: relative;
+  }
+
+  .research-themes-trigger {
+    width: auto;
+  }
+
+  .research-themes-trigger::after {
+    content: '▾';
+    font-size: 0.75rem;
+    transition: transform 180ms ease;
+  }
+
+  .research-themes-menu[data-open='true'] .research-themes-trigger {
+    border-color: #9bb0bc;
+    background: #e8eef2;
+    box-shadow: 0 10px 24px -16px rgba(18, 45, 61, 0.85);
+  }
+
+  .research-themes-menu[data-open='true'] .research-themes-trigger::after {
+    transform: rotate(180deg);
+  }
+
+  .research-themes-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.45rem;
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    right: 0;
+    min-width: min(24rem, calc(100vw - 2rem));
+    background: #ffffff;
+    border: 1px solid #c4cfd5;
+    border-radius: var(--radius-md);
+    box-shadow: 0 18px 34px -26px rgba(15, 32, 43, 0.95);
+    z-index: 20;
+  }
+
+  .research-themes-list a {
+    display: block;
     text-decoration: none;
-    align-items: center;
+    color: var(--color-link);
+    transition: background-color 150ms ease, color 150ms ease;
   }
 
-  .primary-nav[data-expanded='true'] a {
-    display: flex;
+  .research-themes-list a:hover {
+    background-color: #eff4f7;
+    color: #12384d;
   }
 
-  .primary-nav a + a {
+  .research-themes-list li + li {
     margin-top: var(--space-1);
   }
 
-  .menu-toggle:focus-visible,
-  .primary-nav a:focus-visible,
-  .privacy-settings-link:focus-visible,
+  .ui-pill-button:focus-visible,
+  .research-themes-list a:focus-visible,
   .consent-btn:focus-visible,
   a:focus-visible {
     outline: 3px solid var(--color-focus);
@@ -443,16 +587,31 @@ assertProductionTelemetryConfig();
   .footer-inner {
     max-width: 70ch;
     margin-inline: auto;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: var(--space-1);
+    text-align: center;
   }
 
-  .privacy-settings-link {
-    border: none;
-    background: none;
+  .build-timestamp {
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    background: linear-gradient(180deg, #ffffff, #f6f8fa);
+    color: var(--color-muted);
+    font: 600 0.88rem/1.35 var(--font-ui);
+    letter-spacing: 0.01em;
+  }
+
+  .build-timestamp time {
+    color: var(--color-text);
+    font-weight: 700;
+  }
+
+  .build-timestamp-zone {
     color: var(--color-link);
-    text-decoration: underline;
-    font: 600 0.95rem/1.4 var(--font-ui);
-    cursor: pointer;
-    padding: 0;
+    font-weight: 700;
+    margin-left: 0.2rem;
   }
 
   .consent-banner {
@@ -522,14 +681,30 @@ assertProductionTelemetryConfig();
     margin-top: var(--space-3);
   }
 
-  h1,
-  h2,
-  h3 {
-    line-height: 1.25;
-    margin: 0;
-    font-family: var(--font-ui);
-    color: #122d3d;
-  }
+    h1,
+    h2,
+    h3 {
+        line-height: 1.25;
+        margin: 0;
+        margin-top: 2rem;
+        margin-bottom: 0.5rem;
+        font-family: var(--font-ui);
+        color: #122d3d;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+
+
 
   p {
     margin: 0;
@@ -557,36 +732,43 @@ assertProductionTelemetryConfig();
       font-size: 18px;
     }
 
-    .header-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-2);
-    }
-
     .brand-logo {
       width: 17rem;
     }
 
-    .menu-toggle {
-      display: none;
+    main {
+      padding-top: var(--space-4);
+    }
+  }
+
+  @media (max-width: 699px) {
+    .footer-inner {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .build-timestamp {
+      width: auto;
     }
 
     .primary-nav {
-      margin-top: 0;
-      display: flex;
-      gap: var(--space-1);
-      align-items: center;
+      width: 100%;
+      grid-column: 1 / -1;
     }
 
-    .primary-nav a,
-    .primary-nav[data-expanded='false'] a {
-      display: inline-flex;
-      margin-top: 0;
+    .research-themes-menu {
+      width: 100%;
     }
 
-    main {
-      padding-top: var(--space-4);
+    .research-themes-trigger {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .research-themes-list {
+      min-width: 100%;
+      right: auto;
+      left: 0;
     }
   }
 

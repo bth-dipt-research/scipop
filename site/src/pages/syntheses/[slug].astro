@@ -1,104 +1,101 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-
+import { withBase } from '../../lib/paths';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { DISCLAIMER_HEADING, resolveDisclaimer } from '../../lib/disclaimer';
+import { getQuestionText } from '../../lib/questionscontact';
 
 export async function getStaticPaths() {
-  const approvedSyntheses = (await getCollection('syntheses'))
+    const approvedSyntheses = (await getCollection('syntheses'))
     .filter((entry) => entry.data.status === 'approved');
 
-  return approvedSyntheses.map((entry) => ({
-    params: { slug: entry.data.slug },
-    props: { synthesis: entry },
-  }));
+    return approvedSyntheses.map((entry) => ({
+        params: { slug: entry.data.slug },
+        props: { synthesis: entry },
+    }));
 }
 
 interface Props {
-  synthesis: CollectionEntry<'syntheses'>;
+    synthesis: CollectionEntry<'syntheses'>;
 }
 
 const { synthesis } = Astro.props as Props;
 const { Content } = await render(synthesis);
 const disclaimerText = resolveDisclaimer(synthesis.data.disclaimer_override);
+const questionText = getQuestionText(synthesis.data.editor_name, synthesis.data.editor_email)
 
 if (!disclaimerText.trim()) {
-  throw new Error(`Missing disclaimer content for synthesis slug "${synthesis.data.slug}".`);
+    throw new Error(`Missing disclaimer content for synthesis slug "${synthesis.data.slug}".`);
 }
 ---
 
 <BaseLayout title={synthesis.data.title}>
-  <article class="long-form-article" data-long-form="true">
-    <header>
-      <h1>{synthesis.data.title}</h1>
-      <p>Cluster ID: {synthesis.data.cluster_id}</p>
-      <p>Reviewed: {synthesis.data.reviewed_at.toISOString().slice(0, 10)}</p>
-    </header>
+    <article class="long-form-article" data-long-form="true">
+        <header>
+            <h1>{synthesis.data.title}</h1>
+            <p>Reviewed: {synthesis.data.reviewed_at.toISOString().slice(0, 10)}</p>
+        </header>
 
-    <section class="editor-profile" data-phase5-editor-profile aria-label="Synthesis editor">
-      <img src={synthesis.data.editor_photo} alt={synthesis.data.editor_name} loading="lazy" />
-      <div>
-        <h2>Edited by {synthesis.data.editor_name}</h2>
-        <p>
-          <a href={`mailto:${synthesis.data.editor_email}`}>{synthesis.data.editor_email}</a>
-        </p>
-        <p data-phase5-editor-contact>{synthesis.data.editor_contact_sentence}</p>
-      </div>
-    </section>
+        <section class="editor-profile" data-phase5-editor-profile aria-label="Synthesis editor">
+            <img src={withBase(synthesis.data.editor_photo)} alt={synthesis.data.editor_name} loading="lazy" />
+            <div>
+                <p data-phase5-editor-contact><div set:html={questionText}/></p>
+            </div>
+        </section>
 
-    <Content />
+        <Content />
 
-    <section aria-label={DISCLAIMER_HEADING}>
-      <h2>{DISCLAIMER_HEADING}</h2>
-      <p>{disclaimerText}</p>
-    </section>
-  </article>
+        <section aria-label={DISCLAIMER_HEADING}>
+            <h2>{DISCLAIMER_HEADING}</h2>
+            <p><div set:html={disclaimerText}/></p>
+        </section>
+    </article>
 </BaseLayout>
 
 <style>
-  .editor-profile {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    border: 1px solid #ced5d9;
-    border-left: 0.35rem solid #d16d2e;
-    border-radius: 0.75rem;
-    background: #f8fbfc;
-    padding: 1rem;
-  }
-
-  .editor-profile img {
-    width: 8rem;
-    height: 8rem;
-    object-fit: cover;
-    border-radius: 999px;
-    border: 3px solid #173f56;
-  }
-
-  .editor-profile h2 {
-    margin: 0;
-    font-size: 1.05rem;
-  }
-
-  .editor-profile p {
-    margin-top: 0.5rem;
-  }
-
-  @media (min-width: 900px) {
     .editor-profile {
-      display: block;
-      max-width: 21rem;
-      float: left;
-      margin-right: 1.25rem;
-      margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        border: 1px solid #ced5d9;
+        border-left: 0.35rem solid #d16d2e;
+        border-radius: 0.75rem;
+        background: #f8fbfc;
+        padding: 1rem;
     }
 
     .editor-profile img {
-      float: left;
-      margin-right: 0.9rem;
-      margin-bottom: 0.5rem;
-      width: 5.5rem;
-      height: 5.5rem;
+        width: 8rem;
+        height: 8rem;
+        object-fit: cover;
+        border-radius: 999px;
+        border: 3px solid #173f56;
     }
-  }
+
+    .editor-profile h2 {
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    .editor-profile p {
+        margin-top: 0.5rem;
+    }
+
+    @media (min-width: 900px) {
+            .editor-profile {
+                display: block;
+                max-width: 21rem;
+                float: left;
+                margin-right: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .editor-profile img {
+                float: left;
+                margin-right: 0.9rem;
+                margin-bottom: 0.5rem;
+                width: 5.5rem;
+                height: 5.5rem;
+            }
+    }
 </style>

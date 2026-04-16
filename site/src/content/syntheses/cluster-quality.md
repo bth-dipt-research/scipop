@@ -2,20 +2,13 @@
 title: Quality
 slug: quality
 cluster_id: quality
-summary: Research synthesis on measurable software quality practices across reviews, testing, and technical debt.
-reviewed_at: 2026-04-01
+summary: Measurable software quality practices across reviews, testing, and technical debt.
+reviewed_at: 2025-10-10
 status: approved
-order: 3
-editor_name: Professor Kai Petersen
-editor_email: kai.petersen@bth.se
-editor_photo: /images/editor-kai-petersen.svg
-editor_contact_sentence: Questions regarding the research presented on this page? Please contact Professor Kai Petersen. kai.petersen@bth.se
+editor_name: Prof. Jürgen Börstler
+editor_email: jurgen.borstler@bth.se
+editor_photo: /images/jurgen-borstler.jpg
 ---
-
-This overview is based on research conducted at the Software Engineering
-Research Lab (SERL), Blekinge Institute of Technology.
-
-
 SERL investigates software quality where it matters - in code
 reviews, CI pipelines, testing assets, defect handling, data, and product
 documentation. Our work on modern code review explains how information spreads
@@ -38,6 +31,8 @@ quality and customer value, relate technical debt to lead time, and show how
 ownership, clones, and backward compatibility policies shape technical
 debt. Additional contributions include data-smell catalogues for AI-intensive
 systems, requirements/documentation debt, and developer views on “clean code.”
+
+## Current and Future Work
 
 Trends point to context-aware code reviews that blend reviewer guidance,
 diffusion insights, and NLP summaries to spotlight risk and recurring quality

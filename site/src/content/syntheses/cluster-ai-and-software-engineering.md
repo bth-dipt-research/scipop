@@ -2,19 +2,13 @@
 title: Artificial Intelligence and Software Engineering
 slug: ai-and-software-engineering
 cluster_id: ai-software-engineering
-summary: Synthesis of how AI-assisted workflows shape software development outcomes and collaboration.
-reviewed_at: 2026-04-01
+summary: AI-assisted workflows shaping software development outcomes and collaboration.
+reviewed_at: 2025-10-10
 status: approved
-order: 2
-editor_name: Professor Kai Petersen
-editor_email: kai.petersen@bth.se
-editor_photo: /images/editor-kai-petersen.svg
-editor_contact_sentence: Questions regarding the research presented on this page? Please contact Professor Kai Petersen. kai.petersen@bth.se
+editor_name: Prof. Nauman bin Ali
+editor_email: nauman.ali@bth.se
+editor_photo: /images/nauman-ali.jpg
 ---
-
-This overview is based on research conducted at the Software Engineering
-Research Lab (SERL), Blekinge Institute of Technology.
-
 SERL advances two complementary directions in the areas of artificial
 intelligence (AI) and software engineering (SE): using AI to make software work
 smoothly, and engineering AI-intensive systems to be dependable in the real

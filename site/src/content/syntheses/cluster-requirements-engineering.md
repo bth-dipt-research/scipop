@@ -2,19 +2,13 @@
 title: Requirements Engineering
 slug: requirements-engineering
 cluster_id: requirements-engineering
-summary: Synthesis of requirements engineering methods for quality, traceability, and compliance-aware delivery.
-reviewed_at: 2026-04-01
+summary: Requirements engineering methods for quality, traceability, and compliance-aware delivery.
+reviewed_at: 2025-10-10
 status: approved
-order: 4
-editor_name: Professor Kai Petersen
-editor_email: kai.petersen@bth.se
-editor_photo: /images/editor-kai-petersen.svg
-editor_contact_sentence: Questions regarding the research presented on this page? Please contact Professor Kai Petersen. kai.petersen@bth.se
+editor_name: Prof. Daniel Mendez
+editor_email: daniel.mendez@bth.se
+editor_photo: /images/daniel-mendez.jpg
 ---
-
-This overview is based on research conducted at the Software Engineering
-Research Lab (SERL), Blekinge Institute of Technology.
-
 SERL advances requirements engineering research to facilitate requirements
 engineering endeavours of high quality. Requirements manifest themselves in
 various forms but they are mostly written in natural language. A core thread

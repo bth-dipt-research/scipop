@@ -28,7 +28,7 @@ const getExistingHtmlPath = (route) => {
 };
 
 const readApprovedSynthesisSlugs = () => {
-  const synthDir = path.join(siteDir, '..', 'content', 'syntheses');
+  const synthDir = path.join(siteDir, 'src', 'content', 'syntheses');
   if (!fs.existsSync(synthDir)) {
     return [];
   }

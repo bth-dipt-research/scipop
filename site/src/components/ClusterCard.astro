@@ -1,20 +1,46 @@
 ---
 interface Props {
-  title: string;
-  summary: string;
-  href: string;
-  clusterId: string;
+    title: string;
+    summary: string;
+    href: string;
+    editorName: string;
 }
 
-const { title, summary, href, clusterId } = Astro.props;
+const { title, summary, href, editorName } = Astro.props;
 ---
 
 <article>
-  <h2>
-    <a href={href}>{title}</a>
-  </h2>
-  <p>{summary}</p>
-  <p>
-    <small>Cluster: {clusterId}</small>
-  </p>
+    <h2>
+        {title}
+    </h2>
+    <p class="summary">{summary}</p>
+    <p class="editor">Edited by: {editorName}</p>
+    <p class="actions">
+        <a href={href} class="ui-pill-button text-to-button-gap">Read more</a>
+    </p>
 </article>
+
+<style>
+    .summary {
+        text-align: justify;
+        text-justify: inter-word;
+        hyphens: auto;
+        color: var(--color-muted);
+    }
+
+        .editor {
+            font-weight: bold;
+            color: var(--color-muted);
+        }
+
+    .actions {
+        margin-top: 0;
+    }
+
+@media (max-width: 699px) {
+        .summary {
+            text-align: left;
+            hyphens: manual;
+        }
+    }
+</style>
