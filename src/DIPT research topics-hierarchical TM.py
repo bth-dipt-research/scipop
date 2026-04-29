@@ -116,38 +116,97 @@ if st.session_state.step == 1:
 elif st.session_state.step == 2:
     df = st.session_state.df
     st.header('Select data')
-    st.write('Publication types in the data set')
-
+    
     pbtype = 'PublicationType'
     if pbtype in df.keys():
+        st.subheader('Filter by publication type')
+        original_count = len(df)
+        st.write(f'**Original dataset:** {original_count} publications')
         st.write(df[pbtype].value_counts())
-
-        selected_pbtypes = st.multiselect(label='Select the publication types',
-                                          options=set(df[pbtype]))
-
-        df = df[df[pbtype].isin(selected_pbtypes)]
-        df = df.reset_index()
-        st.write('Publication types in the filtered data set')
-        st.write(df[pbtype].value_counts())
-        st.write(f'Total publications: {len(df)}')
+        
+        selected_pbtypes = st.multiselect(
+            label='Select the publication types to include',
+            options=sorted(set(df[pbtype])),
+            help='Choose one or more publication types. Publications matching any selected type will be included.'
+        )
+        
+        if selected_pbtypes:
+            df = df[df[pbtype].isin(selected_pbtypes)]
+            df = df.reset_index(drop=True)  # drop=True to avoid 'index' column pollution
+            filtered_count = len(df)
+            
+            st.write('---')
+            st.write(f'**Filtered dataset:** {filtered_count} publications')
+            st.write(df[pbtype].value_counts())
+            
+            # Show delta with color coding
+            delta = filtered_count - original_count
+            if delta < 0:
+                st.warning(f'Removed {abs(delta)} publications ({abs(delta)/original_count*100:.1f}%)')
+            elif delta == 0:
+                st.info('No publications removed (all types selected)')
+        else:
+            st.info('⚠️ No publication types selected. Please select at least one type to proceed.')
+            df = pd.DataFrame()  # Empty DataFrame to prevent downstream errors
     else:
-        st.write(len(df))
+        st.info(f'Dataset contains {len(df)} publications (no PublicationType column found)')
 
+    st.subheader('Select input columns for topic modeling')
+    
+    # Only show column selection if we have a filtered dataset
+    if len(df) > 0:
+        default_input_columns = [i for i in ['Title', 'Abstract', 'Keywords'] if i in df.keys()]
+        
+        input_columns = st.multiselect(
+            label='Select columns to use for topic modeling',
+            options=[col for col in df.keys() if col not in ['index', 'level_0']],  # Exclude index artifacts
+            default=default_input_columns,
+            help='Select one or more text columns. Topic model will analyze the combined text from all selected columns.'
+        )
+        
+        st.session_state.input = input_columns
+        
+        if input_columns:
+            st.success(f'✓ {len(input_columns)} column(s) selected: {", ".join(input_columns)}')
+            
+            # Preview combined text length
+            combined_text_sample = df[input_columns[0]].iloc[0] if len(df) > 0 else ""
+            st.write(f'Sample from first publication: `{combined_text_sample[:100]}...`')
+        else:
+            st.warning('⚠️ No columns selected. Please select at least one text column to proceed.')
+    else:
+        st.error('Cannot select columns: no publications in filtered dataset.')
+        st.session_state.input = []
+    
+    # Store filtered DataFrame and update fingerprint for checkpoint validation
     st.session_state.df_filtered = df
-
-    default_input_columns = [i for i in ['Title', 'Abstract'] if i in df.keys()]
-    input_columns = st.multiselect(
-        label='Select the input columns for the topic model',
-        options=df.keys(),
-        default=default_input_columns)
-
-    st.session_state.input = input_columns
-
-    cols = st.columns([1])
+    
+    if len(df) > 0 and st.session_state.input:
+        # Update fingerprint to reflect filtered dataset (actual modeling input)
+        st.session_state.dataset_fingerprint = compute_dataset_fingerprint(df)
+        st.write('---')
+        st.info(f'Filtered dataset fingerprint: `{st.session_state.dataset_fingerprint[:16]}...`')
+    
+    st.write('---')
+    cols = st.columns([2, 1])
     with cols[0]:
+        # Show validation status
+        ready = (
+            st.session_state.df_filtered is not None and
+            len(st.session_state.df_filtered) > 0 and
+            st.session_state.input is not None and
+            len(st.session_state.input) > 0
+        )
+        
+        if ready:
+            st.success(f'✓ Ready to proceed with {len(st.session_state.df_filtered)} publications')
+        else:
+            st.error('❌ Cannot proceed: select publication types and input columns')
+    
+    with cols[1]:
         st.button('Next', use_container_width=True,
                   on_click=lambda: goto(3),
-                  disabled=len(st.session_state.df_filtered) == 0)
+                  disabled=not ready)
 
 
 # # Making sure we have a paper id and create a citation id.
