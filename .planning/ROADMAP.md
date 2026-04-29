@@ -95,7 +95,12 @@ Plans:
   7. User can delete old checkpoints via management UI to free disk space
   8. User can export checkpoint as zip file for backup or sharing
   9. System creates sidebar navigation showing all 9 workflow steps with checkmarks for completed steps and highlighting current step
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Checkpoint manager module with save/load/validate/fingerprint
+- [ ] 07-02-PLAN.md — Streamlit checkpoint management UI and 9-step navigation
+
 **UI hint**: yes
 **Pitfall Prevention**: Checkpoint corruption (validate pickle integrity, check file sizes), disk space exhaustion (show total checkpoint disk usage, provide bulk delete), dataset mismatch (fingerprint comparison with clear error messages)
 
@@ -260,7 +265,7 @@ Plans:
 | 04. GDPR Compliance | v1.0 | Complete | Complete | 2026-04-08 |
 | 05. UI Polish | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 06. Data Upload & Filtering | v2.0 | 0/2 | Not started | - |
-| 07. Checkpoint Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 07. Checkpoint Infrastructure | v2.0 | 0/2 | Planned | - |
 | 08. Model Configuration & Training | v2.0 | 0/TBD | Not started | - |
 | 09. Basic Visualization | v2.0 | 0/TBD | Not started | - |
 | 10. Outlier Reduction Comparison | v2.0 | 0/TBD | Not started | - |
