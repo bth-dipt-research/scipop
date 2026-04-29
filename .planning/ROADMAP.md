@@ -73,7 +73,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can select which columns to use for topic modeling (title, abstract, keywords) via checkboxes
   4. System caches the uploaded DataFrame to prevent re-reading on every interaction
   5. System computes and stores dataset fingerprint (hash of filtered DataFrame) for checkpoint validation in later phases
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Enhanced upload with caching and fingerprinting
+- [ ] 06-02-PLAN.md — Enhanced filtering with real-time feedback and validation
+
 **Pitfall Prevention**: Session state race conditions (guard all state access, disable widgets during load)
 
 ### Phase 07: Checkpoint Infrastructure
@@ -254,7 +259,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 | 03. Analytics Baseline | v1.0 | Complete | Complete | 2026-04-05 |
 | 04. GDPR Compliance | v1.0 | Complete | Complete | 2026-04-08 |
 | 05. UI Polish | v1.0 | 3/3 | Complete | 2026-04-10 |
-| 06. Data Upload & Filtering | v2.0 | 0/TBD | Not started | - |
+| 06. Data Upload & Filtering | v2.0 | 0/2 | Not started | - |
 | 07. Checkpoint Infrastructure | v2.0 | 0/TBD | Not started | - |
 | 08. Model Configuration & Training | v2.0 | 0/TBD | Not started | - |
 | 09. Basic Visualization | v2.0 | 0/TBD | Not started | - |
