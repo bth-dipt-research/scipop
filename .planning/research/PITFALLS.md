@@ -1,249 +1,438 @@
-# Pitfalls Research
+# Pitfalls Research: Interactive Topic Modeling UI
 
-**Domain:** Static public websites for expert-reviewed research synthesis
-**Researched:** 2026-04-02
-**Confidence:** MEDIUM
+**Domain:** Interactive topic modeling with BERTopic + Streamlit
+**Researched:** 2026-04-29
+**Confidence:** HIGH
 
 ## Critical Pitfalls
 
-### Pitfall 1: Treating accessibility as a QA checkbox at the end
+### Pitfall 1: Session State Rerun Race Conditions
 
 **What goes wrong:**
-The site launches with inaccessible reading/navigation patterns (weak heading structure, non-descriptive links, poor keyboard focus behavior, missing alt text/captions), even if content quality is high.
+Streamlit reruns the entire script from top to bottom on every interaction. When adding topic model results to session state during a long-running computation, the app may rerun before the computation completes, leading to incomplete or corrupted state. Users see partial results, missing visualizations, or exceptions when accessing expected state keys.
 
 **Why it happens:**
-Teams assume static = simple, so they defer accessibility until pre-launch and rely mostly on automated checks.
+Developers assume synchronous execution but Streamlit's rerun model is interruptive. Any widget interaction (button click, slider change) triggers an immediate rerun, even if a cached function is still computing. Session state mutations during computation can be overwritten by the rerun initialization.
 
 **How to avoid:**
-- Set WCAG 2.2 AA as an explicit non-negotiable release criterion.
-- Bake semantic content rules into templates (single H1, heading hierarchy, meaningful link text, image alt requirements, media transcripts/captions).
-- Run both automated and manual checks (keyboard-only navigation, zoom/reflow, screen reader spot checks) in every content release cycle.
+- Use status indicators (`st.spinner`, `st.status`) to show long-running operations
+- Disable interactive widgets during computation using `disabled=True` parameter
+- Store computation results in session state only after completion, not incrementally
+- Use `st.cache_data` or `st.cache_resource` to prevent re-computation on rerun
+- Guard all session state access with existence checks: `if 'key' not in st.session_state`
 
 **Warning signs:**
-- Accessibility issues are filed only in “polish” phase.
-- Authors/editors can publish pages with missing alt text or skipped heading levels.
-- “Passes Lighthouse” is used as the only acceptance evidence.
+- `KeyError` exceptions on session state access
+- Widgets appear/disappear unexpectedly
+- Results show from previous runs mixed with current run
+- "Rerun requested while script was running" behaviors
 
 **Phase to address:**
-Phase 1 (Foundations: content model + templates) and Phase 2 (Accessibility verification before launch)
+Phase 1 (Data Upload & Filtering) — Establish session state patterns early
 
 ---
 
-### Pitfall 2: Publishing synthesis without visible provenance and review metadata
+### Pitfall 2: Memory Explosion from Uncached Embeddings
 
 **What goes wrong:**
-Readers cannot tell who wrote/reviewed content, when it was published/updated, or how conclusions were produced. Trust drops, especially for high-impact topics.
+Generating sentence embeddings for thousands of documents on every rerun consumes 2-10 GB of memory and takes 30-120 seconds. Without caching, every parameter adjustment (UMAP n_neighbors, HDBSCAN min_cluster_size) regenerates embeddings from scratch. App becomes unusably slow and crashes with OOM errors on large datasets (>1000 documents).
 
 **Why it happens:**
-Teams focus on prose quality but omit trust scaffolding (author/reviewer identity, methodology, source links, update history, uncertainty notes).
+Sentence transformers (all-mpnet-base-v2, all-MiniLM-L6-v2) are computationally expensive. Developers focus on caching topic model fitting but forget embeddings are generated first. BERTopic's `embedding_model` parameter triggers embedding generation inside `fit_transform()`, which isn't cached automatically.
 
 **How to avoid:**
-- Require per-page trust metadata: author(s), reviewer(s), published date, last updated date, methodology link, and source references.
-- Add machine-readable metadata (`Article` schema with `author`, `datePublished`, `dateModified`) plus matching visible dates.
-- Include explicit uncertainty/disagreement sections in synthesis pages.
+- **Pre-compute and cache embeddings separately** before topic modeling:
+  ```python
+  @st.cache_resource
+  def load_embedding_model():
+      return SentenceTransformer('all-mpnet-base-v2')
+  
+  @st.cache_data
+  def compute_embeddings(sentences, _model):  # underscore prefix = don't hash model
+      return _model.encode(sentences, show_progress_bar=True)
+  ```
+- Pass pre-computed embeddings to BERTopic: `topic_model.fit_transform(docs, embeddings=cached_embeddings)`
+- Set `BERTopic(embedding_model=None)` to prevent re-embedding
+- Use `batch_size` parameter for large datasets: `model.encode(docs, batch_size=32)`
+- Monitor memory with `st.sidebar.write(f"Memory: {psutil.Process().memory_info().rss / 1024**2:.0f} MB")`
 
 **Warning signs:**
-- Pages have no byline or only organization-level authorship.
-- Dates exist in page frontmatter but are not shown to users.
-- “Expert-reviewed” is claimed without naming reviewer role/process.
+- App hangs for 30+ seconds on every parameter change
+- Memory usage grows to 5-10 GB
+- "ResourceExhausted" or "Killed" errors in logs
+- Progress bars showing embedding generation repeatedly
 
 **Phase to address:**
-Phase 1 (Content schema + editorial policy) and Phase 3 (Trust & transparency layer)
+Phase 2 (Model Generation) — Cache embeddings before first model fit
 
 ---
 
-### Pitfall 3: “Freshness theater” instead of real content governance
+### Pitfall 3: Outlier Removal Destroys Document-Topic Mapping
 
 **What goes wrong:**
-Pages look current (new timestamps) without substantive updates; citations age out; contradictory or superseded claims remain live.
+After removing outlier topics (topic ID = -1), papers that only appeared in outlier topics have no remaining topic assignments. Export CSVs contain papers with empty topic lists. Visualizations crash when filtering by topic. Quality checks show 10-30% of papers have "no relevant topics" but this isn't surfaced until post-export.
 
 **Why it happens:**
-No ownership model or review cadence per synthesis page; update dates are treated as cosmetic SEO signals.
+Developers think of outlier removal as cleaning noise, but don't track which papers *only* exist in outlier topics. BERTopic assigns each sentence to exactly one topic. When you remove topic -1 and other noise topics, sentences from those topics don't get reassigned — they disappear from the topic model entirely.
 
 **How to avoid:**
-- Create an ownership + review SLA per page (owner, review interval, expiry trigger).
-- Use a “substantive change required” rule before changing `last updated` date.
-- Add stale-content flags and archival rules (e.g., “under review”, “superseded by version X”).
+- **Track paper-topic coverage BEFORE removal**:
+  ```python
+  papers_by_topic = output.groupby('paperid')['topic'].apply(set)
+  papers_at_risk = papers_by_topic[papers_by_topic.apply(
+      lambda topics: topics.issubset(topics_to_remove)
+  )]
+  ```
+- Show quality check UI: "Removing these topics will leave N papers without any topic assignments"
+- Provide remediation options:
+  - Lower HDBSCAN min_cluster_size to reduce outliers
+  - Adjust UMAP parameters to improve clustering
+  - Review papers at risk and decide if they're truly irrelevant
+- Store outlier removal impact in session state for undo capability
+- Build "papers with no topics" view BEFORE export phase
 
 **Warning signs:**
-- Date changes with no changelog or content diff.
-- Growing number of broken source links/citations.
-- No one can answer “who owns this page now?”
+- Large gaps in paper counts between upload and export
+- CSV exports with empty topic columns
+- User complaints: "Where did my papers go?"
+- High percentage (>15%) of outlier assignments in initial clustering
 
 **Phase to address:**
-Phase 4 (Operational governance and maintenance runbook)
+Phase 4 (Outlier Reduction) — Before allowing topic removal, show impact preview
 
 ---
 
-### Pitfall 4: GitHub Pages path/build assumptions causing broken public site behavior
+### Pitfall 4: Comparison State Leakage Between Parameter Variations
 
 **What goes wrong:**
-Site deploys, but navigation/assets fail (404s, wrong base paths, missing index/docs source, custom-domain routing regressions).
+Side-by-side parameter comparison shows the same results in both columns. User adjusts parameters (outlier reduction strategy A vs B, or nr_words=3 vs nr_words=5 for labels), but left and right columns display identical outputs. Clicking "Select left" applies the wrong parameters. Session state mixes up which model belongs to which comparison slot.
 
 **Why it happens:**
-Teams test locally at root path, then deploy as project site (`/<repo>`) or change publishing source/domain without validating path behavior.
+Session state keys for comparison results use simple names like `model_left` and `model_right` without scoping to the comparison context. When rebuilding models based on user selections, the code overwrites previous comparison state. BERTopic models contain mutable internal state (topics_, labels_, hierarchy), and session state doesn't create copies — both `model_left` and `model_right` may reference the same object.
 
 **How to avoid:**
-- Decide early: user/org site vs project site URL model.
-- Standardize link generation through static-site link helpers (avoid hardcoded absolute paths).
-- Add deploy smoke tests for homepage, cluster pages, synthesis detail pages, methodology page, and static assets after every publish.
-- Track GitHub Pages limits (build time, site size, bandwidth) and use Actions-based deploy if needed.
+- Use **namespaced session state keys** for comparison contexts:
+  ```python
+  st.session_state[f'comparison_{comparison_id}_left'] = model_left
+  st.session_state[f'comparison_{comparison_id}_right'] = model_right
+  ```
+- Create **deep copies** of models for comparison: `copy.deepcopy(topic_model)`
+- Store parameters alongside results:
+  ```python
+  st.session_state['comparison_left'] = {
+      'model': model_left,
+      'params': {'strategy': 'probabilities', 'threshold': 0.5},
+      'timestamp': time.time()
+  }
+  ```
+- Display parameter summary above each comparison column for verification
+- Use `st.cache_data` for comparison computations with parameter-specific keys
+- Clear previous comparison state before new comparison: `st.session_state.pop('comparison_*', None)`
 
 **Warning signs:**
-- Works locally, fails only after Pages deploy.
-- Intermittent 404s after domain or branch/source changes.
-- Hardcoded `/` paths in templates/content.
+- Identical results in supposedly different comparisons
+- Parameter changes don't affect comparison outputs
+- Selected option applies opposite set of parameters
+- Changing left side also changes right side
 
 **Phase to address:**
-Phase 2 (Deployment architecture) and Phase 5 (Post-deploy verification automation)
+Phase 4 (Outlier Reduction Comparison) & Phase 5 (Label Configuration Comparison) — Isolate comparison state
 
 ---
 
-### Pitfall 5: Analytics instrumentation that undermines user trust/privacy
+### Pitfall 5: Plotly Visualization Memory Leak on Rerun
 
 **What goes wrong:**
-Basic GA is added in a way that conflicts with user consent expectations or policy requirements, creating trust and compliance risk.
+After 10-20 parameter adjustments and reruns, Streamlit session memory grows to 2-3 GB. Hierarchical topic visualizations (`visualize_hierarchy()`) are regenerated on every rerun but previous Plotly figure objects aren't garbage collected. Browser tab slows down, eventually crashes with "Page unresponsive" error.
 
 **Why it happens:**
-“Just drop GA script” mindset, no consent mode integration, no explicit data-minimization decision.
+Plotly figures for hierarchical topics contain thousands of data points and SVG elements. Each `topic_model.visualize_hierarchy()` call creates a new 10-50 MB figure object. Streamlit's `st.plotly_chart()` keeps references to previous figures in session until explicit cleanup. Session state stores entire figure objects instead of serialized HTML, preventing garbage collection.
 
 **How to avoid:**
-- Define analytics policy before implementation (what is measured, legal basis, retention boundaries, no-PII rule).
-- Implement consent handling deliberately (default state + consent updates; region-aware behavior where applicable).
-- Verify no accidental PII in URLs/events and document measurement behavior publicly.
+- **Cache visualization generation** separately from model fitting:
+  ```python
+  @st.cache_data(ttl=3600, max_entries=10)
+  def generate_hierarchy_viz(_topic_model, _hierarchical_topics):
+      fig = _topic_model.visualize_hierarchy(
+          hierarchical_topics=_hierarchical_topics,
+          title='Topic Hierarchy'
+      )
+      return fig.to_html(include_plotlyjs='cdn')  # Return HTML, not figure object
+  ```
+- Use `st.empty()` containers and replace content instead of appending:
+  ```python
+  viz_container = st.empty()
+  with viz_container:
+      st.plotly_chart(fig, use_container_width=True)
+  ```
+- Set `max_entries` on visualization caches to limit memory
+- Store only serialized HTML in session state, not figure objects
+- Use `fig.update_layout(autosize=True)` and limit data points for large hierarchies
+- For very large topic models (>100 topics), generate static PNG instead of interactive Plotly
 
 **Warning signs:**
-- GA present but no consent flow/spec.
-- Event names/params include identifiable text inputs.
-- Team cannot explain what data is collected when consent is denied.
+- Memory usage grows continuously across reruns (monitor with `psutil`)
+- Browser tab sluggish after multiple interactions
+- "Out of memory" or tab crashes after 15-20 parameter changes
+- Streamlit session size exceeds 1 GB (check `st.session_state` size)
 
 **Phase to address:**
-Phase 3 (Trust/privacy policy) and Phase 5 (Instrumentation + audit)
+Phase 3 (Model Generation) & Phase 6 (Visualization) — Cache and limit visualization memory
 
 ---
 
-### Pitfall 6: Overly academic writing for a general audience
+### Pitfall 6: BERTopic Model Mutation Corrupts Cached State
 
 **What goes wrong:**
-Public readers bounce because synthesis pages are dense, jargon-heavy, and hard to scan, despite being factually strong.
+After merging topics or updating labels, previous cached model states show the new labels. Comparison UI shows merged results in "before merge" column. Undo functionality fails because cached model was mutated in place. Users can't reproduce earlier results even with identical parameters.
 
 **Why it happens:**
-Source material style is preserved without adaptation for web reading and accessibility-oriented plain language.
+`st.cache_resource` returns the same object instance across all sessions without copying. BERTopic methods like `merge_topics()`, `set_topic_labels()`, and `update_topics()` mutate the model in place. When you modify a cached model, you're modifying the cached singleton. All references to that model now see the mutated state.
 
 **How to avoid:**
-- Enforce plain-language editorial standards: concise lead summary, progressive disclosure, glossary for domain terms.
-- Use scannable structure: clear headings, meaningful links, short paragraphs, bullet summaries.
-- Add “quick read” layer at top of each synthesis (what’s known, confidence, limitations, implications).
+- **Use `st.cache_data` for topic models** instead of `st.cache_resource`:
+  ```python
+  @st.cache_data  # Creates copy on return
+  def fit_topic_model(sentences, embeddings, umap_params, hdbscan_params):
+      topic_model = BERTopic(...)
+      topics, probs = topic_model.fit_transform(sentences, embeddings)
+      return topic_model, topics, probs
+  ```
+- If using `st.cache_resource` for memory efficiency, **deep copy before mutation**:
+  ```python
+  @st.cache_resource
+  def get_base_model(...):
+      return topic_model
+  
+  base_model = get_base_model(...)
+  working_model = copy.deepcopy(base_model)  # Now safe to mutate
+  working_model.merge_topics(...)
+  ```
+- Store mutation history in session state for undo:
+  ```python
+  st.session_state['model_history'] = [
+      {'step': 'initial', 'model': copy.deepcopy(model)},
+      {'step': 'merged_topics', 'model': copy.deepcopy(model), 'action': {...}}
+  ]
+  ```
+- Document which BERTopic methods mutate vs. return new objects
 
 **Warning signs:**
-- Long unbroken sections with no summary boxes.
-- User testing feedback: “too technical” / “don’t know where to start.”
-- High exit rates from synthesis detail pages.
+- "Before" and "after" comparisons show identical results
+- Cannot reproduce earlier states with same parameters
+- Undo button shows already-merged state
+- Cached models change without cache invalidation
 
 **Phase to address:**
-Phase 1 (Content design system) and Phase 3 (Editorial quality gate)
+Phase 5 (Label Configuration) & Phase 7 (Manual Curation) — Before any model mutation operations
+
+---
+
+### Pitfall 7: UMAP/HDBSCAN Parameter Coupling Creates Confusing Results
+
+**What goes wrong:**
+Users adjust UMAP `n_components` from 2 to 5 to "create more topics" but get *fewer* topics and more outliers. Changing HDBSCAN `min_cluster_size` from 25 to 15 creates 50 micro-clusters of 1-2 papers each. Parameter tooltips don't explain interdependencies. Users waste hours tweaking parameters randomly without understanding the combined effect.
+
+**Why it happens:**
+UMAP and HDBSCAN are tightly coupled: UMAP's output dimensionality and density structure directly affect HDBSCAN's ability to find clusters. Increasing `n_components` spreads points in higher-dimensional space, making HDBSCAN find fewer dense regions. Developers treat parameters as independent sliders without explaining the clustering pipeline: Embeddings → UMAP → HDBSCAN → Topics.
+
+**How to avoid:**
+- **Show parameter guidance in UI** with interdependency explanations:
+  ```python
+  st.info("""
+  **Parameter relationships:**
+  - Lower n_components (2-3) → Tighter clusters → More outliers
+  - Higher n_components (5-10) → Spread points → Fewer large clusters
+  - Lower min_cluster_size → More small clusters (risk: noise clusters)
+  - Higher min_cluster_size → Fewer large clusters (risk: miss real topics)
+  """)
+  ```
+- Provide **presets** for common scenarios:
+  - "Conservative" (few large clusters): n_components=5, min_cluster_size=30
+  - "Balanced" (default): n_components=3, min_cluster_size=20
+  - "Granular" (many small clusters): n_components=2, min_cluster_size=10
+- Show **real-time preview metrics** as parameters change:
+  - Number of topics found
+  - % of papers in outliers (topic -1)
+  - Average cluster size
+  - Outlier rate by publication type
+- Link to "Understanding Topic Model Parameters" documentation
+- Validate parameter combinations: warn if n_components=10 + min_cluster_size=5 (likely too many tiny clusters)
+
+**Warning signs:**
+- User adjusts sliders repeatedly without improving results
+- Extreme parameter values (n_components=20, min_cluster_size=3)
+- Support questions: "How do I get more topics?"
+- 50+ micro-clusters or >50% outlier rate
+
+**Phase to address:**
+Phase 2 (Model Generation) — Before exposing raw parameters, add guidance and presets
+
+---
+
+### Pitfall 8: Sentence-Level Topics Don't Aggregate to Paper-Level Semantics
+
+**What goes wrong:**
+Topic model assigns each sentence to a topic independently. A single paper with abstract containing sentences about "testing", "data", and "security" gets split across three topics. Paper export lists all three topics but user expects one primary topic per paper. Themed CSV exports contain duplicate papers (appears in testing.csv AND security.csv). Synthesis generation fails because papers aren't cohesively grouped.
+
+**Why it happens:**
+Existing notebook workflow tokenizes abstracts into sentences for finer-grained topic detection (see line 166-168 in `src/DIPT research topics-hierarchical TM.py` comments). This improves topic modeling quality but creates paper-level aggregation complexity. Developers forget to build paper-level topic aggregation logic after sentence-level classification.
+
+**How to avoid:**
+- **Decide on primary aggregation strategy** and document in UI:
+  - **Most frequent topic**: Paper's primary topic = topic with most sentences
+  - **Highest probability**: Paper's primary topic = topic with highest avg probability across sentences
+  - **Multi-label**: Keep all topics, but show primary + secondary
+- Show aggregation preview before export:
+  ```python
+  paper_topics = df.groupby('paperid')['topic'].apply(
+      lambda x: x.mode()[0]  # Most frequent
+  )
+  st.write(f"Papers with 1 topic: {sum(counts == 1)}")
+  st.write(f"Papers with 2+ topics: {sum(counts > 1)}")
+  ```
+- Provide **filtering options** for themed CSV exports:
+  - "Include papers where topic appears in any sentence"
+  - "Include only papers where topic is primary"
+  - "Include papers where topic appears in >50% of sentences"
+- Store both sentence-level AND paper-level topic assignments in session state
+- Show paper-level topic distribution before manual curation (helps identify split papers)
+
+**Warning signs:**
+- Paper appears in 3+ themed CSV exports
+- Single paper has 5+ different topics in sentence view
+- User confusion: "Why is this testing paper in the security CSV?"
+- Low topic coherence in exported paper groups
+
+**Phase to address:**
+Phase 8 (Export) — Define aggregation strategy before CSV generation
 
 ---
 
 ## Technical Debt Patterns
 
-Shortcuts that feel fast in MVP but hurt trust and maintainability.
-
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Hardcode page URLs in markdown/templates | Fast initial publish | Broken links after IA/path changes | Only for throwaway prototype, not MVP release |
-| Copy-paste per-page metadata manually | No schema work now | Inconsistent bylines/dates/reviewer fields | Never for expert-reviewed publication |
-| Manual post-deploy checking only | No CI setup time | Repeated regressions and silent 404s | Only for first internal dry-run |
-| Update “last updated” without changelog | Looks fresh quickly | Trust erosion when changes are unverifiable | Never |
+| Skip embedding caching, regenerate on each parameter change | Simpler code (no cache management) | 30-120 sec waits per interaction, OOM crashes on large datasets | Never — caching is table stakes |
+| Store full BERTopic models in session state instead of just parameters | Easy access to all model methods | 100-500 MB memory per model, session state bloat, can't reproduce from params | Never for production; OK for prototype with <1000 docs |
+| Use `st.cache_resource` for topic models to save memory | 50% less memory than `st.cache_data` | Model mutations corrupt cache, comparison states leak, irreproducible results | Only if models are >500 MB AND you never mutate (rare) |
+| Single global "compare these two" state instead of scoped comparison contexts | Simpler state management (2 keys not N keys) | Can only compare one thing at a time, state leaks between comparisons | Early prototypes (Phase 1-3); must fix by Phase 4 |
+| Show raw parameter sliders without presets or guidance | Faster to implement | Users waste hours tuning parameters randomly, support burden | Never — at minimum provide tooltips with ranges |
+| Export themed CSVs with all papers mentioning topic (sentence-level) | Matches BERTopic output directly | Duplicate papers across CSVs, confusing for synthesis generation | OK if users understand multi-label nature; must document |
+| Generate Plotly visualizations on every rerun without caching | Always fresh, simpler code | Memory leak after 10-20 interactions, browser crashes | Never — visualization generation is expensive |
+| Reload full dataset from uploaded file on every parameter change | Consistent with upload state | Slow reruns, file upload widget flickers, loses filtering state | Never — cache DataFrame after upload/filtering |
+
+---
 
 ## Integration Gotchas
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| GitHub Pages | Misconfigured publishing source (`/docs` removed, wrong branch) | Lock source strategy and monitor Pages workflow/build logs |
-| GitHub Pages + custom domain | Domain switch without rebuild/path validation | Rebuild + run route smoke tests + verify canonical URL behavior |
-| GA4 | Load tracking without explicit consent design | Implement consent mode flow and document expected behavior per consent state |
-| Structured data | Add JSON-LD that conflicts with visible metadata | Keep visible byline/date and structured data values consistent |
+| BERTopic + Streamlit session state | Storing entire `BERTopic` object directly in `st.session_state['model']` → can't access from different session, mutation issues | Cache model creation with `@st.cache_data`, store only parameters + trained state (topics, labels, hierarchical_topics) in session state |
+| SentenceTransformer + caching | Caching embedding function without excluding model parameter: `@st.cache_data def embed(docs, model)` → UnhashableParamError | Use `@st.cache_resource` for model loading, `@st.cache_data` for embedding with `_model` parameter: `def embed(docs, _model)` |
+| Plotly + Streamlit columns | Generating two Plotly figures in side-by-side columns without keys → figures swap positions on rerun, wrong figure in wrong column | Use `st.plotly_chart(fig, key=f'fig_{side}_{param_hash}')` with unique keys per column and parameter set |
+| HDBSCAN + BERTopic | Passing `prediction_data=True` to HDBSCAN without realizing it doubles memory usage → OOM on large datasets | Only enable `prediction_data` if you need `.probabilities_` for new documents; disable for initial model fitting |
+| UMAP + reproducibility | Not setting `random_state=42` in UMAP → different embeddings on each run, can't reproduce topic model | Always set `random_state` in UMAP, HDBSCAN, and BERTopic for reproducible results |
+| Pandas + BERTopic output | Using `df.merge(topic_info)` without handling outlier topic -1 → KeyError or missing rows | Filter outliers before merge: `topic_info = topic_info[topic_info['Topic'] != -1]` or left join with `how='left'` |
+| Streamlit file uploader + caching | Caching function that uses `st.file_uploader` return value directly → cannot hash `UploadedFile` | Read file into bytes first: `file_bytes = uploaded_file.read()`, then cache function takes bytes |
+
+---
 
 ## Performance Traps
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Shipping oversized media/files in static repo | Slow page loads, failed build budgets | Optimize assets, cap image dimensions, precompress static files | Usually noticeable by first public launch on mobile networks |
-| Relying on default Pages build for growing content sets | Slow or timed-out deploys | Move to explicit GitHub Actions build pipeline with artifact deploy | As content volume approaches Pages size/build limits |
-| No broken-link checks on release | Trust-impacting dead citations/navigation | Add link-check CI and fail release on critical link errors | Starts small, compounds quickly with each publication cycle |
+| Generating sentence embeddings on every parameter change | 30-120 sec waits, 100% CPU for 2 min, memory grows to 5+ GB | Cache embeddings separately with `@st.cache_data`, pass pre-computed embeddings to BERTopic | >500 documents with sentence-level tokenization |
+| Regenerating hierarchical visualizations on every rerun | Slow reruns (5-10 sec), memory growth, browser lag | Cache visualization HTML with `@st.cache_data(ttl=3600)`, store HTML string not figure object | >50 topics in hierarchy |
+| Storing full topic models in session state without garbage collection | Memory grows from 200 MB to 2 GB over 20 interactions, eventual crash | Use `st.cache_data` for models (auto-managed), or manually clear old models: `st.session_state.pop('old_model', None)` | >5 model variations stored in session |
+| Reading uploaded CSV/XLSX on every rerun | 2-5 sec lag on every interaction, file uploader flickers | Cache DataFrame immediately after upload: `@st.cache_data def load_data(file_bytes, filename)` | Files >10 MB or >10,000 rows |
+| Computing sentence tokenization on every rerun | 1-3 sec lag, blocks UI updates | Cache tokenized sentences: `@st.cache_data def tokenize(abstracts)` using NLTK sent_tokenize | >1000 documents |
+| Filtering DataFrame in multiple places without caching | Repeated computation (10-50ms each), adds up across UI | Cache filtered DataFrame in session state after filtering step: `st.session_state['df_filtered']` | >5000 rows with complex filtering |
+| Rendering 1000-row DataFrames with `st.dataframe` without pagination | Slow initial render, laggy scrolling, high memory | Use `st.dataframe(height=400)` + pagination: only show top N rows, provide download CSV button for full data | >1000 rows |
+| Side-by-side comparison generating full topic models twice | 2-3 min wait for comparisons, 2x memory usage | Cache both model variations with parameter-specific keys, compute both in parallel with threading (if possible) | Parameter variations require full retraining |
 
-## Security Mistakes
-
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| Publishing private notes/reviewer comments in repo-backed site content | Accidental disclosure of internal deliberation | Separate public vs internal content folders and enforce pre-publish checks |
-| Allowing PII in analytics event payloads or query params | Privacy/legal exposure | Ban PII in tracking schema; lint event definitions; review URL/query handling |
-| Treating static hosting as “no security work needed” | Unmanaged dependency/template vulnerabilities | Keep static-site generator/theme dependencies patched and audited |
+---
 
 ## UX Pitfalls
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| No clear “methodology + limitations” entry point | Readers mistrust conclusions | Prominent methodology and limitations links on every synthesis page |
-| Unclear cluster navigation and hierarchy | Users cannot discover related syntheses | Consistent index/detail IA with breadcrumbs and related-links blocks |
-| Long-form synthesis with no summary layer | Non-experts abandon quickly | Add executive summary + key takeaways + confidence labels at top |
+| No progress indication during 60-120 sec embedding generation | User thinks app is frozen, refreshes page, loses work | Use `st.status` with step-by-step updates: "Loading model (10s)... Generating embeddings (90s)... Clustering (20s)..." |
+| Parameter sliders with no guidance on what values are reasonable | Random tweaking, frustration, poor results | Show recommended ranges in help tooltips, provide 3 presets (Conservative/Balanced/Granular), show live preview metrics |
+| Comparison UI shows identical results but doesn't explain why | User thinks app is broken, loses trust | Add parameter diff summary at top: "Comparing: min_cluster_size 20 vs 30" with differences highlighted |
+| Removing outlier topics without showing impact preview | User removes topics, 30% of papers vanish from export, confusion and frustration | Show "Impact Preview" before confirmation: "Removing these topics will leave 45 papers (12%) without any topic assignments. Continue?" |
+| Export generates 8 CSV files with no explanation of what's in each | User opens 8 files trying to find their data, doesn't understand multi-label output | Provide export summary: "security.csv: 87 papers (primary topic: security)" + README.txt explaining aggregation logic |
+| Side-by-side comparison but "Select left" button applies right parameters | User makes wrong choice, has to redo comparison, frustration | Show confirmation dialog: "Apply these parameters? - min_cluster_size: 20, min_samples: 15" with parameter summary |
+| No way to undo topic merge or label change | User makes mistake, has to restart entire workflow (15+ min), high frustration | Store model history in session state, provide "Undo last action" button with stack of previous states |
+| Upload 10,000-row CSV, app hangs for 5 minutes with no feedback | User thinks app crashed, closes tab and reports bug | Show upload progress: "Uploaded 10,000 rows... Validating columns... Filtering..." + estimated time remaining |
+
+---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Synthesis page template:** Includes visible byline, reviewer, published date, updated date, and methodology link.
-- [ ] **Accessibility:** Keyboard-only, heading structure, contrast, alt text, and link purpose checks completed on representative pages.
-- [ ] **Deployment:** Public URL smoke-tested for all core routes after deploy (home, cluster, detail, methodology, featured synthesis).
-- [ ] **Trust metadata:** Structured data values (`author`, `datePublished`, `dateModified`) match visible page metadata.
-- [ ] **Analytics:** Consent behavior validated and no PII in events/URLs.
-- [ ] **Maintenance:** Each published page has an owner and next-review date.
+- [ ] **Embedding caching:** Verify embeddings are cached separately from model fitting — check cache hit logs, confirm no re-encoding on parameter changes
+- [ ] **Session state initialization:** Every session state key has initialization guard (`if 'key' not in st.session_state`) — test by refreshing page mid-workflow
+- [ ] **Outlier impact preview:** Before topic removal, app shows count of papers that will have no remaining topics — test with dataset where 50% of papers are in topic -1
+- [ ] **Comparison state isolation:** Side-by-side comparisons use namespaced keys, verify left/right don't share references — test by making 3 comparisons in sequence
+- [ ] **Visualization memory management:** Plotly figures are cached and old figures are cleared — monitor memory usage over 20 parameter changes
+- [ ] **Paper-level aggregation logic:** Sentence-level topics are aggregated to paper level with documented strategy — verify paper doesn't appear in 5+ themed CSVs
+- [ ] **Widget state during computation:** Interactive widgets are disabled during long operations — try clicking buttons during 60-sec embedding generation
+- [ ] **Model mutation protection:** BERTopic models are deep copied before mutation or cached with `@st.cache_data` — test undo functionality and comparison consistency
+- [ ] **Parameter validation:** UMAP/HDBSCAN parameter combinations are validated (e.g., reject n_components=20 + min_cluster_size=3) — test with extreme values
+- [ ] **Upload state persistence:** Uploaded DataFrame is cached and doesn't reload on every parameter change — verify file uploader doesn't flicker on slider adjustment
+
+---
 
 ## Recovery Strategies
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Missing trust/provenance metadata across pages | MEDIUM | Define canonical metadata schema, backfill all published pages, add CI checks |
-| Accessibility regressions post-launch | HIGH | Triage by severity, patch templates first, re-audit representative sample before next release |
-| Widespread broken links after URL/path change | MEDIUM | Add redirects where possible, regenerate links via helpers, run full link validation |
-| Privacy issue in analytics implementation | HIGH | Disable affected tracking, remove offending fields, publish remediation note, re-enable with tested consent config |
+| Session state race condition corrupted state | LOW | Add initialization guards to all session state access, implement state validation on rerun, use `st.rerun()` to reset clean state |
+| Memory explosion from uncached embeddings | LOW | Add `@st.cache_data` to embedding generation, pass `_model` parameter, test with small dataset first, add memory monitoring to sidebar |
+| Outlier removal left papers without topics | MEDIUM | Add undo stack to session state, store model history before destructive operations, rebuild model from cached embeddings (2-5 min), implement impact preview UI |
+| Comparison state leaked between variations | LOW | Refactor to namespaced keys (`comparison_{id}_left/right`), clear previous comparison state on new comparison, add parameter summary display |
+| Plotly memory leak after 20 interactions | LOW | Cache visualization generation, convert to HTML string before storage, use `st.empty()` containers, add manual "Clear visualizations" button |
+| BERTopic model mutation corrupted cache | HIGH | Switch to `@st.cache_data` (forces copy), add deep copy before all mutations, rebuild cache (30-60 min), document which methods mutate |
+| UMAP/HDBSCAN parameters created 100 micro-clusters | LOW | Provide "Reset to defaults" button, show parameter presets, add validation warnings, explain parameter relationships in UI |
+| Sentence-level topics don't aggregate correctly | MEDIUM | Implement paper-level aggregation function, add aggregation strategy selector to UI, regenerate themed CSVs with new logic, update export documentation |
+
+---
 
 ## Pitfall-to-Phase Mapping
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Accessibility treated as late QA | Phase 1-2 | WCAG AA acceptance gates + manual test evidence in release checklist |
-| Missing provenance/review metadata | Phase 1 & 3 | Every synthesis page renders required trust fields and methodology links |
-| Freshness theater / stale content | Phase 4 | Owner + review date present; update-date changes tied to changelog entries |
-| GitHub Pages path/build breakage | Phase 2 & 5 | Post-deploy smoke tests and zero critical 404s |
-| Privacy-eroding analytics | Phase 3 & 5 | Consent behavior test cases pass; no PII in event payload audits |
-| Overly academic UX for general public | Phase 1 & 3 | Readability/editorial QA checklist passed on sampled pages |
+| Session state rerun race conditions | Phase 1: Data Upload & Filtering | Run upload → filter → navigate back → verify state intact; monitor logs for KeyError exceptions |
+| Memory explosion from uncached embeddings | Phase 2: Model Generation | Generate model with 1000 docs → adjust parameters → verify embeddings not regenerated (check timing and memory logs) |
+| Outlier removal destroys document-topic mapping | Phase 4: Outlier Reduction | Remove outlier topics → verify "papers with no topics" count shown; test with dataset where 40% are in topic -1 |
+| Comparison state leakage | Phase 4: Outlier Reduction Comparison | Create comparison → adjust parameters → verify left ≠ right; create 2nd comparison → verify doesn't affect 1st |
+| Plotly visualization memory leak | Phase 3: Model Generation, Phase 6: Visualization | Generate model → adjust parameters 20 times → monitor memory (should stay <500 MB), check browser memory usage |
+| BERTopic model mutation corrupts cache | Phase 5: Label Configuration, Phase 7: Manual Curation | Generate labels → merge topics → undo → verify returns to pre-merge state; compare "before" vs "after" columns |
+| UMAP/HDBSCAN parameter coupling | Phase 2: Model Generation | Test with extreme parameters → verify validation warnings; provide presets → verify reasonable topic counts |
+| Sentence-level topics don't aggregate | Phase 8: Export | Export themed CSVs → verify paper appears in ≤2 files; check aggregation strategy is documented in UI and README |
+
+---
 
 ## Sources
 
-- W3C WCAG 2.2 (Recommendation, updated 2024-12-12): https://www.w3.org/TR/WCAG22/  
-  (HIGH confidence for accessibility conformance expectations)
-- W3C Writing for Web Accessibility (updated 2024-07-16): https://www.w3.org/WAI/tips/writing/  
-  (HIGH confidence for content clarity/accessibility practices)
-- W3C WCAG-EM Overview (updated 2026-02-05): https://www.w3.org/WAI/test-evaluate/conformance/wcag-em/  
-  (HIGH confidence for evaluation methodology and lifecycle integration)
-- W3C Accessibility Statements guidance: https://www.w3.org/WAI/planning/statements/  
-  (MEDIUM confidence; page older but still normative guidance context)
-- GitHub Pages overview, config, troubleshooting, limits:  
-  https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages  
-  https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site  
-  https://docs.github.com/en/pages/getting-started-with-github-pages/troubleshooting-404-errors-for-github-pages-sites  
-  https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits  
-  (HIGH confidence for deployment/hosting pitfalls)
-- Jekyll link tag validation and path handling: https://jekyllrb.com/docs/liquid/tags/#links  
-  (HIGH confidence for Jekyll-based static link robustness)
-- Google Search Central: helpful, reliable content + trust signals (updated 2025-12-10):  
-  https://developers.google.com/search/docs/fundamentals/creating-helpful-content  
-  https://developers.google.com/search/docs/appearance/publication-dates  
-  https://developers.google.com/search/docs/appearance/structured-data/article  
-  (MEDIUM-HIGH confidence for trust/provenance discoverability patterns)
-- Google Analytics consent mode docs: https://support.google.com/analytics/answer/9976101  
-  (MEDIUM confidence for consent/measurement implementation pitfalls)
+**HIGH confidence sources:**
+- [Streamlit Session State Documentation](https://docs.streamlit.io/develop/concepts/architecture/session-state) — Official guidance on session state persistence and limitations
+- [Streamlit Caching Documentation](https://docs.streamlit.io/develop/concepts/architecture/caching) — Official guidance on `st.cache_data` vs `st.cache_resource`, mutation issues, memory management
+- [BERTopic GitHub Repository](https://github.com/maartengr/bertopic) — Official documentation on caching, memory optimization, visualization performance
+- [HDBSCAN Parameter Selection Guide](https://github.com/scikit-learn-contrib/hdbscan/blob/master/docs/parameter_selection.rst) — Official guidance on min_cluster_size and min_samples tuning
+- [UMAP Parameter Guide](https://umap-learn.readthedocs.io) — Official documentation on n_neighbors, min_dist, n_components interdependencies
+
+**MEDIUM confidence sources:**
+- Context7 documentation queries for Streamlit, BERTopic, HDBSCAN, UMAP — Aggregated best practices and common patterns
+- Existing scipop codebase analysis (`src/DIPT research topics-hierarchical TM.py`, `experiments/BTH research topics.ipynb`) — Real-world patterns and commenting showing known issues
+
+**Domain expertise:**
+- Interactive ML app patterns — Caching expensive operations, state management, comparison UI isolation
+- Streamlit rerun model implications — Race conditions, widget state management, memory leaks
+- Topic modeling workflow — Sentence vs document granularity, outlier handling, parameter interdependencies
 
 ---
-*Pitfalls research for: static expert-reviewed synthesis publication sites*
-*Researched: 2026-04-02*
+
+*Pitfalls research for: Interactive Topic Modeling UI (scipop v2.0)*  
+*Researched: 2026-04-29*  
+*Confidence: HIGH — based on official documentation, real codebase patterns, and domain expertise*

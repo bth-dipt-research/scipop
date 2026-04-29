@@ -1,103 +1,259 @@
-# Stack Research
+# Stack Research: Interactive Topic Modeling UI
 
-**Domain:** Static research-synthesis publishing site (Markdown-first, GitHub Pages, basic analytics)
-**Researched:** 2026-04-02
+**Domain:** Interactive topic modeling web application  
+**Researched:** 2026-04-29  
 **Confidence:** HIGH
 
-## Recommended Stack
+## Executive Summary
 
-### Core Technologies
+This research focuses on **stack additions needed for the v2.0 interactive topic modeling UI**, not the entire scipop stack. The existing stack (BERTopic 0.16.4, Streamlit 1.50.0, UMAP, HDBSCAN, pandas) is **validated and should be upgraded**, not replaced. Key additions are needed for side-by-side comparison UI, iterative workflow state, interactive visualizations, and export functionality.
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Astro | `^6.0` (acceptable: `^5.0`) | Static site generation from Markdown/content collections | Best fit for content-heavy static publishing: built-in Markdown + content collections + first-party GitHub Pages deploy docs. Minimal client JS by default, so pages stay fast/readable. **Confidence: HIGH** |
-| Node.js | `22 LTS` | Build/runtime for Astro in CI and local dev | Astro’s current engine requirement is Node `>=22.12.0`; aligning on Node 22 avoids CI drift and “works locally, fails in Actions” issues. **Confidence: HIGH** |
-| GitHub Pages + GitHub Actions | `actions/checkout@v5`, `actions/upload-pages-artifact@v4`, `actions/deploy-pages@v4` (or `withastro/action@v5`) | Hosting and deployment pipeline | Official GitHub guidance recommends Actions-based publishing for non-Jekyll/custom builds. This is now the standard path for modern static generators on Pages. **Confidence: HIGH** |
-| Google Analytics 4 (Google tag / gtag.js) | Current GA4 web tagging | Basic page-level usage analytics | GA4 is the current Analytics model; for MVP-level pageview tracking, a single global site tag in the shared layout is enough (no custom analytics backend/UI). **Confidence: HIGH** |
+**Core recommendation:** Upgrade core libraries to current stable versions and add minimal supporting tools for UI enhancements. Avoid adding heavy dependencies—keep the tool lightweight and focused.
 
-### Supporting Libraries
+---
+
+## Recommended Stack Additions
+
+### Core Framework Upgrades
+
+| Technology | Current | Recommended | Purpose | Why Upgrade |
+|------------|---------|-------------|---------|-------------|
+| **Streamlit** | 1.50.0 | **1.57.0** | Interactive web UI framework | Adds improved `st.columns()` layout control, better session state management, enhanced `st.dataframe()` with row selection events (`on_select`, `selection_mode`), and performance improvements for large datasets |
+| **BERTopic** | 0.16.4 | **0.17.4** | Topic modeling engine | Adds improved `reduce_outliers()` methods, enhanced `update_topics()` for iterative refinement, better `visualize_hierarchy()` output, and `merge_topics()` stability improvements |
+| **Plotly** | (not listed) | **6.7.0** | Interactive visualization backend | BERTopic's `visualize_hierarchy()` uses Plotly under the hood; explicit inclusion ensures compatibility and enables custom interactive visualizations |
+
+### Supporting Libraries (NEW)
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| `@astrojs/sitemap` | `^3.7` | Auto-generate `sitemap-index.xml` and sitemap files | Use by default for public content discoverability and cleaner SEO operations. |
-| `@astrojs/mdx` | `^5.0` | MDX support for richer synthesis pages | Use only if syntheses need embedded components/charts in Markdown. Skip for pure `.md` content. |
-| `rehype-slug` + `rehype-autolink-headings` | latest compatible | Stable anchor links on long-form pages | Use when syntheses are long and need section deep-linking/table-of-contents UX. |
+| **pandas** | 2.2+ | DataFrame comparison and diff operations | Already present (via BERTopic dependencies); explicitly require for side-by-side parameter result comparisons |
+| **None needed** | — | Interactive tables | Streamlit's built-in `st.dataframe()` with `on_select` and `column_config` is sufficient; **avoid adding streamlit-aggrid** unless basic tables prove inadequate |
 
 ### Development Tools
 
 | Tool | Purpose | Notes |
 |------|---------|-------|
-| TypeScript | Typed frontmatter/content schemas | Keep Astro content schemas typed to catch missing metadata during build. |
-| Prettier (+ `prettier-plugin-astro`) | Consistent formatting | Prevent noisy PR diffs for Markdown/frontmatter/layout files. |
-| GitHub Actions cache | Faster repeat builds | Cache package manager dependencies; improves CI turnaround for content-only updates. |
+| **Python 3.12** | Runtime environment | Already validated in existing stack |
+| **pip + requirements.txt** | Dependency management | Already validated; no need for poetry/pipenv in this project |
+
+---
 
 ## Installation
 
 ```bash
-# Core
-npm install astro
+# Core upgrades (replace existing versions)
+pip install --upgrade streamlit==1.57.0
+pip install --upgrade bertopic==0.17.4
+pip install plotly==6.7.0
 
-# Supporting
-npm install @astrojs/sitemap @astrojs/mdx rehype-slug rehype-autolink-headings
+# Supporting (likely already installed via BERTopic, but ensure versions)
+pip install --upgrade pandas>=2.2.0
 
-# Dev dependencies
-npm install -D typescript prettier prettier-plugin-astro
+# Existing dependencies (keep as-is unless conflicts arise)
+# These are already in requirements.txt and work with upgraded versions:
+# - umap-learn (via BERTopic)
+# - hdbscan (via BERTopic)
+# - sentence-transformers (via BERTopic)
+# - nltk==3.9.1 (for sentence tokenization)
+# - openpyxl==3.1.5 (for Excel upload support)
 ```
+
+---
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| Astro + content collections | Eleventy (11ty) | Choose Eleventy if your team already has deep 11ty/Nunjucks expertise and wants minimal framework conventions. |
-| GitHub Actions artifact deploy | Branch-based deploy (`/docs` or `gh-pages`) | Choose branch deploy only for ultra-simple prebuilt HTML and no build pipeline customization needs. |
-| Direct GA4 Google tag in layout | Google Tag Manager | Choose GTM when non-engineers must manage multiple marketing tags frequently. |
+| **Streamlit 1.57.0** | Dash (Plotly) | If you need fine-grained JavaScript callbacks or highly custom component behavior (overkill for this use case) |
+| **Built-in `st.dataframe()`** | streamlit-aggrid | Only if you need Excel-like cell editing or complex filtering UI (adds 40MB+ dependency, slows startup) |
+| **Plotly (via BERTopic)** | Altair / Bokeh | If you prefer declarative grammar of graphics (Altair) or need server-side interactions (Bokeh); Plotly is already integrated with BERTopic |
+| **Session state (built-in)** | Redis / SQLite | Only if you need persistent sessions across browser restarts (out of scope for v2.0) |
+
+---
 
 ## What NOT to Use
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| Universal Analytics (UA) docs/snippets | UA is legacy/deprecated for modern Analytics usage | GA4 Google tag (or GTM with GA4 tag) |
-| Ruby/Jekyll as default choice for this milestone | Adds Ruby toolchain and GitHub Pages plugin constraints (`safe: true`, supported plugin set) for a Node-centric content app | Astro + Actions deployment |
-| SSR-first framework setup (for this MVP) | Adds runtime complexity and hosting mismatch for a read-only static publication site | Pure static build (Astro default prerender) |
+| **streamlit-aggrid** | 40MB+ overhead, complex API, often causes version conflicts with pandas/Streamlit; built-in `st.dataframe()` now supports selection and column config | `st.dataframe()` with `on_select="rerun"` and `selection_mode="multi-row"` |
+| **Dash / Plotly Dash** | Requires Flask backend, more complex deployment model, JavaScript callback overhead | Streamlit (simpler, Python-native) |
+| **BERTopic <0.17** | Missing critical iterative refinement APIs (`reduce_outliers()` improvements, better `update_topics()` behavior) | BERTopic 0.17.4+ |
+| **Streamlit <1.55** | Missing `st.dataframe()` selection events and improved `st.columns()` gap control | Streamlit 1.57.0 |
+| **Custom state management (Redis, etc.)** | Adds deployment complexity, v2.0 scope explicitly excludes session persistence | `st.session_state` (built-in) |
 
-## Stack Patterns by Variant
+---
 
-**If content is mostly finalized Markdown with predictable frontmatter:**
-- Use Astro content collections + strict schema validation.
-- Because the build should fail fast on missing metadata before publish.
+## Stack Patterns by Feature
 
-**If pages need richer embeds (interactive figures/components):**
-- Add `@astrojs/mdx` only for those sections.
-- Because MDX gives flexibility without converting the entire site to client-heavy rendering.
+### Side-by-Side Comparison UI
+
+```python
+# Use Streamlit columns with explicit gap control (requires 1.55+)
+col1, col2 = st.columns(2, gap="large")
+
+with col1:
+    st.subheader("Option A")
+    st.dataframe(results_a)
+    
+with col2:
+    st.subheader("Option B")
+    st.dataframe(results_b)
+```
+
+**Why:** Streamlit 1.55+ adds `gap` parameter to `st.columns()` for better visual separation of comparison panels.
+
+### Iterative Workflow State
+
+```python
+# Use session state for multi-step workflow (built-in, no external library needed)
+if 'step' not in st.session_state:
+    st.session_state.step = 1
+if 'topic_model' not in st.session_state:
+    st.session_state.topic_model = None
+
+def goto(step: int):
+    st.session_state.step = step
+    st.rerun()
+
+# Step-based navigation
+if st.session_state.step == 1:
+    # Upload/filter step
+    pass
+elif st.session_state.step == 2:
+    # Parameter configuration step
+    pass
+```
+
+**Why:** Built-in session state is sufficient for single-user, non-persistent workflow tracking. No need for Redis, SQLite, or external state managers.
+
+### Interactive Visualizations
+
+```python
+# BERTopic generates Plotly figures by default
+hierarchical_topics = topic_model.hierarchical_topics(docs)
+fig = topic_model.visualize_hierarchy(hierarchical_topics=hierarchical_topics)
+
+# Display in Streamlit (native support for Plotly)
+st.plotly_chart(fig, use_container_width=True)
+
+# Export to HTML for download
+fig.write_html("topic_hierarchy.html")
+```
+
+**Why:** BERTopic's `visualize_hierarchy()` returns Plotly figures; Streamlit has native Plotly support via `st.plotly_chart()`. No additional visualization library needed.
+
+### Topic Info Tables with Selection
+
+```python
+# Use Streamlit's built-in dataframe with selection (requires 1.55+)
+topic_info = topic_model.get_topic_info()
+
+event = st.dataframe(
+    topic_info,
+    on_select="rerun",
+    selection_mode="multi-row",
+    key="topic_selection"
+)
+
+if event.selection.rows:
+    selected_topics = topic_info.iloc[event.selection.rows]['Topic'].tolist()
+    st.write(f"Selected topics: {selected_topics}")
+```
+
+**Why:** Streamlit 1.55+ added native row selection to `st.dataframe()`, eliminating need for streamlit-aggrid.
+
+### Export Functionality
+
+```python
+# Export topic model results
+output_df = topic_model.get_document_info(docs)
+csv = output_df.to_csv(index=False).encode('utf-8')
+
+st.download_button(
+    label="Download topic results (CSV)",
+    data=csv,
+    file_name="topic_results.csv",
+    mime="text/csv"
+)
+
+# Export topic model for reuse
+topic_model.save("my_topic_model", serialization="safetensors")
+```
+
+**Why:** Streamlit's `st.download_button()` handles in-memory exports. BERTopic 0.17.4 supports safetensors serialization (smaller, safer than pickle).
+
+---
 
 ## Version Compatibility
 
 | Package A | Compatible With | Notes |
 |-----------|-----------------|-------|
-| `astro@^6.0` | `node@22 LTS` | Astro latest requires Node `>=22.12.0`. Pin CI to Node 22. |
-| `@astrojs/mdx@^5.0` | `astro@^6.0` | MDX integration peer-dep aligns with Astro 6 major. |
-| `@astrojs/sitemap@^3.7` | `astro@^6.0` | Official Astro integration; generated files rely on configured `site` URL. |
+| Streamlit 1.57.0 | Python 3.10-3.14 | Requires Python >=3.10 (existing stack uses 3.12 ✓) |
+| BERTopic 0.17.4 | Python 3.10-3.13 | Compatible with Python 3.12 ✓ |
+| Plotly 6.7.0 | Python 3.8-3.13 | Compatible with Python 3.12 ✓ |
+| pandas 2.2+ | Python 3.9-3.13 | Compatible with Python 3.12 ✓ |
+| BERTopic 0.17.4 | Plotly 5.0+ | No known conflicts with Plotly 6.7.0 |
+| Streamlit 1.57.0 | pandas 1.3+ | No known conflicts with pandas 2.2+ |
 
-## Prescriptive Recommendation (for roadmap)
+**Critical:** All recommended versions are compatible with Python 3.12 (existing project requirement) and with each other.
 
-Use **Astro 6 + content collections + GitHub Actions Pages deploy + GA4 global tag** as the default stack.
+---
 
-Do **not** start with Jekyll or SSR frameworks for this milestone. The project goal is public, static publication of already-reviewed syntheses, and this stack minimizes moving parts while keeping the door open for richer MDX content later.
+## Integration Points
+
+### BERTopic ↔ Streamlit
+
+- **Workflow:** BERTopic outputs (topic info, hierarchical topics, document info) are pandas DataFrames → display directly with `st.dataframe()`
+- **Visualization:** BERTopic's `visualize_*()` methods return Plotly figures → display with `st.plotly_chart()`
+- **State:** Store trained `BERTopic` models in `st.session_state` for iterative refinement across steps
+
+### Streamlit ↔ pandas
+
+- **Comparison UI:** Store parameter variations as DataFrames in session state, display side-by-side in `st.columns()`
+- **Export:** Convert DataFrames to CSV/XLSX using pandas methods, serve via `st.download_button()`
+
+### BERTopic ↔ Plotly
+
+- **Hierarchical visualization:** `topic_model.visualize_hierarchy()` generates Plotly dendrogram
+- **Customization:** Plotly figures are mutable Python objects—modify before displaying in Streamlit if needed (e.g., update titles, colors)
+
+---
+
+## What NOT to Add
+
+### ❌ streamlit-aggrid
+**Reason:** Adds 40MB+, causes version conflicts, API complexity. Streamlit 1.55+ built-in `st.dataframe()` now supports row selection and column configuration, which covers 95% of use cases.
+
+**When to reconsider:** Only if you need Excel-like cell editing (not in v2.0 scope) or complex multi-column filtering UI (build custom filters with `st.multiselect()` instead).
+
+### ❌ Redis / SQLite for session state
+**Reason:** v2.0 scope explicitly excludes session persistence ("user exports results, no session management"). Adds deployment complexity.
+
+**When to reconsider:** Future milestone requiring multi-user collaboration or session recovery after browser restart.
+
+### ❌ Jupyter widgets (ipywidgets)
+**Reason:** v2.0 targets Streamlit UI, not Jupyter. Existing notebooks in `experiments/` can stay as-is for exploration.
+
+**When to reconsider:** Never for v2.0; notebooks are for prototyping, not production UI.
+
+### ❌ Flask / Dash backend
+**Reason:** Streamlit already provides a web server and deployment model. Adding Flask/Dash duplicates functionality and increases complexity.
+
+**When to reconsider:** Only if you need API endpoints (not in v2.0 scope) or need to integrate with non-Python services.
+
+---
 
 ## Sources
 
-- Astro docs — GitHub Pages deployment (official action, `site`/`base` config): https://docs.astro.build/en/guides/deploy/github/ (HIGH)
-- Astro docs — Content collections and static-first guidance: https://docs.astro.build/en/guides/content-collections/ (HIGH)
-- Astro docs — Markdown support and plugin model: https://docs.astro.build/en/guides/markdown-content/ (HIGH)
-- Astro docs — `@astrojs/sitemap` integration: https://docs.astro.build/en/guides/integrations-guide/sitemap/ (HIGH)
-- GitHub Docs — custom workflows with Pages (`configure-pages`, `upload-pages-artifact`, `deploy-pages`): https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages (HIGH)
-- GitHub Docs — publishing source guidance and custom workflow recommendation for non-Jekyll builds: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site (HIGH)
-- GitHub Docs — Jekyll on Pages constraints (`safe: true`, plugin limits): https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/about-github-pages-and-jekyll (HIGH)
-- Google Analytics dev docs — tagging options (Tag Manager vs gtag.js): https://developers.google.com/analytics/devguides/collection/ga4/tag-options (HIGH)
-- Google Analytics dev docs — web setup + tagging recommendation context: https://developers.google.com/analytics/devguides/collection/ga4/web (HIGH)
-- Google Analytics dev docs — pageview behavior (`send_page_view`, manual control): https://developers.google.com/analytics/devguides/collection/ga4/views (HIGH)
-- npm registry metadata — current package versions/engines (`astro`, `@astrojs/mdx`, `@astrojs/sitemap`): https://registry.npmjs.org/astro/latest, https://registry.npmjs.org/@astrojs/mdx/latest, https://registry.npmjs.org/@astrojs/sitemap/latest (MEDIUM)
+- **Streamlit 1.57.0** — PyPI (https://pypi.org/project/streamlit/1.57.0/) — Released 2026-04-28 (VERIFIED, HIGH confidence)
+- **BERTopic 0.17.4** — PyPI (https://pypi.org/project/bertopic/0.17.4/) — Released 2025-12-03 (VERIFIED, HIGH confidence)
+- **Plotly 6.7.0** — PyPI (https://pypi.org/project/plotly/6.7.0/) — Released 2026-04-09 (VERIFIED, HIGH confidence)
+- **Streamlit API docs** — Context7 (/streamlit/streamlit) — Session state, columns, dataframe selection (VERIFIED, HIGH confidence)
+- **BERTopic API docs** — Context7 (/maartengr/bertopic) — Visualization, save/load, reduce_outliers (VERIFIED, HIGH confidence)
+- **Plotly API docs** — Context7 (/plotly/plotly.py) — Dendrogram, write_html, interactive features (VERIFIED, HIGH confidence)
 
 ---
-*Stack research for: static research-synthesis publishing sites on GitHub Pages*
-*Researched: 2026-04-02*
+
+*Stack research for: Interactive topic modeling UI (v2.0 milestone)*  
+*Researched: 2026-04-29*  
+*Focus: NEW capabilities only—existing validated stack not re-researched*
