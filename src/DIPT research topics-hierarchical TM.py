@@ -4,6 +4,8 @@
 # In[1]:
 
 from pathlib import Path
+import io
+import hashlib
 import streamlit as st
 import pandas as pd
 from bertopic import BERTopic
@@ -14,6 +16,28 @@ from bertopic.representation import KeyBERTInspired
 from sklearn.feature_extraction.text import CountVectorizer
 from sentence_transformers import SentenceTransformer
 from nltk.tokenize import sent_tokenize
+
+
+@st.cache_data
+def load_dataframe(file_bytes: bytes, filename: str) -> pd.DataFrame:
+    """Load DataFrame from uploaded file bytes. Cached to prevent re-reading on rerun."""
+    if filename.endswith('.csv'):
+        return pd.read_csv(io.BytesIO(file_bytes))
+    elif filename.endswith('.xlsx'):
+        return pd.read_excel(io.BytesIO(file_bytes))
+    else:
+        raise ValueError(f"Unsupported file type: {filename}")
+
+
+def compute_dataset_fingerprint(df: pd.DataFrame) -> str:
+    """
+    Compute stable hash of DataFrame for checkpoint validation.
+    Uses sorted CSV representation to ensure consistent hashing.
+    """
+    # Sort by all columns to ensure stable hash regardless of row order
+    df_sorted = df.sort_values(by=list(df.columns)).reset_index(drop=True)
+    csv_bytes = df_sorted.to_csv(index=False).encode('utf-8')
+    return hashlib.sha256(csv_bytes).hexdigest()
 
 
 def goto(step: int):
@@ -35,6 +59,8 @@ if 'df_filtered' not in st.session_state:
     st.session_state.df_filtered = None
 if 'input' not in st.session_state:
     st.session_state.input = None
+if 'dataset_fingerprint' not in st.session_state:
+    st.session_state.dataset_fingerprint = None
 
 with st.sidebar:
     st.markdown("### Progress")
@@ -62,21 +88,28 @@ if st.session_state.step == 1:
         st.session_state.uploaded = file
         st.success(f'Uploaded: {file.name}')
 
-        if file.name.endswith('.csv'):
-            df = pd.read_csv(file)
-        else:
-            df = pd.read_excel(file)
+        # Cache file bytes to prevent re-reading on rerun (per PITFALLS.md)
+        file_bytes = file.read()
+        df = load_dataframe(file_bytes, file.name)
 
         st.write('Data preview')
         st.dataframe(df)
 
-        st.session_state.df = df
+        # Store in session state with existence guard
+        if 'df' not in st.session_state or st.session_state.df is None:
+            st.session_state.df = df
+
+        # Compute dataset fingerprint for checkpoint validation (Phase 07)
+        st.session_state.dataset_fingerprint = compute_dataset_fingerprint(df)
+        st.write(f'Dataset fingerprint: `{st.session_state.dataset_fingerprint[:16]}...`')
 
     cols = st.columns([1, 1])
     with cols[0]:
         st.button('Next', use_container_width=True,
                   on_click=lambda: goto(2),
-                  disabled=st.session_state.uploaded is None)
+                  disabled=(st.session_state.uploaded is None or 
+                           'df' not in st.session_state or 
+                           st.session_state.df is None))
     with cols[1]:
         st.button('Cancel', use_container_width=True,
                   on_click=cancel_upload_cb)
