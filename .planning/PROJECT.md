@@ -8,6 +8,20 @@ Static scipop is a public, static website that publishes expert-reviewed synthes
 
 Anyone can reliably access and understand the approved research syntheses through a simple, shareable public website.
 
+## Current Milestone: v2.0 Interactive Topic Modeling
+
+**Goal:** Build an interactive web UI that guides users through iterative topic model refinement with side-by-side parameter comparisons at key decision points.
+
+**Target features:**
+- Data upload and filtering (publications by type, select input columns)
+- Configurable model generation (UMAP, HDBSCAN, vectorizer, embedding parameters)
+- Iterative refinement with side-by-side comparisons at each step:
+  - Outlier reduction strategy comparison (before/after preview)
+  - Topic labeling configuration comparison (different nr_words settings)
+  - Manual topic curation with impact preview (merge/remove topics)
+  - Quality check showing papers with no remaining topics after removal
+- Visualization and export (hierarchical topic trees, topic info tables, themed paper CSVs)
+
 ## Requirements
 
 ### Validated
@@ -26,18 +40,35 @@ Anyone can reliably access and understand the approved research syntheses throug
 
 ### Active
 
-- [ ] Deploy the site on GitHub Pages with a stable public URL for sharing
+- [ ] Upload publication data (CSV/XLSX) and preview in UI
+- [ ] Filter publications by type and select input columns for topic modeling
+- [ ] Configure and run topic model with adjustable parameters (UMAP, HDBSCAN, vectorizer, embedding)
+- [ ] Compare outlier reduction strategies side-by-side and select preferred approach
+- [ ] Compare topic labeling configurations and select preferred settings
+- [ ] Manually curate topics (merge/remove) with impact preview
+- [ ] Show quality check: papers with no remaining topics after curation
+- [ ] Visualize hierarchical topic structure
+- [ ] Export topic model results and themed paper CSVs
+- [ ] Deploy the site on GitHub Pages with a stable public URL for sharing (from v1.0)
 
 ### Out of Scope
 
-- Automation pipeline for synthesis generation and publishing — explicitly deferred until after MVP publication succeeds
-- User accounts/authentication — not needed for public read-only synthesis delivery
-- Search/filter features — deferred to keep first release focused on core publish-and-browse flow
-- Custom analytics dashboards or interactive reporting tools — excluded from MVP; basic GA tracking only
+- Integration with v1.0 static site — v2.0 is a standalone tool, not part of the public website
+- Automated synthesis generation from topic models — still deferred; v2.0 focuses on topic model UI only
+- User accounts/authentication — not needed for local topic modeling tool
+- Persistent storage of topic model sessions — user exports results, no session management
+- Real-time collaboration — single-user tool for now
 
 ## Context
 
-This repository already contains exploratory topic-modeling work and synthesis-related prompt assets, but not a production publication surface for external readers. Current artifacts are primarily in local research workflows (`experiments/`, `src/`, `data/`, `prompts/`) and are not packaged as an audience-ready website. The user has validated synthesis quality through expert review and now wants to publish those approved syntheses first, then automate the pipeline in a later milestone.
+**v1.0 delivered:** A static publication website with homepage, synthesis pages, overview, methodology, readability/accessibility baseline, Google Analytics with GDPR consent, and UI polish.
+
+**v2.0 focus:** Build an interactive UI for the topic modeling workflow that currently exists only in Jupyter notebooks (`experiments/BTH research topics.ipynb`) and partially in a Streamlit prototype (`src/DIPT research topics-hierarchical TM.py`). The notebook demonstrates an iterative refinement process where parameters are adjusted manually and outputs compared by eye. The new UI should formalize this workflow with side-by-side comparisons at key decision points.
+
+**Existing topic modeling artifacts:**
+- Notebook workflow: `experiments/BTH research topics.ipynb`
+- Partial Streamlit prototype: `src/DIPT research topics-hierarchical TM.py` (upload + filtering only)
+- BERTopic-based pipeline with UMAP, HDBSCAN, KeyBERT representation
 
 Existing codebase map documents:
 - `/.planning/codebase/STACK.md`
@@ -46,11 +77,11 @@ Existing codebase map documents:
 
 ## Constraints
 
-- **Hosting**: GitHub Pages — required for initial deployment target and sharing simplicity
-- **Content Source**: Markdown-first — finalized syntheses are currently stored in markdown files
-- **Scope**: MVP publication only — no planning/execution for end-to-end automation yet
-- **Audience**: General public — content presentation should be readable beyond domain experts
-- **Delivery Model**: Static site architecture — avoid backend/runtime complexity in v1
+- **Tech Stack**: Python + Streamlit — topic modeling UI should extend existing Streamlit prototype
+- **Workflow Fidelity**: Mirror notebook workflow — must replicate the iterative refinement process from `experiments/BTH research topics.ipynb`
+- **ML Stack**: BERTopic + UMAP + HDBSCAN — keep existing topic modeling pipeline components
+- **Comparison UI**: Side-by-side parameter variations — core convenience feature for decision points
+- **Scope**: Topic modeling tool only — v2.0 does not integrate with static site publication from v1.0
 
 ## Key Decisions
 
@@ -87,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after Phase 5*
+*Last updated: 2026-04-29 after starting milestone v2.0*
