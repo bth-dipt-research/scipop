@@ -103,17 +103,18 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Pitfall Prevention**: Plotly visualization memory leak (cache HTML not figure objects, use st.empty() containers)
 
 ### Phase 09: Outlier Reduction Comparison
-**Goal**: Users can compare 2-3 outlier reduction strategies side-by-side and select the preferred approach, demonstrating v2.0's core value proposition and establishing comparison patterns for later phases
+**Goal**: Users can compare 2-3 UMAP/HDBSCAN parameter configurations side-by-side to minimize outliers through retraining, demonstrating v2.0's core value proposition and establishing comparison patterns for later phases
 **Depends on**: Phase 08
 **Requirements**: TM-04
 **Success Criteria** (what must be TRUE):
-  1. User can trigger side-by-side comparison of outlier reduction strategies (c-TF-IDF, distributions, embeddings)
-  2. User sees before/after metrics for each strategy (outlier count, reassignment distribution, sample paper movements)
-  3. User can select the preferred outlier reduction strategy and apply it to the working model
-  4. System isolates comparison state to prevent results leaking between left/right columns
+  1. User can configure 2-3 alternative parameter sets targeting different outlier/granularity tradeoffs (e.g., Conservative/Balanced/Granular presets or custom UMAP/HDBSCAN values)
+  2. System trains models in parallel or sequentially with each parameter configuration, reusing cached embeddings to minimize overhead
+  3. User sees side-by-side comparison showing outlier count, total topics, average topic size, and sample topic labels for each configuration
+  4. User can select the preferred parameter configuration and replace the working model with the chosen variant
+  5. System isolates comparison state to prevent model objects leaking between left/right/center columns
 **Plans**: TBD
 **UI hint**: yes
-**Pitfall Prevention**: Comparison state leakage (use namespaced session keys, deep copy models), outlier removal destroys document-topic mapping (show impact preview)
+**Pitfall Prevention**: Retraining overhead (reuse embeddings across parameter variations, show progress clearly), comparison state leakage (use namespaced session keys, deep copy models), parameter coupling confusion (provide presets with rationale)
 
 ### Phase 10: Topic Labeling Comparison
 **Goal**: Users can compare 2-3 topic labeling configurations side-by-side and select optimal label verbosity, reusing the comparison patterns established in Phase 09

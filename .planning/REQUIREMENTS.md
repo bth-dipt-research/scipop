@@ -44,7 +44,7 @@ Requirements for v2.0 Interactive Topic Modeling milestone. Each maps to exactly
 
 ### Iterative Refinement
 
-- [ ] **TM-04**: User can compare outlier reduction strategies side-by-side and select preferred approach
+- [ ] **TM-04**: User can compare UMAP/HDBSCAN parameter configurations side-by-side to minimize outliers through retraining and select preferred approach
 - [ ] **TM-05**: User can compare topic labeling configurations side-by-side and select preferred settings
 - [ ] **TM-06**: User can manually curate topics (merge/remove) with impact preview before applying changes
 

@@ -44,7 +44,7 @@ The v2.0 feature set extends the existing upload + filter prototype (steps 1-2) 
 - Model and results export (CSV/XLSX/pickle)
 
 **Should have (differentiators):**
-- **Side-by-side outlier reduction comparison** — Compare 2-4 strategies (c-TF-IDF, distributions, embeddings) with before/after metrics to avoid trial-and-error
+- **Side-by-side outlier reduction comparison** — Compare 2-3 UMAP/HDBSCAN parameter configurations (e.g., min_cluster_size, n_components) side-by-side to minimize outliers through informed parameter tuning with retraining
 - **Side-by-side topic labeling comparison** — Show 3-5 word vs 7-10 word labels side-by-side for optimal verbosity selection
 - **Manual topic merge/remove with impact preview** — Show "before merge" vs "after merge" topic structure without re-training
 - **Quality check: papers with no topics** — Explicit QC step after manual curation prevents orphaning documents
@@ -160,22 +160,23 @@ Based on research, suggested phase structure follows the natural workflow progre
 **Research flags:** Low complexity; BERTopic's `visualize_hierarchy()` is built-in, just needs proper caching. No additional research needed.
 
 ### Phase 4: Outlier Reduction Comparison (First Decision Point)
-**Rationale:** BERTopic creates -1 outliers by default; outlier reduction is first major refinement decision. Side-by-side comparison of strategies (c-TF-IDF, distributions, embeddings) demonstrates v2.0's core value proposition. Must establish comparison state isolation patterns for Phases 5 and 7.
+**Rationale:** BERTopic creates -1 outliers by default; minimizing outliers through parameter tuning is first major refinement decision. Side-by-side comparison of 2-3 UMAP/HDBSCAN parameter configurations demonstrates v2.0's core value proposition. Must establish comparison state isolation patterns for Phases 5 and 7.
 
-**Delivers:** Side-by-side comparison view for 2-3 outlier reduction strategies with before/after metrics (outlier count, sample reassignments), strategy selection UI, impact preview before applying.
+**Delivers:** Side-by-side comparison view for 2-3 parameter configurations (e.g., Conservative/Balanced/Granular presets or custom UMAP/HDBSCAN values) with metrics (outlier count, total topics, avg topic size, sample labels), configuration selection UI.
 
 **Addresses:**
-- Differentiator: Side-by-side outlier reduction comparison
-- Table stakes: Outlier handling workflow
+- Differentiator: Side-by-side outlier reduction comparison via parameter tuning
+- Table stakes: Outlier minimization workflow
 
 **Implements:**
-- Architecture: Side-by-Side Comparison Views (using `st.columns(2)`)
+- Architecture: Side-by-Side Comparison Views (using `st.columns(2)` or `st.columns(3)`)
 
 **Avoids:**
-- Pitfall #3 (outlier removal destroys document-topic mapping) — Show impact preview, quality check for papers losing all topics
+- Pitfall #2 (memory explosion from uncached embeddings) — Reuse cached embeddings across parameter variations to minimize retraining overhead
 - Pitfall #4 (comparison state leakage) — Use namespaced session state keys, deep copy models
+- Pitfall #7 (UMAP/HDBSCAN parameter coupling) — Provide presets with rationale, explain parameter relationships
 
-**Research flags:** Medium complexity; BERTopic outlier reduction strategies are documented, but comparison state isolation requires careful session state management. Pattern established here reused in Phases 5 and 7.
+**Research flags:** Medium-HIGH complexity; requires retraining models with different parameters (more expensive than post-training outlier reduction), comparison state isolation requires careful session state management, embeddings must be cached and reused. Pattern established here reused in Phases 5 and 7.
 
 ### Phase 5: Topic Labeling Comparison (Second Decision Point)
 **Rationale:** KeyBERT `nr_words` parameter affects topic interpretability; side-by-side comparison of 3-5-7 word labels lets users choose optimal verbosity. Simpler than Phase 4 (same model, different representation) but reuses comparison patterns.
