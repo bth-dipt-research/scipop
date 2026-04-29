@@ -75,19 +75,22 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Pitfall Prevention**: Session state race conditions (guard all state access, disable widgets during load)
 
 ### Phase 07: Model Configuration & Training
-**Goal**: Users can configure topic model parameters and train models with cached embeddings and progress indicators, establishing the ML caching patterns that determine overall app performance
+**Goal**: Users can configure topic model parameters, train models with cached embeddings, and create the first checkpoint, establishing both ML caching patterns and the checkpoint system that enable iterative refinement
 **Depends on**: Phase 06
 **Requirements**: TM-03
 **Success Criteria** (what must be TRUE):
-  1. User can configure UMAP parameters (n_neighbors, n_components, min_dist) with guidance explaining parameter relationships
-  2. User can configure HDBSCAN parameters (min_cluster_size, min_samples) with preset options (Conservative/Balanced/Granular)
-  3. User can configure vectorizer settings (n-gram range, min_df, max_df) for topic representation
-  4. System generates and caches embeddings separately to prevent 30-120 sec regeneration on parameter changes
-  5. User sees progress indicators for long-running operations (embedding generation, model training)
-  6. User sees basic topic list view with topic IDs, labels, and document counts after successful training
+  1. User can navigate between workflow steps via sidebar showing all 8 steps with checkmarks for completed steps and highlighting current step
+  2. User can configure UMAP parameters (n_neighbors, n_components, min_dist) with guidance explaining parameter relationships
+  3. User can configure HDBSCAN parameters (min_cluster_size, min_samples) with preset options (Conservative/Balanced/Granular)
+  4. User can configure vectorizer settings (n-gram range, min_df, max_df) for topic representation
+  5. System generates and caches embeddings separately to prevent 30-120 sec regeneration on parameter changes
+  6. User sees progress indicators for long-running operations (embedding generation, model training)
+  7. User sees basic topic list view with topic IDs, labels, and document counts after successful training
+  8. System creates first checkpoint (timestamp, config, model object, metadata) automatically when user proceeds to next step
+  9. User is prompted to save checkpoint when navigating backward to earlier steps
 **Plans**: TBD
 **UI hint**: yes
-**Pitfall Prevention**: Memory explosion from uncached embeddings (cache with @st.cache_data), UMAP/HDBSCAN parameter coupling confusion (add guidance and presets)
+**Pitfall Prevention**: Memory explosion from uncached embeddings (cache with @st.cache_data), UMAP/HDBSCAN parameter coupling confusion (add guidance and presets), checkpoint serialization size (use pickle protocol 5 for large models)
 
 ### Phase 08: Basic Visualization
 **Goal**: Users can visualize initial topic model results with hierarchical structure and topic-document assignments, providing validation feedback before refinement
@@ -103,31 +106,35 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Pitfall Prevention**: Plotly visualization memory leak (cache HTML not figure objects, use st.empty() containers)
 
 ### Phase 09: Outlier Reduction Comparison
-**Goal**: Users can compare 2-3 UMAP/HDBSCAN parameter configurations side-by-side to minimize outliers through retraining, demonstrating v2.0's core value proposition and establishing comparison patterns for later phases
+**Goal**: Users can adjust UMAP/HDBSCAN parameters to minimize outliers and compare current results against any previously saved checkpoint, demonstrating v2.0's core value proposition of checkpoint-based iterative refinement
 **Depends on**: Phase 08
 **Requirements**: TM-04
 **Success Criteria** (what must be TRUE):
-  1. User can configure 2-3 alternative parameter sets targeting different outlier/granularity tradeoffs (e.g., Conservative/Balanced/Granular presets or custom UMAP/HDBSCAN values)
-  2. System trains models in parallel or sequentially with each parameter configuration, reusing cached embeddings to minimize overhead
-  3. User sees side-by-side comparison showing outlier count, total topics, average topic size, and sample topic labels for each configuration
-  4. User can select the preferred parameter configuration and replace the working model with the chosen variant
-  5. System isolates comparison state to prevent model objects leaking between left/right/center columns
+  1. User can adjust UMAP/HDBSCAN parameters and retrain model (reusing cached embeddings)
+  2. User can select any previous checkpoint from dropdown (showing timestamp, topic count, outlier %) for comparison
+  3. User sees side-by-side comparison (2 columns) showing "Current" vs "Selected Checkpoint" with metrics: outlier count, total topics, average topic size, sample topic labels
+  4. User sees full parameter configuration displayed for both Current and Selected Checkpoint
+  5. System creates new checkpoint automatically when user proceeds to next step
+  6. System prompts user to save checkpoint when navigating backward to earlier steps
 **Plans**: TBD
 **UI hint**: yes
-**Pitfall Prevention**: Retraining overhead (reuse embeddings across parameter variations, show progress clearly), comparison state leakage (use namespaced session keys, deep copy models), parameter coupling confusion (provide presets with rationale)
+**Pitfall Prevention**: Retraining overhead (reuse embeddings across parameter variations, show progress clearly), comparison state leakage (ensure checkpoint is deep copy of model), parameter coupling confusion (provide presets with rationale), checkpoint memory usage (monitor pickle size for large models)
 
 ### Phase 10: Topic Labeling Comparison
-**Goal**: Users can compare 2-3 topic labeling configurations side-by-side and select optimal label verbosity, reusing the comparison patterns established in Phase 09
+**Goal**: Users can adjust topic labeling verbosity and compare current labels against any previously saved checkpoint, reusing the checkpoint-based comparison patterns established in Phase 09
 **Depends on**: Phase 09
 **Requirements**: TM-05
 **Success Criteria** (what must be TRUE):
-  1. User can trigger side-by-side comparison of nr_words settings (e.g., 5 words, 7 words, 10 words)
-  2. User sees topic labels at different verbosity levels displayed in split columns for direct comparison
-  3. User can select the preferred labeling configuration and apply it to update topic representation
-  4. System prevents model mutation from corrupting cached state during representation updates
+  1. User can adjust nr_words settings (e.g., 5, 7, 10 words) and update topic representation
+  2. User can select any previous checkpoint from dropdown for comparison
+  3. User sees side-by-side comparison (2 columns) showing "Current" vs "Selected Checkpoint" topic labels at different verbosity levels
+  4. User sees full labeling configuration displayed for both Current and Selected Checkpoint
+  5. System prevents model mutation from corrupting cached state during representation updates
+  6. System creates new checkpoint automatically when user proceeds to next step
+  7. System prompts user to save checkpoint when navigating backward to earlier steps
 **Plans**: TBD
 **UI hint**: yes
-**Pitfall Prevention**: Model mutation corrupts cache (use @st.cache_data or deep copy before mutation), comparison state leakage (reuse Phase 09 patterns)
+**Pitfall Prevention**: Model mutation corrupts cache (deep copy before representation update), comparison state leakage (reuse Phase 09 checkpoint patterns), checkpoint versioning (ensure representation changes are captured in checkpoint metadata)
 
 ### Phase 11: Manual Topic Curation
 **Goal**: Users can manually merge similar topics and remove noise topics with impact preview, completing the iterative refinement workflow before quality validation
@@ -138,9 +145,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can select multiple topics for merging via multiselect with before/after topic structure preview
   3. User sees impact preview showing which papers will lose all topics before confirming removal
   4. System applies merge/remove operations only after user confirmation, preserving pre-curation state for comparison
+  5. System creates new checkpoint automatically after manual curation operations are applied
+  6. System prompts user to save checkpoint when navigating backward to earlier steps
 **Plans**: TBD
 **UI hint**: yes
-**Pitfall Prevention**: Outlier removal destroys document-topic mapping (compute and show at-risk papers), model mutation corrupts cache (deep copy before merge_topics/reduce_topics)
+**Pitfall Prevention**: Outlier removal destroys document-topic mapping (compute and show at-risk papers), model mutation corrupts cache (deep copy before merge_topics/reduce_topics), checkpoint captures curation state (store merged/removed topic IDs in metadata)
 
 ### Phase 12: Quality Check & Aggregation
 **Goal**: Users can validate paper-topic coverage after curation and select aggregation strategy for paper-level topic assignment, preventing orphaned documents and sentence-level aggregation issues

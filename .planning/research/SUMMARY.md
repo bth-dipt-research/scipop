@@ -44,12 +44,13 @@ The v2.0 feature set extends the existing upload + filter prototype (steps 1-2) 
 - Model and results export (CSV/XLSX/pickle)
 
 **Should have (differentiators):**
-- **Side-by-side outlier reduction comparison** — Compare 2-3 UMAP/HDBSCAN parameter configurations (e.g., min_cluster_size, n_components) side-by-side to minimize outliers through informed parameter tuning with retraining
-- **Side-by-side topic labeling comparison** — Show 3-5 word vs 7-10 word labels side-by-side for optimal verbosity selection
+- **Checkpoint-based comparison system** — Automatically save model state (config + trained model + metadata) at each step; compare current state against any saved checkpoint in 2-column view; navigate backward/forward with checkpoint save prompts
+- **Outlier reduction via parameter comparison** — Adjust UMAP/HDBSCAN parameters and compare current results against any saved checkpoint to minimize outliers through informed parameter tuning
+- **Topic labeling comparison** — Adjust verbosity and compare current labels against any saved checkpoint for optimal label length selection
+- **Sidebar step navigation** — Jump to any workflow step with sidebar showing progress checkmarks and current step highlighting
 - **Manual topic merge/remove with impact preview** — Show "before merge" vs "after merge" topic structure without re-training
 - **Quality check: papers with no topics** — Explicit QC step after manual curation prevents orphaning documents
 - **Hierarchical topic tree visualization** — Interactive Plotly dendrogram showing topic relationships
-- **Comparison checkpoint system** (defer to v2.1) — Save/restore model states at decision points
 
 **Defer (v2+):**
 - LLM-based topic naming (external API dependency, cost)
@@ -63,22 +64,28 @@ The architecture is a **step-wizard pattern with session state** managing 8 sequ
 
 **Major components:**
 
-1. **Multi-Step Workflow Controller** — Orchestrates 8 workflow steps (Upload → Filter → Configure → Compare Outliers → Compare Labels → Curate → Quality Check → Export) with validation gates and session state management. Uses existing `st.session_state.step` pattern, extended from 2 steps to 8.
+1. **Sidebar Step Navigation** — Persistent sidebar showing all 8 workflow steps with checkmarks for completed steps and highlighting current step. Allows jumping to any step; prompts to save checkpoint when navigating backward.
 
-2. **Cached ML Pipeline** — Wraps expensive operations in `@st.cache_resource` (sentence transformers, trained topic models) and `@st.cache_data` (embeddings, outlier reduction, hierarchical topic computation). Critical for performance — prevents 30-120 sec waits on every parameter change.
+2. **Checkpoint Storage System** — Stores model state snapshots {timestamp, config_dict, model_object, metadata} at key decision points. Auto-saves when proceeding forward; prompts when going backward. Enables comparison of current state against any saved checkpoint.
 
-3. **Side-by-Side Comparison Views** — Uses `st.columns(2)` for before/after or A/B parameter comparisons at decision points (outlier reduction, topic labeling, manual curation). Requires careful state isolation to prevent comparison results from leaking between left/right columns.
+3. **Multi-Step Workflow Controller** — Orchestrates 8 workflow steps (Upload → Filter → Configure → Train → Visualize → Compare → Curate → Export) with validation gates and session state management. Uses existing `st.session_state.step` pattern, extended from 2 steps to 8.
 
-4. **Manual Topic Curation Interface** — Checkboxes for topic removal, multiselect for merging, with impact preview before applying changes. Computes "papers that will lose all topics" count to prevent accidental orphaning.
+4. **Cached ML Pipeline** — Wraps expensive operations in `@st.cache_resource` (sentence transformers, trained topic models) and `@st.cache_data` (embeddings, hierarchical topic computation). Critical for performance — prevents 30-120 sec waits on every parameter change. Embeddings cached globally and reused across all checkpoints.
 
-5. **Hierarchical Visualization Engine** — Caches Plotly dendrogram generation (`topic_model.visualize_hierarchy()`) and stores serialized HTML rather than figure objects to prevent memory leaks (figures are 10-50 MB each).
+5. **Checkpoint-Based Comparison Views** — Uses `st.columns(2)` to compare "Current" state vs "Selected Checkpoint" with dropdown to choose any saved checkpoint. Displays full config and metrics side-by-side for outlier reduction and topic labeling decisions.
 
-6. **Export Generation** — Creates 5 artifact types: topic info CSV, papers-with-topics CSV, themed paper sets (grouped by manual topic themes), hierarchical visualization HTML, trained model pickle.
+6. **Manual Topic Curation Interface** — Checkboxes for topic removal, multiselect for merging, with impact preview before applying changes. Computes "papers that will lose all topics" count to prevent accidental orphaning.
+
+7. **Hierarchical Visualization Engine** — Caches Plotly dendrogram generation (`topic_model.visualize_hierarchy()`) and stores serialized HTML rather than figure objects to prevent memory leaks (figures are 10-50 MB each).
+
+8. **Export Generation** — Creates 5 artifact types: topic info CSV, papers-with-topics CSV, themed paper sets (grouped by manual topic themes), hierarchical visualization HTML, trained model pickle.
 
 **Key architectural patterns:**
+- **Sidebar Step Navigation** — Always-visible sidebar with all steps, checkmarks for completion, click to jump to any step
+- **Checkpoint System with Auto-Save** — Store model snapshots (config + model + metadata) automatically on forward navigation; prompt on backward navigation
+- **Checkpoint-Based Comparison** — 2-column view comparing Current vs Selected Checkpoint (dropdown to choose any saved checkpoint)
 - **Step-Wizard with Session State** — Linear workflow with clear prerequisites and validation gates; state persists across reruns naturally
-- **Cached ML Pipeline Components** — Expensive operations wrapped in `@st.cache_resource`/`@st.cache_data` with proper cache key strategies
-- **Side-by-Side Comparison with Columns** — Visual comparison at decision points using `st.columns([1,1])` for A/B views
+- **Cached ML Pipeline Components** — Expensive operations wrapped in `@st.cache_resource`/`@st.cache_data` with proper cache key strategies; embeddings cached globally and reused
 - **Incremental Refinement with Preview** — Show impact of changes before committing (e.g., topic removal preview)
 
 ### Critical Pitfalls

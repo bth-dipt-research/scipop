@@ -38,12 +38,13 @@ Features that set this tool apart and align with the project's unique value prop
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| **Side-by-side outlier reduction comparison** | BERTopic creates -1 outliers; comparing different UMAP/HDBSCAN parameter configurations (e.g., min_cluster_size, n_components) side-by-side helps users minimize outliers through informed parameter tuning without trial-and-error retraining | MEDIUM-HIGH | Train 2-3 models with different parameter sets (reusing cached embeddings), display outlier counts, total topics, avg topic size, and sample labels for comparison |
-| **Side-by-side topic labeling comparison** | KeyBERT `nr_words` parameter affects topic interpretability; showing 3-5 word labels vs 7-10 word labels side-by-side lets users choose optimal verbosity | LOW-MEDIUM | Generate representations with different `nr_words` values, display in split columns with same topics |
+| **Checkpoint-based comparison system** | Core v2.0 feature: automatically save model state (config + trained model + metadata) at each step; compare current state against any saved checkpoint in 2-column view; navigate backward/forward with checkpoint save prompts | HIGH | Session state management with checkpoint list, sidebar navigation with step indicators, comparison UI showing Current vs Selected Checkpoint, auto-save on forward navigation |
+| **Outlier reduction via parameter comparison** | BERTopic creates -1 outliers; users can adjust UMAP/HDBSCAN parameters and compare current results against any saved checkpoint to minimize outliers through informed parameter tuning | MEDIUM-HIGH | Retrain model with adjusted parameters (reusing cached embeddings), compare outlier counts/topic distributions against checkpoint, create new checkpoint when satisfied |
+| **Topic labeling comparison** | KeyBERT `nr_words` parameter affects topic interpretability; users can adjust verbosity and compare current labels against any saved checkpoint to choose optimal label length | LOW-MEDIUM | Update topic representation with different `nr_words` values, compare labels side-by-side with checkpoint, create new checkpoint when satisfied |
 | **Manual topic merge/remove with impact preview** | Users need to combine similar topics or remove noise topics; showing "before merge" vs "after merge" topic sizes and labels reduces uncertainty | MEDIUM | UI for selecting topics to merge/remove, instant preview of resulting topic structure without re-training |
 | **Quality check: papers with no topics** | After manual curation (removing topics), some papers may end up orphaned; explicit QC step prevents accidentally leaving documents unclassified | LOW | Filter and display documents where assigned topic was removed, with option to reassign or flag |
 | **Hierarchical topic tree visualization** | BERTopic's `.hierarchical_topics()` shows topic relationships; interactive tree helps users understand cluster structure and decide merge candidates | MEDIUM | BERTopic built-in visualization (`.visualize_hierarchy()`), embed in Streamlit with Plotly |
-| **Comparison checkpoint system** | Allow users to "pin" a configuration at each decision point (outlier reduction, labeling, curation) and compare against alternatives before committing | HIGH | Session state management with multiple model snapshots, UI for switching between checkpoints |
+| **Sidebar step navigation** | Allow users to jump to any workflow step (upload, configure, compare, curate, export) and see progress with checkmarks for completed steps; sidebar always visible | LOW | Streamlit sidebar with clickable step list, current step highlighted, checkmarks for completed |
 | **Parameter presets by domain** | Research publication analysis has known "good starting points"; presets reduce initial configuration burden | LOW | Dropdown with preset configurations (e.g., "General Research", "Conference Papers", "Abstracts Only") |
 
 ### Anti-Features (Explicitly Out of Scope)
@@ -107,11 +108,14 @@ Minimum features to replicate and improve upon the notebook workflow.
 - [x] **Upload & Preview** — CSV/XLSX upload with dataframe preview (already in prototype)
 - [x] **Filter Publications** — Multiselect by publication type (already in prototype)
 - [x] **Select Input Columns** — Choose Title, Abstract, Keywords columns (already in prototype)
+- [ ] **Sidebar Step Navigation** — Sidebar showing all 8 workflow steps with checkmarks for completed steps, click to jump to any step
 - [ ] **Configure Model Parameters** — Collapsible sections for UMAP (n_neighbors, n_components, min_dist), HDBSCAN (min_cluster_size, min_samples), Vectorizer (stop_words, ngram_range), Representation (nr_repr_docs)
 - [ ] **Train Model** — Run BERTopic pipeline with progress indicator
+- [ ] **Checkpoint System** — Automatically save model state (config + model + metadata) when proceeding to next step; prompt to save when navigating backward
 - [ ] **Topic List View** — Display all topics with ID, label, size, top 10 terms
-- [ ] **Side-by-Side Outlier Reduction** — Compare 2-3 strategies (c-TF-IDF, distributions, embeddings) with metrics (outlier count before/after, sample reassignments)
-- [ ] **Side-by-Side Topic Labeling** — Compare 2-3 `nr_words` settings (e.g., 5, 7, 10) in split view
+- [ ] **Checkpoint-Based Comparison** — Select any saved checkpoint from dropdown; compare Current vs Selected Checkpoint in 2-column view with full config display
+- [ ] **Outlier Reduction via Parameter Tuning** — Adjust UMAP/HDBSCAN parameters, retrain (reusing embeddings), compare against checkpoint
+- [ ] **Topic Labeling Adjustment** — Adjust `nr_words` settings, compare labels against checkpoint
 - [ ] **Manual Topic Curation** — Select topics to merge or remove with checkboxes/multiselect
 - [ ] **Impact Preview** — Show resulting topic structure after merge/remove without committing
 - [ ] **Quality Check** — Display papers orphaned by topic removal with option to review
@@ -123,7 +127,6 @@ Minimum features to replicate and improve upon the notebook workflow.
 
 Features that add value but aren't critical for initial validation.
 
-- [ ] **Comparison checkpoint system** — Save/restore model states at decision points
 - [ ] **Parameter presets** — Dropdown with domain-specific starting configurations
 - [ ] **Document-level topic drill-down** — Click topic to see all assigned documents
 - [ ] **Topic similarity heatmap** — BERTopic's `.visualize_heatmap()` for exploring topic relationships
