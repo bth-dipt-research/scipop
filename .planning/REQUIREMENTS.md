@@ -38,24 +38,28 @@ Requirements for v2.0 Interactive Topic Modeling milestone. Each maps to exactly
 - [ ] **TM-01**: User can upload publication data (CSV/XLSX) and preview contents in UI
 - [ ] **TM-02**: User can filter publications by type and select input columns for topic modeling
 
+### Checkpoint System
+
+- [ ] **TM-03**: User can save and load persistent checkpoints (config + model + embeddings) to resume work across sessions, extract parameters from saved checkpoints, and validate dataset compatibility with checkpoint fingerprinting
+
 ### Model Configuration
 
-- [ ] **TM-03**: User can configure and run topic model with adjustable parameters (UMAP, HDBSCAN, vectorizer, embedding)
+- [ ] **TM-04**: User can configure and run topic model with adjustable parameters (UMAP, HDBSCAN, vectorizer, embedding) with cached embeddings and checkpoint integration
 
 ### Iterative Refinement
 
-- [ ] **TM-04**: User can adjust UMAP/HDBSCAN parameters to minimize outliers, compare current results against any saved checkpoint, and navigate between workflow steps with automatic checkpoint creation
-- [ ] **TM-05**: User can adjust topic labeling verbosity, compare current labels against any saved checkpoint, and navigate between workflow steps with automatic checkpoint creation
-- [ ] **TM-06**: User can manually curate topics (merge/remove) with impact preview before applying changes
+- [ ] **TM-05**: User can adjust UMAP/HDBSCAN parameters to minimize outliers, compare current results against any saved checkpoint (session or disk), and navigate between workflow steps with automatic checkpoint creation
+- [ ] **TM-06**: User can adjust topic labeling verbosity, compare current labels against any saved checkpoint (session or disk), and navigate between workflow steps with automatic checkpoint creation
+- [ ] **TM-07**: User can manually curate topics (merge/remove) with impact preview before applying changes
 
 ### Quality & Validation
 
-- [ ] **TM-07**: User can see quality check showing papers with no remaining topics after curation
-- [ ] **TM-08**: User can visualize hierarchical topic structure as interactive dendrogram
+- [ ] **TM-08**: User can see quality check showing papers with no remaining topics after curation
+- [ ] **TM-09**: User can visualize hierarchical topic structure as interactive dendrogram
 
 ### Export
 
-- [ ] **TM-09**: User can export topic model results (topic info, papers-with-topics, themed CSVs, trained model, visualization)
+- [ ] **TM-10**: User can export topic model results (topic info, papers-with-topics, themed CSVs, trained model, visualization)
 
 ## v3+ Requirements
 
