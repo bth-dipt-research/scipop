@@ -2,11 +2,14 @@
 phase: 06
 phase_name: Data Upload & Filtering
 verification_date: 2026-05-01
-status: human_needed
+verification_completed: 2026-05-01
+status: passed
 score: 7/7
 gaps_found: 0
 human_verification_items: 5
+human_verification_completed: true
 verified_by: gsd-verifier
+ux_improvements_applied: 1
 ---
 
 # Phase 06 Verification Report
@@ -19,14 +22,15 @@ verified_by: gsd-verifier
 
 ## Verification Summary
 
-**Status**: ⚠️ **HUMAN_NEEDED** — All structural checks passed, manual testing required
+**Status**: ✓ **PASSED** — All structural checks and manual verification completed successfully
 
-**Score**: 7/7 truths verified (100%)
+**Score**: **7/7 truths verified (100%)**
 
 - ✓ All artifacts exist and are substantive
 - ✓ All key links wired correctly
 - ✓ All must-have truths structurally verified
-- ⚠️ 5 items require human verification (UI interaction, real-time feedback)
+- ✓ All 5 manual verification items tested and confirmed working
+- ✓ UX improvement applied based on manual testing feedback
 
 ---
 
@@ -187,35 +191,76 @@ The phase successfully establishes:
 4. ✓ **Filtering foundation** — Publication type and column selection with real-time feedback
 5. ✓ **Fingerprinting infrastructure** — SHA256 hash on filtered data enables Phase 07 checkpoint validation
 
-All structural checks pass. Human verification required to confirm interactive behaviors work correctly in the running Streamlit app.
+All structural checks pass. Human verification completed — all interactive behaviors confirmed working.
+
+---
+
+## Manual Verification Results
+
+**Completed**: 2026-05-01  
+**Tested by**: User  
+**Status**: ✓ All 5 manual tests passed
+
+### Test Results
+
+| Test | Status | Notes |
+|------|--------|-------|
+| 1. Upload Flow & Caching | ✓ PASS | DataFrame caching prevents re-reading on rerun (instant load confirmed) |
+| 2. Real-Time Filtering Feedback | ✓ PASS | Row counts update immediately when selecting publication types |
+| 3. Column Selection & Sample Preview | ✓ PASS | Column selection shows sample text correctly |
+| 4. Navigation Guards | ✓ PASS | Next button properly disabled until valid selections made |
+| 5. Filtered Dataset Fingerprint | ✓ PASS | Fingerprint changes when publication type selection changes |
+
+### UX Improvement Applied
+
+During manual testing, user identified misleading fingerprint placement:
+
+**Issue**: Fingerprint displayed after column selection, creating expectation it should change with both filters (publication type AND columns). However, fingerprint only reflects dataset identity (which publications), not feature selection (which columns).
+
+**Resolution** (commit 9e0a868):
+- Moved fingerprint display to appear immediately after publication type filtering, before column selection
+- Added explanatory caption: "Fingerprint reflects which publications are included (changes with publication type filter)"
+- This placement makes the scope clear: fingerprint = dataset identity, not feature configuration
+
+**Impact**: "Small detail, big effect" — placement creates expectation. New positioning prevents user confusion.
+
+---
+
+## Design Decision: Fingerprint Scope
+
+**Fingerprint represents**: Dataset identity (which publications are included)  
+**Fingerprint does NOT represent**: Feature configuration (which columns selected for modeling)
+
+**Rationale**:
+- Validates "are we analyzing the same set of papers?" (checkpoint compatibility)
+- Allows comparing checkpoints trained on different feature sets (Title vs Title+Abstract)
+- Column selection is parameter metadata, validated separately in Phase 07
+
+**Phase 07 checkpoint validation should**:
+1. Check dataset fingerprint (validates row-level dataset identity) ← current Phase 06 implementation
+2. Check column selection match separately (validates feature compatibility) ← deferred to Phase 07
 
 ---
 
 ## Next Steps
 
-### Option 1: Complete Human Verification
-Run the 5 manual tests above in a Streamlit session. If all pass → mark phase as **PASSED**.
+Phase 06 verification complete. Proceed to Phase 07 (Checkpoint Infrastructure):
 
-### Option 2: Defer Verification
-Proceed to Phase 07 (Checkpoint Infrastructure). Phase 06 serves as foundation — if Phase 07 successfully loads/validates checkpoints, Phase 06's fingerprinting is proven correct end-to-end.
-
-### Option 3: Add Automated Tests (Optional)
-Run `/gsd-add-tests 06` to generate unit tests for pure functions:
-- `load_dataframe()` — test CSV/XLSX parsing
-- `compute_dataset_fingerprint()` — test hash stability, sorted CSV behavior
-
-Note: Streamlit widget interactions (file uploader, multiselect) are not unit-testable; manual verification remains necessary for UI validation.
+```bash
+/gsd-plan-phase 07
+```
 
 ---
 
 ## Verification Metadata
 
-**Verified by**: gsd-verifier agent  
+**Verified by**: gsd-verifier agent + human tester  
 **Verification date**: 2026-05-01  
-**Verification method**: Structural analysis (file existence, wiring checks, pattern matching)  
-**Commits verified**: 2013641, ad6db5d, 2ac8a53, c48e354, a6a7fc8  
-**Files analyzed**: 1 (src/DIPT research topics-hierarchical TM.py — 444 lines)
+**Verification method**: Structural analysis + manual Streamlit session testing  
+**Commits verified**: 2013641, ad6db5d, 2ac8a53, c48e354, a6a7fc8, 217c75d, 9e0a868  
+**Files analyzed**: 1 (src/DIPT research topics-hierarchical TM.py — 446 lines)  
+**UX improvements**: 1 (fingerprint placement optimization — commit 9e0a868)
 
 ---
 
-*Report generated by `/gsd-verify-phase 06`*
+*Report generated by `/gsd-verify-phase 06` and completed with manual testing on 2026-05-01*
