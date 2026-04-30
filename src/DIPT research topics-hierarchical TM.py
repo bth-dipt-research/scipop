@@ -5,6 +5,7 @@
 
 from pathlib import Path
 import io
+import json
 import hashlib
 import sys
 import shutil
@@ -192,6 +193,42 @@ with st.sidebar:
                     )
             except Exception as e:
                 st.error(f"Error creating ZIP: {str(e)}")
+        
+        # View Parameters - allow extracting config from checkpoint
+        with st.expander("📋 View Parameters", expanded=False):
+            selected_checkpoint = st.session_state.available_checkpoints[selected_idx]
+            checkpoint_path = Path(selected_checkpoint['path'])
+            
+            try:
+                config_file = checkpoint_path / 'config.json'
+                metadata_file = checkpoint_path / 'metadata.json'
+                
+                if config_file.exists():
+                    with open(config_file, 'r') as f:
+                        config = json.load(f)
+                    
+                    st.markdown("**Model Configuration:**")
+                    st.json(config)
+                    
+                    # Copy-friendly format
+                    config_str = json.dumps(config, indent=2)
+                    st.code(config_str, language='json')
+                    
+                    st.caption("💡 Copy these parameters to apply to a new dataset in Phase 08")
+                else:
+                    st.warning("Config file not found in checkpoint")
+                
+                if metadata_file.exists():
+                    with open(metadata_file, 'r') as f:
+                        metadata = json.load(f)
+                    
+                    st.markdown("**Metadata:**")
+                    st.json(metadata)
+                else:
+                    st.warning("Metadata file not found in checkpoint")
+                    
+            except Exception as e:
+                st.error(f"Error reading checkpoint files: {str(e)}")
     else:
         st.info("No saved checkpoints yet")
 
