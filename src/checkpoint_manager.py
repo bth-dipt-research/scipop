@@ -202,7 +202,7 @@ def validate_checkpoint_integrity(checkpoint_dir: Path) -> tuple[bool, list[str]
     try:
         with open(model_file, 'rb') as f:
             pickle.load(f)
-    except (pickle.UnpicklingError, EOFError, OSError) as e:
+    except (pickle.UnpicklingError, EOFError, OSError, AttributeError, ModuleNotFoundError) as e:
         errors.append(f"Corrupted pickle file: {str(e)}")
     
     # Try loading embeddings
