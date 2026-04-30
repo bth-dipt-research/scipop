@@ -7,3 +7,4 @@ site/dist/
 site/.astro/
 .opencode
 data/artwork/
+.venv/
