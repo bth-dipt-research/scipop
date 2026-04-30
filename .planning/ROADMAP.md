@@ -52,7 +52,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Milestone Goal:** Build an interactive web UI that guides users through iterative topic model refinement with side-by-side parameter comparisons at key decision points, transforming the notebook workflow into a guided step-by-step tool.
 
 - [x] **Phase 06: Data Upload & Filtering** - Establish data ingestion and session state foundation
-- [ ] **Phase 07: Checkpoint Infrastructure** - Build persistent checkpoint save/load system with dataset fingerprinting
+- [x] **Phase 07: Checkpoint Infrastructure** - Build persistent checkpoint save/load system with dataset fingerprinting
 - [ ] **Phase 08: Model Configuration & Training** - Implement cached ML pipeline with parameter configuration and checkpoint integration
 - [ ] **Phase 09: Basic Visualization** - Add hierarchical topic tree and results display
 - [ ] **Phase 10: Outlier Reduction Comparison** - First decision point comparing current vs any saved checkpoint
@@ -98,8 +98,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Checkpoint manager module with save/load/validate/fingerprint
-- [ ] 07-02-PLAN.md — Streamlit checkpoint management UI and 9-step navigation
+- [x] 07-01-PLAN.md — Checkpoint manager module with save/load/validate/fingerprint
+- [x] 07-02-PLAN.md — Streamlit checkpoint management UI and 9-step navigation
 
 **UI hint**: yes
 **Pitfall Prevention**: Checkpoint corruption (validate pickle integrity, check file sizes), disk space exhaustion (show total checkpoint disk usage, provide bulk delete), dataset mismatch (fingerprint comparison with clear error messages)
@@ -265,7 +265,7 @@ Plans:
 | 04. GDPR Compliance | v1.0 | Complete | Complete | 2026-04-08 |
 | 05. UI Polish | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 06. Data Upload & Filtering | v2.0 | 2/2 | Complete | 2026-05-01 |
-| 07. Checkpoint Infrastructure | v2.0 | 0/2 | Planned | - |
+| 07. Checkpoint Infrastructure | v2.0 | 2/2 | Complete | 2026-05-01 |
 | 08. Model Configuration & Training | v2.0 | 0/TBD | Not started | - |
 | 09. Basic Visualization | v2.0 | 0/TBD | Not started | - |
 | 10. Outlier Reduction Comparison | v2.0 | 0/TBD | Not started | - |
