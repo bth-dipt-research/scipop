@@ -42,6 +42,13 @@ Integrated checkpoint management UI into the Streamlit app with 9-step workflow 
    - Download button with proper filename: `{dataset_name}_{timestamp}.zip`
    - Enables backup and sharing of checkpoints
 
+6. **View Parameters (Extract & Clone)**
+   - Expandable "📋 View Parameters" section in sidebar
+   - Displays config.json (UMAP/HDBSCAN/vectorizer parameters) in JSON format
+   - Displays metadata.json (timestamp, dataset info, topic counts)
+   - Copy-friendly code block for extracting parameters
+   - Addresses success criterion #6: enables parameter reuse across datasets
+
 ### Technical Implementation
 
 **Session State Management:**
@@ -70,7 +77,7 @@ st.session_state.delete_confirm       # Delete confirmation flag
 
 ## Files Modified
 
-- `src/DIPT research topics-hierarchical TM.py` — 146 lines changed (imported checkpoint_manager, added 9-step navigation, checkpoint UI)
+- `src/DIPT research topics-hierarchical TM.py` — 183 lines changed (imported checkpoint_manager, added 9-step navigation, checkpoint UI, parameter viewing)
 - `src/checkpoint_manager.py` — Path resolution fix and validation enhancement
 
 ## Commits
@@ -78,6 +85,7 @@ st.session_state.delete_confirm       # Delete confirmation flag
 1. **6663459** - feat(07-02): integrate checkpoint management UI into Streamlit app
 2. **b8aebca** - fix(07-02): resolve checkpoint paths relative to project root
 3. **56a5635** - fix(07-02): handle AttributeError in checkpoint validation
+4. **7d7752b** - feat(07): add View Parameters feature for checkpoint extraction
 
 ## Self-Check: PASSED
 
@@ -87,6 +95,7 @@ st.session_state.delete_confirm       # Delete confirmation flag
 - [x] Load validates integrity before loading
 - [x] Load validates fingerprint and blocks mismatch with clear error
 - [x] Load shows warning when no data uploaded
+- [x] **View Parameters expander shows config and metadata in copy-friendly format**
 - [x] Delete requires two-click confirmation
 - [x] Export creates downloadable ZIP
 - [x] Loaded checkpoint metadata displays in header
