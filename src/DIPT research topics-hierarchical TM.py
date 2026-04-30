@@ -150,7 +150,15 @@ elif st.session_state.step == 2:
             df = pd.DataFrame()  # Empty DataFrame to prevent downstream errors
     else:
         st.info(f'Dataset contains {len(df)} publications (no PublicationType column found)')
-
+    
+    # Compute and display dataset fingerprint after publication type filtering
+    # (Fingerprint reflects dataset identity = which publications, not feature selection = which columns)
+    if len(df) > 0:
+        st.session_state.dataset_fingerprint = compute_dataset_fingerprint(df)
+        st.write('---')
+        st.info(f'**Dataset fingerprint:** `{st.session_state.dataset_fingerprint[:16]}...`')
+        st.caption('↑ Fingerprint reflects which publications are included (changes with publication type filter)')
+    
     st.subheader('Select input columns for topic modeling')
     
     # Only show column selection if we have a filtered dataset
@@ -178,14 +186,8 @@ elif st.session_state.step == 2:
         st.error('Cannot select columns: no publications in filtered dataset.')
         st.session_state.input = []
     
-    # Store filtered DataFrame and update fingerprint for checkpoint validation
+    # Store filtered DataFrame for downstream use
     st.session_state.df_filtered = df
-    
-    if len(df) > 0 and st.session_state.input:
-        # Update fingerprint to reflect filtered dataset (actual modeling input)
-        st.session_state.dataset_fingerprint = compute_dataset_fingerprint(df)
-        st.write('---')
-        st.info(f'Filtered dataset fingerprint: `{st.session_state.dataset_fingerprint[:16]}...`')
     
     st.write('---')
     cols = st.columns([2, 1])
