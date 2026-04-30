@@ -6,6 +6,9 @@
 from pathlib import Path
 import io
 import hashlib
+import sys
+import shutil
+import tempfile
 import streamlit as st
 import pandas as pd
 from bertopic import BERTopic
@@ -16,6 +19,16 @@ from bertopic.representation import KeyBERTInspired
 from sklearn.feature_extraction.text import CountVectorizer
 from sentence_transformers import SentenceTransformer
 from nltk.tokenize import sent_tokenize
+
+# Import checkpoint manager
+sys.path.insert(0, str(Path(__file__).parent))
+from checkpoint_manager import (
+    compute_dataset_fingerprint as cm_compute_fingerprint,
+    save_checkpoint,
+    load_checkpoint,
+    list_checkpoints,
+    validate_checkpoint_integrity
+)
 
 
 @st.cache_data
@@ -29,15 +42,8 @@ def load_dataframe(file_bytes: bytes, filename: str) -> pd.DataFrame:
         raise ValueError(f"Unsupported file type: {filename}")
 
 
-def compute_dataset_fingerprint(df: pd.DataFrame) -> str:
-    """
-    Compute stable hash of DataFrame for checkpoint validation.
-    Uses sorted CSV representation to ensure consistent hashing.
-    """
-    # Sort by all columns to ensure stable hash regardless of row order
-    df_sorted = df.sort_values(by=list(df.columns)).reset_index(drop=True)
-    csv_bytes = df_sorted.to_csv(index=False).encode('utf-8')
-    return hashlib.sha256(csv_bytes).hexdigest()
+# Note: Using checkpoint_manager.compute_dataset_fingerprint for all fingerprinting
+# to ensure consistency with checkpoint validation
 
 
 def goto(step: int):
@@ -61,22 +67,141 @@ if 'input' not in st.session_state:
     st.session_state.input = None
 if 'dataset_fingerprint' not in st.session_state:
     st.session_state.dataset_fingerprint = None
+if 'loaded_checkpoint' not in st.session_state:
+    st.session_state.loaded_checkpoint = None
+if 'available_checkpoints' not in st.session_state:
+    st.session_state.available_checkpoints = []
+if 'delete_confirm' not in st.session_state:
+    st.session_state.delete_confirm = False
 
 with st.sidebar:
-    st.markdown("### Progress")
-    steps = [
-        ('Upload data', st.session_state.step > 1),
-        ('Select data', st.session_state.step > 2),
-        #("3. Train / Analyze", st.session_state.step > 3 or st.session_state.result is not None),
-        #("4. Review results", st.session_state.step == 4),
+    st.markdown("### Workflow Steps")
+    
+    # Define all 9 steps for v2.0 workflow
+    workflow_steps = [
+        ('1. Upload Data', 1),
+        ('2. Filter Data', 2),
+        ('3. Configure Model', 3),
+        ('4. Train Model', 4),
+        ('5. Visualize Results', 5),
+        ('6. Reduce Outliers', 6),
+        ('7. Refine Labels', 7),
+        ('8. Curate Topics', 8),
+        ('9. Export Results', 9),
     ]
-    for label, done in steps:
-        icon = ':material/check:' if done else ':material/hourglass:'
-        color = 'green' if done else 'orange'
-        st.badge(label, icon=icon, color=color)
+    
+    for label, step_num in workflow_steps:
+        if st.session_state.step == step_num:
+            # Current step: highlighted
+            st.markdown(f"**→ {label}**")
+        elif st.session_state.step > step_num:
+            # Completed step: checkmark
+            st.markdown(f"✓ {label}")
+        else:
+            # Future step: plain text
+            st.markdown(f"  {label}")
+    
+    st.markdown("---")
+    st.markdown("### Checkpoint Management")
+    
+    # Refresh available checkpoints
+    st.session_state.available_checkpoints = list_checkpoints()
+    
+    if len(st.session_state.available_checkpoints) > 0:
+        checkpoint_options = [
+            f"{cp['dataset_name']} ({cp['timestamp']}) - {cp['topic_count']} topics"
+            for cp in st.session_state.available_checkpoints
+        ]
+        
+        selected_idx = st.selectbox(
+            "Load checkpoint",
+            range(len(checkpoint_options)),
+            format_func=lambda i: checkpoint_options[i],
+            key='checkpoint_selector'
+        )
+        
+        if st.button("Load Selected", use_container_width=True):
+            selected_checkpoint = st.session_state.available_checkpoints[selected_idx]
+            checkpoint_path = Path(selected_checkpoint['path'])
+            
+            # Validate integrity first
+            is_valid, errors = validate_checkpoint_integrity(checkpoint_path)
+            if not is_valid:
+                st.error(f"Checkpoint validation failed: {', '.join(errors)}")
+            else:
+                try:
+                    config, metadata, model, embeddings, fingerprint = load_checkpoint(checkpoint_path)
+                    
+                    # Check dataset fingerprint match if data is loaded
+                    if st.session_state.df_filtered is not None:
+                        current_fingerprint = cm_compute_fingerprint(st.session_state.df_filtered)
+                        if current_fingerprint != fingerprint:
+                            st.error("❌ Dataset fingerprint mismatch! This checkpoint was created with different data. Please upload the original dataset or use a different checkpoint.")
+                        else:
+                            st.session_state.loaded_checkpoint = {
+                                'config': config,
+                                'metadata': metadata,
+                                'model': model,
+                                'embeddings': embeddings,
+                                'fingerprint': fingerprint,
+                                'path': checkpoint_path
+                            }
+                            st.success(f"✓ Loaded checkpoint: {metadata['dataset_name']}")
+                            st.rerun()
+                    else:
+                        st.warning("⚠ Please upload and filter data first to validate checkpoint compatibility")
+                except Exception as e:
+                    st.error(f"Error loading checkpoint: {str(e)}")
+        
+        if st.button("Delete Selected", use_container_width=True, type="secondary"):
+            selected_checkpoint = st.session_state.available_checkpoints[selected_idx]
+            checkpoint_path = Path(selected_checkpoint['path'])
+            
+            if not st.session_state.delete_confirm:
+                st.session_state.delete_confirm = True
+                st.warning("⚠ Click Delete again to confirm permanent removal")
+                st.rerun()
+            else:
+                try:
+                    shutil.rmtree(checkpoint_path)
+                    st.success(f"Deleted checkpoint: {selected_checkpoint['dataset_name']}")
+                    st.session_state.delete_confirm = False
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error deleting checkpoint: {str(e)}")
+                    st.session_state.delete_confirm = False
+        
+        if st.button("Export as ZIP", use_container_width=True, type="secondary"):
+            selected_checkpoint = st.session_state.available_checkpoints[selected_idx]
+            checkpoint_path = Path(selected_checkpoint['path'])
+            
+            try:
+                # Create zip file in temp directory
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as tmp:
+                    zip_path = tmp.name
+                
+                shutil.make_archive(zip_path.replace('.zip', ''), 'zip', checkpoint_path)
+                
+                with open(zip_path, 'rb') as f:
+                    st.download_button(
+                        label="Download ZIP",
+                        data=f.read(),
+                        file_name=f"{selected_checkpoint['dataset_name']}_{selected_checkpoint['timestamp']}.zip",
+                        mime="application/zip",
+                        use_container_width=True
+                    )
+            except Exception as e:
+                st.error(f"Error creating ZIP: {str(e)}")
+    else:
+        st.info("No saved checkpoints yet")
 
 
 st.title('Scipop topic model generation')
+
+# Show loaded checkpoint info if available
+if st.session_state.loaded_checkpoint is not None:
+    metadata = st.session_state.loaded_checkpoint['metadata']
+    st.info(f"📋 Loaded checkpoint: **{metadata['dataset_name']}** ({metadata['timestamp']}) - {metadata['topic_count']} topics, {metadata.get('outlier_percentage', 0):.1f}% outliers")
 
 if st.session_state.step == 1:
     st.header('Upload publication data')
@@ -100,7 +225,7 @@ if st.session_state.step == 1:
             st.session_state.df = df
 
         # Compute dataset fingerprint for checkpoint validation (Phase 07)
-        st.session_state.dataset_fingerprint = compute_dataset_fingerprint(df)
+        st.session_state.dataset_fingerprint = cm_compute_fingerprint(df)
         st.write(f'Dataset fingerprint: `{st.session_state.dataset_fingerprint[:16]}...`')
 
     cols = st.columns([1, 1])
@@ -154,7 +279,7 @@ elif st.session_state.step == 2:
     # Compute and display dataset fingerprint after publication type filtering
     # (Fingerprint reflects dataset identity = which publications, not feature selection = which columns)
     if len(df) > 0:
-        st.session_state.dataset_fingerprint = compute_dataset_fingerprint(df)
+        st.session_state.dataset_fingerprint = cm_compute_fingerprint(df)
         st.write('---')
         st.info(f'**Dataset fingerprint:** `{st.session_state.dataset_fingerprint[:16]}...`')
         st.caption('↑ Fingerprint reflects which publications are included (changes with publication type filter)')
