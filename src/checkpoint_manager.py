@@ -14,6 +14,10 @@ import pandas as pd
 from datetime import datetime
 from bertopic import BERTopic
 
+# Project root: parent of src/ directory
+PROJECT_ROOT = Path(__file__).parent.parent
+CHECKPOINTS_DIR = PROJECT_ROOT / 'data' / 'checkpoints'
+
 
 def compute_dataset_fingerprint(df: pd.DataFrame) -> str:
     """
@@ -68,7 +72,7 @@ def save_checkpoint(
     dataset_name = metadata.get('dataset_name', 'unknown').replace(' ', '_')
     checkpoint_name = f"{timestamp}_{dataset_name}"
     
-    checkpoint_dir = Path('data/checkpoints') / checkpoint_name
+    checkpoint_dir = CHECKPOINTS_DIR / checkpoint_name
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     
     try:
@@ -112,14 +116,12 @@ def list_checkpoints() -> list[dict]:
         Each dict contains: path, timestamp, dataset_name, topic_count,
         outlier_percentage, row_count
     """
-    checkpoints_dir = Path('data/checkpoints')
-    
-    if not checkpoints_dir.exists():
+    if not CHECKPOINTS_DIR.exists():
         return []
     
     checkpoints = []
     
-    for checkpoint_dir in checkpoints_dir.iterdir():
+    for checkpoint_dir in CHECKPOINTS_DIR.iterdir():
         if not checkpoint_dir.is_dir():
             continue
         
