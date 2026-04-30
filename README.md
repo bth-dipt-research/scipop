@@ -18,15 +18,22 @@ flowchart LR
 
 # Environment setup
 
-1. Install miniconda
-2. Switch to the base environment
+1. Install uv
 
-   `conda activate base`
-3. Create a new conda environment and switch to it
+   Follow the installation instructions at [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
-   `conda create --name scipop python=3.12 pip`
+2. Create a virtual environment
 
-    `conda activate scipop`
+   `uv venv --python 3.12`
+
+3. Activate the virtual environment
+
+   **Linux/Mac:** `source .venv/bin/activate`
+   
+   **Windows:** `.venv\Scripts\activate`
+
 4. Install required packages
 
-   `pip install -r requirements.txt`
+   `uv pip install -r requirements.txt`
+
+**Note:** The original conda-based setup is preserved in the git history if needed.
