@@ -10,20 +10,18 @@ editor_email: davide.fucci@bth.se
 editor_photo: /images/davide-fucci.jpg
 ---
 SERL focuses on making software engineering evidence more trustworthy, findable,
-and useful in practice. The group strengthens how we plan, search, appraise, and
-report empirical work so stakeholders of software-intensive products of and
+and useful in practice. The group strengthens how empirical software engineering studies are planned, appraised, and
+reported so stakeholders of software-intensive products and
 services can make decisions with confidence. Quality and credibility are
-recurring anchors. The group’s work clarifies what “good” empirical SE looks
-like, from core quality views and instruments to assess reviews, to overlooked
-validity threats. Ethical and human factors receive explicit attention -
-authorship ethics and transparent handling of consent, anonymity, and
+recurring our group guiding principles. Ethical and human factors receive explicit attention, including
+authorship ethics, transparent handling of consent, anonymity, and
 confidentiality in studies with people.
 
 To improve the usefulness of results, the lab advances clearer reporting of case
-studies and their identification criteria, promotes FAIR research objects so
-artifacts are reusable, and offers practical guidance for qualitative work. They
-also examine theoretical lenses (e.g., technology acceptance in SE) to connect
-measures with behaviour in real organizations, and revisit experimental designs
+studies and their identification criteria, promotes FAIR research so
+artifacts are reusable, and offers practical guidance for qualitative work. The group
+also examines theoretical lenses (e.g., technology acceptance in SE) to connect
+measures with behaviour in real organizations, and revisits experimental designs
 and analysis choices to draw stronger causal insights.
 
 Together, this work equips practitioners to base decisions on clearer, more
