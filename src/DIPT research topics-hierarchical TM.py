@@ -96,6 +96,8 @@ if 'available_checkpoints' not in st.session_state:
     st.session_state.available_checkpoints = []
 if 'delete_confirm' not in st.session_state:
     st.session_state.delete_confirm = False
+if 'navigation_pending' not in st.session_state:
+    st.session_state.navigation_pending = None
 
 with st.sidebar:
     st.markdown("### Workflow Steps")
@@ -113,16 +115,106 @@ with st.sidebar:
         ('9. Export Results', 9),
     ]
     
+    # 9-step navigation with guard logic
     for label, step_num in workflow_steps:
+        # Determine status indicator
         if st.session_state.step == step_num:
-            # Current step: highlighted
-            st.markdown(f"**→ {label}**")
+            status_label = f"→ {label}"
         elif st.session_state.step > step_num:
-            # Completed step: checkmark
-            st.markdown(f"✓ {label}")
+            status_label = f"✓ {label}"
         else:
-            # Future step: plain text
-            st.markdown(f"  {label}")
+            status_label = f"  {label}"
+        
+        # Navigation guard logic (D-17, D-18, D-19, D-20)
+        if st.button(status_label, key=f"nav_step_{step_num}", use_container_width=True):
+            # If navigating backward from Step 3 and model is trained
+            if st.session_state.step == 3 and step_num < 3 and st.session_state.get('trained_model') is not None:
+                # Prompt to save checkpoint (D-18: 3 options)
+                st.session_state.navigation_pending = step_num
+                st.rerun()
+            
+            # If navigating backward from Step 3 and NO model trained yet
+            elif st.session_state.step == 3 and step_num < 3:
+                # Confirm parameter loss (D-17: always confirm)
+                st.session_state.navigation_pending = step_num
+                st.rerun()
+            
+            # Forward or other navigation
+            else:
+                goto(step_num)
+    
+    # Navigation Guard Prompts (D-20: in sidebar near navigation)
+    if st.session_state.navigation_pending is not None:
+        target_step = st.session_state.navigation_pending
+        
+        st.divider()
+        
+        # If model trained: offer to save checkpoint (D-18)
+        if st.session_state.get('trained_model') is not None:
+            st.warning("⚠️ You have a trained model. Save checkpoint before going back?")
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                if st.button("Save & Go", key="guard_save_go", use_container_width=True):
+                    # Save checkpoint
+                    try:
+                        dataset_name = st.session_state.uploaded.name if st.session_state.uploaded else "unknown"
+                        if '.' in dataset_name:
+                            dataset_name = dataset_name.rsplit('.', 1)[0]
+                        
+                        metadata = {
+                            'timestamp': datetime.now().isoformat(),
+                            'dataset_name': dataset_name,
+                            'topic_count': len(st.session_state.trained_model.get_topics()) - 1,
+                            'outlier_count': len([t for t in st.session_state.topics if t == -1]),
+                            'total_documents': len(st.session_state.topics),
+                            'outlier_percentage': (len([t for t in st.session_state.topics if t == -1]) / len(st.session_state.topics)) * 100
+                        }
+                        
+                        checkpoint_dir = save_checkpoint(
+                            config=st.session_state.model_config,
+                            metadata=metadata,
+                            model=st.session_state.trained_model,
+                            embeddings=st.session_state.embeddings,
+                            dataset_fingerprint=st.session_state.dataset_fingerprint
+                        )
+                        
+                        st.session_state.available_checkpoints = list_checkpoints()
+                        st.success(f"✓ Saved: {checkpoint_dir.name}")
+                        
+                        # Navigate after successful save
+                        st.session_state.navigation_pending = None
+                        goto(target_step)
+                        
+                    except Exception as e:
+                        st.error(f"Save failed: {e}")
+            
+            with col2:
+                if st.button("Go Back", key="guard_go_nosave", use_container_width=True):
+                    st.session_state.navigation_pending = None
+                    goto(target_step)
+            
+            with col3:
+                if st.button("Cancel", key="guard_cancel", use_container_width=True):
+                    st.session_state.navigation_pending = None
+                    st.rerun()
+        
+        # If NO model trained: confirm parameter loss (D-17)
+        else:
+            st.warning("⚠️ Are you sure? Parameter changes will be lost.")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("Go Back", key="guard_confirm_go", use_container_width=True):
+                    st.session_state.navigation_pending = None
+                    goto(target_step)
+            
+            with col2:
+                if st.button("Cancel", key="guard_confirm_cancel", use_container_width=True):
+                    st.session_state.navigation_pending = None
+                    st.rerun()
     
     st.markdown("---")
     st.markdown("### Checkpoint Management")
