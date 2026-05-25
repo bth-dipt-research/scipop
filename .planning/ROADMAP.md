@@ -105,24 +105,6 @@ Plans:
 **Pitfall Prevention**: Checkpoint corruption (validate pickle integrity, check file sizes), disk space exhaustion (show total checkpoint disk usage, provide bulk delete), dataset mismatch (fingerprint comparison with clear error messages)
 
 ### Phase 08: Model Configuration & Training
-**Goal**: Users can configure topic model parameters, train models with cached embeddings, and create the first checkpoint, establishing both ML caching patterns and the checkpoint system that enable iterative refinement
-**Depends on**: Phase 06
-**Requirements**: TM-03
-**Success Criteria** (what must be TRUE):
-  1. User can navigate between workflow steps via sidebar showing all 8 steps with checkmarks for completed steps and highlighting current step
-  2. User can configure UMAP parameters (n_neighbors, n_components, min_dist) with guidance explaining parameter relationships
-  3. User can configure HDBSCAN parameters (min_cluster_size, min_samples) with preset options (Conservative/Balanced/Granular)
-  4. User can configure vectorizer settings (n-gram range, min_df, max_df) for topic representation
-  5. System generates and caches embeddings separately to prevent 30-120 sec regeneration on parameter changes
-  6. User sees progress indicators for long-running operations (embedding generation, model training)
-  7. User sees basic topic list view with topic IDs, labels, and document counts after successful training
-  8. System creates first checkpoint (timestamp, config, model object, metadata) automatically when user proceeds to next step
-  9. User is prompted to save checkpoint when navigating backward to earlier steps
-**Plans**: TBD
-**UI hint**: yes
-**Pitfall Prevention**: Memory explosion from uncached embeddings (cache with @st.cache_data), UMAP/HDBSCAN parameter coupling confusion (add guidance and presets), checkpoint serialization size (use pickle protocol 5 for large models)
-
-### Phase 08: Model Configuration & Training
 **Goal**: Users can configure topic model parameters, train models with cached embeddings, and save checkpoints to persistent storage, establishing the ML caching patterns and checkpoint integration that enable iterative refinement
 **Depends on**: Phase 07
 **Requirements**: TM-04
@@ -136,37 +118,13 @@ Plans:
   7. System creates persistent checkpoint (config.json, model.pkl, embeddings.npy, metadata.json, dataset_fingerprint.txt) automatically when user proceeds to next step
   8. Checkpoint includes all trained model state and embeddings for fast reload across sessions
   9. User is prompted to save checkpoint when navigating backward to earlier steps
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Parameter configuration UI + cached embedding generation + model training
+- [ ] 08-02-PLAN.md — Results display + checkpoint auto-save + navigation guards
 **UI hint**: yes
 **Pitfall Prevention**: Memory explosion from uncached embeddings (cache with @st.cache_data), UMAP/HDBSCAN parameter coupling confusion (add guidance and presets), checkpoint serialization size (monitor pickle protocol 5 overhead, typical checkpoint 50-500 MB), embeddings storage (include in checkpoint for fast reload)
-
-### Phase 09: Basic Visualization
-**Goal**: Users can visualize initial topic model results with hierarchical structure and topic-document assignments, providing validation feedback before refinement
-**Depends on**: Phase 07
-**Requirements**: TM-08
-**Success Criteria** (what must be TRUE):
-  1. User can view an interactive hierarchical topic dendrogram showing topic relationships and clustering structure
-  2. User can see a topic info table displaying topic ID, representative terms, document count, and hierarchy level
-  3. User can view document-topic assignments showing which papers are assigned to each topic
-  4. System caches visualization generation to prevent memory leaks from 10-50 MB Plotly figures
-**Plans**: TBD
-**UI hint**: yes
-**Pitfall Prevention**: Plotly visualization memory leak (cache HTML not figure objects, use st.empty() containers)
-
-### Phase 09: Outlier Reduction Comparison
-**Goal**: Users can adjust UMAP/HDBSCAN parameters to minimize outliers and compare current results against any previously saved checkpoint, demonstrating v2.0's core value proposition of checkpoint-based iterative refinement
-**Depends on**: Phase 08
-**Requirements**: TM-04
-**Success Criteria** (what must be TRUE):
-  1. User can adjust UMAP/HDBSCAN parameters and retrain model (reusing cached embeddings)
-  2. User can select any previous checkpoint from dropdown (showing timestamp, topic count, outlier %) for comparison
-  3. User sees side-by-side comparison (2 columns) showing "Current" vs "Selected Checkpoint" with metrics: outlier count, total topics, average topic size, sample topic labels
-  4. User sees full parameter configuration displayed for both Current and Selected Checkpoint
-  5. System creates new checkpoint automatically when user proceeds to next step
-  6. System prompts user to save checkpoint when navigating backward to earlier steps
-**Plans**: TBD
-**UI hint**: yes
-**Pitfall Prevention**: Retraining overhead (reuse embeddings across parameter variations, show progress clearly), comparison state leakage (ensure checkpoint is deep copy of model), parameter coupling confusion (provide presets with rationale), checkpoint memory usage (monitor pickle size for large models)
 
 ### Phase 09: Basic Visualization
 **Goal**: Users can visualize initial topic model results with hierarchical structure and topic-document assignments, providing validation feedback before refinement
