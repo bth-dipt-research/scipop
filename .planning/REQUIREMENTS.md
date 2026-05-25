@@ -44,7 +44,7 @@ Requirements for v2.0 Interactive Topic Modeling milestone. Each maps to exactly
 
 ### Model Configuration
 
-- [ ] **TM-04**: User can configure and run topic model with adjustable parameters (UMAP, HDBSCAN, vectorizer, embedding) with cached embeddings and checkpoint integration
+- [x] **TM-04**: User can configure and run topic model with adjustable parameters (UMAP, HDBSCAN, vectorizer, embedding) with cached embeddings and checkpoint integration
 
 ### Iterative Refinement
 
@@ -115,10 +115,10 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TM-01 | Phase 06 | Pending |
-| TM-02 | Phase 06 | Pending |
-| TM-03 | Phase 07 | Pending |
-| TM-04 | Phase 08 | In Progress |
+| TM-01 | Phase 06 | Satisfied |
+| TM-02 | Phase 06 | Satisfied |
+| TM-03 | Phase 07 | Satisfied |
+| TM-04 | Phase 08 | Satisfied |
 | TM-09 | Phase 09 | Pending |
 | TM-05 | Phase 10 | Pending |
 | TM-06 | Phase 11 | Pending |
