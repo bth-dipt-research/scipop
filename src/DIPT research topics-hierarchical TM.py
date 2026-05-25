@@ -645,6 +645,42 @@ elif st.session_state.step == 3:
         finally:
             st.session_state.training_in_progress = False
             st.rerun()
+    
+    # Display Results (if model trained)
+    if st.session_state.trained_model is not None:
+        st.divider()
+        st.subheader("Training Results")
+        
+        topic_model = st.session_state.trained_model
+        topics_list = st.session_state.topics
+        
+        # Get topic info
+        topic_info = topic_model.get_topic_info()
+        
+        # Filter out -1 (outliers) for cleaner display, but show outlier count separately
+        outlier_count = len([t for t in topics_list if t == -1])
+        total_docs = len(topics_list)
+        
+        st.write(f"**Topics found:** {len(topic_info) - 1} topics ({outlier_count} outliers out of {total_docs} documents)")
+        
+        # Display topic dataframe (all topics with ID, label, count)
+        # Rename columns for clarity
+        display_df = topic_info[['Topic', 'Name', 'Count']].copy()
+        display_df = display_df[display_df['Topic'] != -1]  # Hide outlier row for cleaner view
+        display_df.columns = ['Topic ID', 'Representative Terms', 'Document Count']
+        
+        st.dataframe(
+            display_df,
+            use_container_width=True,
+            hide_index=True
+        )
+        
+        # Show outlier details separately
+        if outlier_count > 0:
+            with st.expander(f"ℹ️ Outliers ({outlier_count} documents)"):
+                st.write("Outliers are documents that don't fit well into any topic. These are labeled as Topic -1.")
+                outlier_percentage = (outlier_count / total_docs) * 100
+                st.write(f"**Outlier rate:** {outlier_percentage:.1f}%")
 
 
 # # Making sure we have a paper id and create a citation id.
