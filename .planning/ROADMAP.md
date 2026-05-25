@@ -121,7 +121,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Parameter configuration UI + cached embedding generation + model training
+- [x] 08-01-PLAN.md — Parameter configuration UI + cached embedding generation + model training
 - [ ] 08-02-PLAN.md — Results display + checkpoint auto-save + navigation guards
 **UI hint**: yes
 **Pitfall Prevention**: Memory explosion from uncached embeddings (cache with @st.cache_data), UMAP/HDBSCAN parameter coupling confusion (add guidance and presets), checkpoint serialization size (monitor pickle protocol 5 overhead, typical checkpoint 50-500 MB), embeddings storage (include in checkpoint for fast reload)
@@ -224,7 +224,7 @@ Plans:
 | 05. UI Polish | v1.0 | 3/3 | Complete | 2026-04-10 |
 | 06. Data Upload & Filtering | v2.0 | 2/2 | Complete | 2026-05-01 |
 | 07. Checkpoint Infrastructure | v2.0 | 2/2 | Complete | 2026-05-01 |
-| 08. Model Configuration & Training | v2.0 | 0/TBD | Not started | - |
+| 08. Model Configuration & Training | v2.0 | 1/2 | In Progress | - |
 | 09. Basic Visualization | v2.0 | 0/TBD | Not started | - |
 | 10. Outlier Reduction Comparison | v2.0 | 0/TBD | Not started | - |
 | 11. Topic Labeling Comparison | v2.0 | 0/TBD | Not started | - |

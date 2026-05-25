@@ -118,12 +118,12 @@ Which phases cover which requirements. This section is refreshed during roadmap 
 | TM-01 | Phase 06 | Pending |
 | TM-02 | Phase 06 | Pending |
 | TM-03 | Phase 07 | Pending |
-| TM-08 | Phase 08 | Pending |
-| TM-04 | Phase 09 | Pending |
+| TM-04 | Phase 08 | In Progress |
+| TM-09 | Phase 09 | Pending |
 | TM-05 | Phase 10 | Pending |
 | TM-06 | Phase 11 | Pending |
 | TM-07 | Phase 12 | Pending |
-| TM-09 | Phase 13 | Pending |
+| TM-08 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.0 requirements: 13 total → 13 mapped ✓
