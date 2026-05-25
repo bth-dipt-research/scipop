@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Interactive Topic Modeling
 status: in_progress
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-05-25T20:11:48Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-05-25T20:17:12Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 5
-  completed_plans: 5
-  percent: 31.25
+  completed_plans: 6
+  percent: 37.5
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-29)
 
 **Core value:** Anyone can reliably access and understand the approved research syntheses through a simple, shareable public website.
-**Current focus:** v2.0 Interactive Topic Modeling — Phase 08 Plan 01 complete
+**Current focus:** v2.0 Interactive Topic Modeling — Phase 08 complete
 
 ## Current Position
 
-Phase: 08 of 13 (Model Configuration & Training) - **IN PROGRESS**
-Plans: 1 of 2 complete
-Status: Plan 08-01 complete (parameter configuration UI + cached ML pipeline)
-Last activity: 2026-05-25 — Plan 08-01 executed (Step 3 with 8 parameter widgets, cached embedding generation, model training)
+Phase: 08 of 13 (Model Configuration & Training) - **COMPLETE**
+Plans: 2 of 2 complete
+Status: Phase 08 complete (parameter configuration, training, results display, checkpoint integration, navigation guards)
+Last activity: 2026-05-25 — Plan 08-02 executed (topic results dataframe, checkpoint auto-save on proceed, navigation guards with save prompts)
 
-Progress: [███░░░░░░░] 31.25% (5/16 plans complete)
+Progress: [████░░░░░░] 37.5% (6/16 plans complete)
 
 ## Accumulated Context
 
@@ -56,6 +56,10 @@ Recent decisions affecting v2.0:
 - [Phase 08 Plan 01]: Cached embedding generation with @st.cache_data and dataset fingerprint cache key prevents 30-120 sec regeneration on parameter changes
 - [Phase 08 Plan 01]: Parameter pre-fill from loaded checkpoint with fallback to notebook defaults
 - [Phase 08 Plan 01]: UI state management during long operations using training_in_progress flag to disable widgets and prevent state corruption
+- [Phase 08 Plan 02]: Topic results display all topics (excluding outlier row -1) in sortable dataframe with outlier details in expandable section
+- [Phase 08 Plan 02]: Checkpoint auto-save integrated with navigation flow — saves only on "Proceed to Next Step", blocks navigation on save failure
+- [Phase 08 Plan 02]: Navigation guards always prompt on backward navigation from Step 3 — no session memory, prioritizes safety
+- [Phase 08 Plan 02]: Navigation guard prompts render in sidebar near 9-step navigation buttons where click originated
 
 ### Pending Todos
 
@@ -68,8 +72,8 @@ None. Phase 07 complete with human verification approved.
 ## Session Continuity
 
 Last session: 2026-05-25
-Stopped at: Completed 08-01-PLAN.md — Step 3 parameter configuration + cached ML pipeline
-Resume file: .planning/phases/08-model-configuration-training/08-01-SUMMARY.md
+Stopped at: Completed 08-02-PLAN.md — Step 3 results display + checkpoint auto-save + navigation guards
+Resume file: .planning/phases/08-model-configuration-training/08-02-SUMMARY.md
 
 ---
-*Next step:* `/gsd-execute-phase 08` to execute Plan 08-02 (results display + checkpoint auto-save + navigation guards)
+*Next step:* `/gsd-plan-phase 09` to plan Phase 09: Basic Visualization or `/gsd-verify-work 08` to verify Phase 08 implementation
