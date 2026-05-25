@@ -10,6 +10,8 @@ import hashlib
 import sys
 import shutil
 import tempfile
+import time
+import numpy as np
 import streamlit as st
 import pandas as pd
 from bertopic import BERTopic
@@ -45,6 +47,25 @@ def load_dataframe(file_bytes: bytes, filename: str) -> pd.DataFrame:
 
 # Note: Using checkpoint_manager.compute_dataset_fingerprint for all fingerprinting
 # to ensure consistency with checkpoint validation
+
+
+@st.cache_data
+def generate_embeddings(input_texts: list, dataset_fingerprint: str):
+    """
+    Generate embeddings with caching by dataset fingerprint.
+    
+    Args:
+        input_texts: List of text strings to embed
+        dataset_fingerprint: SHA-256 fingerprint from Phase 06
+        
+    Returns:
+        np.ndarray of embeddings
+    """
+    from sentence_transformers import SentenceTransformer
+    
+    sentence_model = SentenceTransformer("all-MiniLM-L6-v2")
+    embeddings = sentence_model.encode(input_texts, show_progress_bar=False)
+    return embeddings
 
 
 def goto(step: int):
@@ -548,6 +569,82 @@ elif st.session_state.step == 3:
         
         **For more descriptive labels:** Increase `ngram_max` to 3 to capture multi-word phrases.
         """)
+    
+    st.divider()
+    
+    # Training Section
+    st.subheader("Train Model")
+    
+    # Initialize session state for trained model
+    if 'trained_model' not in st.session_state:
+        st.session_state.trained_model = None
+    if 'embeddings' not in st.session_state:
+        st.session_state.embeddings = None
+    if 'topics' not in st.session_state:
+        st.session_state.topics = None
+    if 'probs' not in st.session_state:
+        st.session_state.probs = None
+    
+    # Train button
+    if st.button("Train Model", disabled=st.session_state.training_in_progress, type="primary"):
+        st.session_state.training_in_progress = True
+        st.rerun()
+    
+    # Execute training if flag is set (D-12 disable inputs during operation)
+    if st.session_state.training_in_progress:
+        try:
+            # Step 1: Generate or retrieve cached embeddings
+            input_texts = st.session_state.df_filtered[st.session_state.input].apply(
+                lambda row: '. '.join(row.dropna().astype(str)), axis=1
+            ).tolist()
+            
+            # Check if embeddings are cached
+            embeddings = generate_embeddings(input_texts, st.session_state.dataset_fingerprint)
+            
+            # Show cache hit message (D-11)
+            st.success('✓ Using cached embeddings')
+            
+            # Step 2: Train model with progress indicator (D-10 elapsed time)
+            with st.spinner("Training model..."):
+                import time
+                
+                start_time = time.time()
+                
+                # Initialize model components from config
+                umap_config = st.session_state.model_config['umap']
+                hdbscan_config = st.session_state.model_config['hdbscan']
+                vectorizer_config = st.session_state.model_config['vectorizer']
+                
+                umap_model = UMAP(**umap_config)
+                hdbscan_model = HDBSCAN(**hdbscan_config)
+                vectorizer_model = CountVectorizer(**vectorizer_config)
+                
+                # Create and train BERTopic model
+                topic_model = BERTopic(
+                    umap_model=umap_model,
+                    hdbscan_model=hdbscan_model,
+                    vectorizer_model=vectorizer_model,
+                    verbose=False
+                )
+                
+                topics, probs = topic_model.fit_transform(input_texts, embeddings)
+                
+                elapsed = int(time.time() - start_time)
+                
+                # Store results in session state
+                st.session_state.trained_model = topic_model
+                st.session_state.embeddings = embeddings
+                st.session_state.topics = topics
+                st.session_state.probs = probs
+                
+                st.success(f"✓ Model trained in {elapsed}s — {len(topic_model.get_topics())} topics found")
+                
+        except Exception as e:
+            st.error(f"Training failed: {e}")
+        
+        finally:
+            st.session_state.training_in_progress = False
+            st.rerun()
 
 
 # # Making sure we have a paper id and create a citation id.
