@@ -372,6 +372,183 @@ elif st.session_state.step == 2:
                   on_click=lambda: goto(3),
                   disabled=not ready)
 
+elif st.session_state.step == 3:
+    st.header("Step 3: Model Configuration & Training")
+    
+    st.write("Configure topic model parameters and train your model.")
+    
+    # Pre-fill defaults from checkpoint if available (D-04)
+    if st.session_state.loaded_checkpoint is not None:
+        checkpoint_config = st.session_state.loaded_checkpoint['config']
+        default_n_neighbors = checkpoint_config.get('umap', {}).get('n_neighbors', 15)
+        default_n_components = checkpoint_config.get('umap', {}).get('n_components', 5)
+        default_min_dist = checkpoint_config.get('umap', {}).get('min_dist', 0.0)
+        default_min_cluster_size = checkpoint_config.get('hdbscan', {}).get('min_cluster_size', 15)
+        default_min_samples = checkpoint_config.get('hdbscan', {}).get('min_samples', 5)
+        default_ngram_min = checkpoint_config.get('vectorizer', {}).get('ngram_range', [1, 2])[0]
+        default_ngram_max = checkpoint_config.get('vectorizer', {}).get('ngram_range', [1, 2])[1]
+        default_min_df = checkpoint_config.get('vectorizer', {}).get('min_df', 2)
+        default_max_df = checkpoint_config.get('vectorizer', {}).get('max_df', 0.95)
+    else:
+        # Hard-coded defaults from notebook workflow (experiments/BTH research topics.ipynb)
+        default_n_neighbors = 15
+        default_n_components = 5
+        default_min_dist = 0.0
+        default_min_cluster_size = 15
+        default_min_samples = 5
+        default_ngram_min = 1
+        default_ngram_max = 2
+        default_min_df = 2
+        default_max_df = 0.95
+    
+    # Initialize training_in_progress flag
+    if 'training_in_progress' not in st.session_state:
+        st.session_state.training_in_progress = False
+    
+    # UMAP Parameters Section
+    st.subheader("UMAP Parameters")
+    n_neighbors = st.slider(
+        "n_neighbors",
+        min_value=5,
+        max_value=100,
+        value=default_n_neighbors,
+        help="Number of neighbors for UMAP. Lower = more local structure, Higher = more global structure.",
+        disabled=st.session_state.training_in_progress
+    )
+    n_components = st.slider(
+        "n_components",
+        min_value=2,
+        max_value=20,
+        value=default_n_components,
+        help="Dimensionality of UMAP output. Lower = simpler, Higher = preserves more variance.",
+        disabled=st.session_state.training_in_progress
+    )
+    min_dist = st.slider(
+        "min_dist",
+        min_value=0.0,
+        max_value=1.0,
+        value=default_min_dist,
+        step=0.1,
+        help="Minimum distance between points in UMAP space. 0.0 = tight clusters, 1.0 = spread out.",
+        disabled=st.session_state.training_in_progress
+    )
+    
+    st.divider()  # D-03
+    
+    # HDBSCAN Parameters Section
+    st.subheader("HDBSCAN Parameters")
+    min_cluster_size = st.slider(
+        "min_cluster_size",
+        min_value=5,
+        max_value=100,
+        value=default_min_cluster_size,
+        help="Minimum size of a cluster. Lower = more granular topics, Higher = fewer broad topics.",
+        disabled=st.session_state.training_in_progress
+    )
+    min_samples = st.slider(
+        "min_samples",
+        min_value=1,
+        max_value=50,
+        value=default_min_samples,
+        help="Minimum number of samples for core points. Lower = more noise, Higher = stricter clustering.",
+        disabled=st.session_state.training_in_progress
+    )
+    
+    st.divider()  # D-03
+    
+    # Vectorizer Parameters Section
+    st.subheader("Vectorizer Parameters")
+    ngram_min = st.number_input(
+        "n-gram min",
+        min_value=1,
+        max_value=3,
+        value=default_ngram_min,
+        help="Minimum n-gram size (1 = single words).",
+        disabled=st.session_state.training_in_progress
+    )
+    ngram_max = st.number_input(
+        "n-gram max",
+        min_value=1,
+        max_value=5,
+        value=default_ngram_max,
+        help="Maximum n-gram size (2 = bigrams).",
+        disabled=st.session_state.training_in_progress
+    )
+    min_df = st.number_input(
+        "min_df",
+        min_value=1,
+        max_value=20,
+        value=default_min_df,
+        help="Minimum document frequency (ignore rare terms).",
+        disabled=st.session_state.training_in_progress
+    )
+    max_df = st.slider(
+        "max_df",
+        min_value=0.5,
+        max_value=1.0,
+        value=default_max_df,
+        step=0.05,
+        help="Maximum document frequency (ignore common terms).",
+        disabled=st.session_state.training_in_progress
+    )
+    
+    # Store config in session state for checkpoint save
+    st.session_state.model_config = {
+        'umap': {
+            'n_neighbors': n_neighbors,
+            'n_components': n_components,
+            'min_dist': min_dist,
+            'metric': 'cosine',
+            'random_state': 42
+        },
+        'hdbscan': {
+            'min_cluster_size': min_cluster_size,
+            'min_samples': min_samples,
+            'metric': 'euclidean',
+            'cluster_selection_method': 'eom',
+            'prediction_data': True
+        },
+        'vectorizer': {
+            'ngram_range': (ngram_min, ngram_max),
+            'min_df': min_df,
+            'max_df': max_df,
+            'stop_words': 'english'
+        },
+        'embedding': {
+            'model': 'all-MiniLM-L6-v2'
+        }
+    }
+    
+    # Parameter Guide (D-05/D-06/D-08)
+    with st.expander("▶ Need help? Click for parameter explanations"):
+        st.markdown("""
+        ### Parameter Reference
+        
+        **UMAP Parameters:**
+        - **n_neighbors (5-100):** Controls balance between local and global structure. Lower values (5-15) preserve fine-grained local structure, higher values (50-100) capture broader global patterns.
+        - **n_components (2-20):** Dimensionality of the embedding space. 5 is typical for clustering; higher values preserve more variance but slow computation.
+        - **min_dist (0.0-1.0):** How tightly UMAP packs points. 0.0 creates tight clusters, 1.0 spreads points evenly.
+        
+        **HDBSCAN Parameters:**
+        - **min_cluster_size (5-100):** Minimum documents per topic. Lower = more granular topics, higher = fewer broad topics.
+        - **min_samples (1-50):** Core point threshold. Lower = more noise allowed, higher = stricter clustering.
+        
+        **Vectorizer Parameters:**
+        - **n-gram range (1-1 to 1-5):** Word sequence length. (1,1) = single words, (1,2) = words + bigrams.
+        - **min_df (1-20):** Minimum document frequency. Filters out rare terms.
+        - **max_df (0.5-1.0):** Maximum document frequency. Filters out common terms (0.95 = ignore terms in >95% of docs).
+        
+        ### Workflow Tips
+        
+        **For more granular topics:** Decrease `min_cluster_size` (e.g., 10-15) and `n_neighbors` (e.g., 10-15).
+        
+        **For broader topics:** Increase `min_cluster_size` (e.g., 30-50) and `n_neighbors` (e.g., 30-50).
+        
+        **To reduce outliers:** Increase `min_samples` (e.g., 10-20) or decrease `min_dist` (e.g., 0.0).
+        
+        **For more descriptive labels:** Increase `ngram_max` to 3 to capture multi-word phrases.
+        """)
+
 
 # # Making sure we have a paper id and create a citation id.
 
