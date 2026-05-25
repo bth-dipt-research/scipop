@@ -11,6 +11,7 @@ import sys
 import shutil
 import tempfile
 import time
+from datetime import datetime
 import numpy as np
 import streamlit as st
 import pandas as pd
@@ -681,6 +682,55 @@ elif st.session_state.step == 3:
                 st.write("Outliers are documents that don't fit well into any topic. These are labeled as Topic -1.")
                 outlier_percentage = (outlier_count / total_docs) * 100
                 st.write(f"**Outlier rate:** {outlier_percentage:.1f}%")
+    
+    # Navigation (Proceed to Next Step)
+    if st.session_state.trained_model is not None:
+        st.divider()
+        
+        if st.button("Proceed to Next Step", type="primary"):
+            # Auto-save checkpoint (D-13)
+            try:
+                # Extract dataset name from session state (set in Phase 06)
+                dataset_name = st.session_state.uploaded.name if st.session_state.uploaded else "unknown"
+                # Remove file extension
+                if '.' in dataset_name:
+                    dataset_name = dataset_name.rsplit('.', 1)[0]
+                
+                # Prepare metadata
+                metadata = {
+                    'timestamp': datetime.now().isoformat(),
+                    'dataset_name': dataset_name,
+                    'topic_count': len(st.session_state.trained_model.get_topics()) - 1,  # Exclude outlier topic -1
+                    'outlier_count': len([t for t in st.session_state.topics if t == -1]),
+                    'total_documents': len(st.session_state.topics),
+                    'outlier_percentage': (len([t for t in st.session_state.topics if t == -1]) / len(st.session_state.topics)) * 100
+                }
+                
+                # Save checkpoint (D-16: timestamp + dataset name)
+                with st.spinner("Saving checkpoint..."):
+                    checkpoint_dir = save_checkpoint(
+                        config=st.session_state.model_config,
+                        metadata=metadata,
+                        model=st.session_state.trained_model,
+                        embeddings=st.session_state.embeddings,
+                        dataset_fingerprint=st.session_state.dataset_fingerprint
+                    )
+                
+                st.success(f"✓ Checkpoint saved: {checkpoint_dir.name}")
+                
+                # Update available checkpoints list for Phase 07 UI
+                st.session_state.available_checkpoints = list_checkpoints()
+                
+                # Advance to Step 4 (Phase 09: Basic Visualization)
+                goto(4)
+                
+            except Exception as e:
+                # Block navigation on failure (D-14)
+                st.error(f"❌ Checkpoint save failed: {e}")
+                st.error("Cannot proceed to next step until checkpoint is saved. Please resolve the issue (disk space, permissions) and try again.")
+    else:
+        # Show message if no model trained yet
+        st.info("Train a model to proceed to the next step")
 
 
 # # Making sure we have a paper id and create a citation id.
