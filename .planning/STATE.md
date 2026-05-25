@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Interactive Topic Modeling
 status: ready_to_plan
-stopped_at: Phase 07 complete — ready to plan Phase 08
-last_updated: "2026-05-01T00:00:00.000Z"
-last_activity: 2026-05-01
+stopped_at: Phase 08 context gathered
+last_updated: "2026-05-25T00:00:00.000Z"
+last_activity: 2026-05-25
 progress:
   total_phases: 8
   completed_phases: 2
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-29)
 
 **Core value:** Anyone can reliably access and understand the approved research syntheses through a simple, shareable public website.
-**Current focus:** v2.0 Interactive Topic Modeling — Phase 07 complete, ready to plan Phase 08
+**Current focus:** v2.0 Interactive Topic Modeling — Phase 08 context gathered, ready to plan
 
 ## Current Position
 
-Phase: 07 of 13 (Checkpoint Infrastructure) - **COMPLETE**
-Plans: 2 of 2 complete
+Phase: 08 of 13 (Model Configuration & Training) - **CONTEXT GATHERED**
+Plans: 0 of TBD
 Status: Ready to plan Phase 08
-Last activity: 2026-05-01 — Phase 07 execution complete (2 plans, 7 commits)
+Last activity: 2026-05-25 — Phase 08 context discussion complete (20 implementation decisions captured)
 
 Progress: [██░░░░░░░░] 25.0% (2/8 phases complete)
 
@@ -48,6 +48,11 @@ Recent decisions affecting v2.0:
 - [Phase 07]: Checkpoint paths resolved relative to PROJECT_ROOT to work from any working directory
 - [Phase 07]: 9-step workflow navigation provides clear progress visibility through entire v2.0 workflow
 - [Phase 07]: Fingerprint validation blocks loading mismatched checkpoints with clear error messages
+- [Phase 08]: Single scrolling form for all parameters (UMAP, HDBSCAN, vectorizer) visible at once with divider separators
+- [Phase 08]: No preset buttons — user wants full manual control for parameter tuning (diverges from roadmap mention but explicit preference)
+- [Phase 08]: Spinner with elapsed time for both embedding generation (30-120 sec) and model training (10-60 sec) operations
+- [Phase 08]: Auto-save checkpoint only on "Proceed to Next Step" button (no manual save button for simpler UI)
+- [Phase 08]: Always prompt on backward navigation with save options — prioritizes data safety over convenience
 
 ### Pending Todos
 
@@ -59,9 +64,9 @@ None. Phase 07 complete with human verification approved.
 
 ## Session Continuity
 
-Last session: 2026-05-01
-Stopped at: Phase 07 complete — 2 plans executed, 7 commits (e7a9358, 1943c06, 88d4a6b, 6663459, b8aebca, 56a5635, aeffa4c)
-Resume file: .planning/ROADMAP.md
+Last session: 2026-05-25
+Stopped at: Phase 08 context gathered — 20 implementation decisions captured (D-01 through D-20)
+Resume file: .planning/phases/08-model-configuration-training/08-CONTEXT.md
 
 ---
 *Next step:* `/gsd-plan-phase 08` to create execution plans for Model Configuration & Training
